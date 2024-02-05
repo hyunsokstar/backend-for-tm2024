@@ -1,0 +1,1 @@
+DELETE FROM tech_notes_model;

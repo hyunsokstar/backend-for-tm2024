@@ -1,0 +1,11 @@
+{
+  "prettier/prettier": [
+    "error",
+    {
+      "tabWidth": 4
+    },
+    {
+      "usePrettierrc": true
+    }
+  ]
+}
