@@ -176,27 +176,18 @@ export class TodosService {
     async saveTodos(todoRowsForSave: any[]): Promise<any> {
         console.log("todoRowsForSave : ", todoRowsForSave);
         console.log("todoRowsForSave.length : ", todoRowsForSave.length);
-
         let count = 0;
 
         for (const todo of todoRowsForSave) {
             const { id, email, nickname, task, ...data } = todo;
-            console.log("todo.email : ", todo.email);
-
             const startedAt = new Date(todo.startTime).getTime();
             const currentDeadline = new Date().getTime();
-            console.log("currentDeadline : ", currentDeadline);
-            console.log("startedAt : ", startedAt);
             const timeDifferenceInMilliseconds = currentDeadline - startedAt;
-            // const timeDifferenceAsTimestamp = new Date(timeDifferenceInMilliseconds).toISOString();
-
             const hoursDifference = Math.floor(timeDifferenceInMilliseconds / (1000 * 60 * 60)); // 시간
             const minutesDifference = Math.floor((timeDifferenceInMilliseconds % (1000 * 60 * 60)) / (1000 * 60)); // 분
 
-
             // 이메일로 해당하는 유저를 찾음
             const manager = await this.usersRepository.findOne({ where: { email: todo.email } });
-            console.log("manager : ", manager);
 
             if (!manager) {
                 throw new NotFoundException('User not found email is required !!');
@@ -302,11 +293,8 @@ export class TodosService {
             console.log("currentDeadline : ", currentDeadline);
             console.log("startedAt : ", startedAt);
             const timeDifferenceInMilliseconds = currentDeadline - startedAt;
-            // const timeDifferenceAsTimestamp = new Date(timeDifferenceInMilliseconds).toISOString();
-
             const hoursDifference = Math.floor(timeDifferenceInMilliseconds / (1000 * 60 * 60)); // 시간
             const minutesDifference = Math.floor((timeDifferenceInMilliseconds % (1000 * 60 * 60)) / (1000 * 60)); // 분
-
 
             // 이메일로 해당하는 유저를 찾음
             const manager = await this.usersRepository.findOne({ where: { email: todo.email } });

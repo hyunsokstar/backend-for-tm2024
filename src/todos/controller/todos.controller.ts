@@ -31,8 +31,7 @@ export class TodosController {
         @Query('perPage') perPage = 200,
         @Query('todoStatusOption') todoStatusOption,
     ): Promise<{ usersEmailInfo: string[], todoList: TodosModel[], totalCount: number, perPage: number }> {
-        console.log("요청 확인 for todo list ???");
-
+        // console.log("요청 확인 for todo list ???");
         return this.todosService.getTodoListForUserId(pageNum, perPage, userId, todoStatusOption);
     }
 
