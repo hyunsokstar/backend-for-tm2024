@@ -12,7 +12,6 @@ export class AuthMiddleware implements NestMiddleware {
     use(req: Request, res: any, next: Function) {
         const accessTokenSecret = this.configService.get<string>('ACCESS_TOKEN_SECRET');
         // console.log("accessTokenSecret : ", accessTokenSecret);
-        // console.log("미들웨어 실행 확인 ");
 
         // 헤더에서 토큰 추출
         const authHeader = req.headers['authorization'];
@@ -32,10 +31,6 @@ export class AuthMiddleware implements NestMiddleware {
             };
 
             console.log("req['user'] ::: ", req['user']);
-            // if (req['user']) {
-            //     next()
-            // }
-
         } catch (error) {
             // console.log("error :?? ", error);
             // console.log("token 유효 기간 지남");
