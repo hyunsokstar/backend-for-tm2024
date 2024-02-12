@@ -10,7 +10,7 @@ export class TodoBriefingController {
     async addBriefingToTodo(
         @Param('todoId') todoId: string, // todoId를 경로 파라미터로 받음
         @Body() addTodoBriefingDto: AddTodoBriefingDto,
-        @Req() req: Request,
+        @Req() req,
     ): Promise<any> {
         return this.todoBriefingService.addTodoBriefing(todoId, addTodoBriefingDto);
     }

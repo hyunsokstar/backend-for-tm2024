@@ -97,7 +97,7 @@ export class UsersController {
   }
 
   @Post("login-check-by-accessToken")
-  async loginCheckByAccessToken(@Req() req: Request, @Res() response) {
+  async loginCheckByAccessToken(@Req() req, @Res() response) {
     console.log("login check by accessToken");
 
     try {
@@ -139,7 +139,7 @@ export class UsersController {
   }
 
   @Post("login-check-by-refreshToken")
-  async loginCheckByRefreshToken(@Req() req: Request, @Res() response) {
+  async loginCheckByRefreshToken(@Req() req, @Res() response) {
 
     try {
       const authorizationHeader = req.headers['authorization'] as string;
@@ -226,15 +226,15 @@ export class UsersController {
   }
 
   @Post('follow')
-  async followUser(@Body('targetUserId') targetUserId: number, @Req() req: Request): Promise<any> {
+  async followUser(@Body('targetUserId') targetUserId: number, @Req() req): Promise<any> {
     // 로그인 여부 확인
-    if (!req['user']) {
+    if (!req.user) {
       throw new UnauthorizedException('로그인이 필요합니다.');
     }
 
     try {
       // 현재 로그인된 사용자의 아이디를 가져옴
-      const userId = req['user'].id; // 이 부분은 실제 로그인 사용자의 아이디를 가져오는 방법에 따라 달라질 수 있습니다.
+      const userId = req.user.id; // 이 부분은 실제 로그인 사용자의 아이디를 가져오는 방법에 따라 달라질 수 있습니다.
 
       // followUser 함수에 직접 targetUserId와 userId를 전달하여 호출
       await this.usersService.followUser({ userId, targetUserId });
@@ -259,14 +259,14 @@ export class UsersController {
   }
 
   @Delete('unfollow')
-  async unfollowUser(@Body('targetUserId') targetUserId: number, @Req() req: Request): Promise<any> {
+  async unfollowUser(@Body('targetUserId') targetUserId: number, @Req() req): Promise<any> {
     // 로그인 여부 확인
-    if (!req['user']) {
+    if (!req.user) {
       throw new UnauthorizedException('로그인이 필요합니다.');
     }
 
     try {
-      const userId = req['user'].id; // 현재 로그인된 사용자의 아이디
+      const userId = req.user.id; // 현재 로그인된 사용자의 아이디
 
       await this.usersService.unfollowUser({ userId, targetUserId });
       return {

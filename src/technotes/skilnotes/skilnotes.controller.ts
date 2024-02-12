@@ -14,7 +14,7 @@ export class SkilnotesController {
     async getAllTechNoteList(
         @Query('pageNum') pageNum = 1,
         @Query('perPage') perPage = 10,
-        @Req() req: Request
+        @Req() req
     ) {
 
         console.log("pageNum at controller : ", pageNum);
@@ -64,9 +64,9 @@ export class SkilnotesController {
     }
 
     @Post('saveRows')
-    async saveSkilNoteRows(@Body() dataForNoteRows: dtoForCreateSkilNoteContent[], @Req() req: Request) {
+    async saveSkilNoteRows(@Body() dataForNoteRows: dtoForCreateSkilNoteContent[], @Req() req) {
         console.log("dataForNoteRows : ", dataForNoteRows)
-        const loginUser = req['user']
+        const loginUser = req.user
         return this.skilnoteService.saveSkilNoteRows(dataForNoteRows, loginUser);
     }
 
@@ -74,13 +74,13 @@ export class SkilnotesController {
     @UseGuards(AuthGuard)
     @Post(':skilNoteId/contents/:pageNum')
     async createSkilNoteContents(
-        @Req() req: Request,
+        @Req() req,
         @Body() dto: dtoForCreateSkilNoteContent,
         @Param('skilNoteId') skilNoteId: string,
         @Param('pageNum') pageNum: string,
         @Res() response
     ) {
-        const loginUser = req['user'];
+        const loginUser = req.user;
         console.log("pageNum : ", pageNum);
 
         console.log("loginUser at create skilnote contents: ", loginUser);
@@ -110,12 +110,12 @@ export class SkilnotesController {
     @UseGuards(AuthGuard)
     @Put('content/:skilNoteContentId')
     async updateSkilNoteContent(
-        @Req() req: Request,
+        @Req() req,
         @Param('skilNoteContentId') skilNoteContentId: string,
         @Body() dto: dtoForCreateSkilNoteContent,
         @Res() response
     ) {
-        const loginUser = req['user'];
+        const loginUser = req.user;
 
         if (!loginUser) {
 
@@ -132,11 +132,11 @@ export class SkilnotesController {
     @UseGuards(AuthGuard)
     @Delete('content/deleteByCheckedIds')
     async deleteSkilNoteContentsByCheckedIds(
-        @Req() req: Request,
+        @Req() req,
         @Body() checkedIds: DeleteSkilNoteContentsDto,
         @Res() response
     ) {
-        const loginUser = req['user'];
+        const loginUser = req.user;
 
         if (!loginUser) {
         }
@@ -194,7 +194,7 @@ export class SkilnotesController {
     // }
     @Post('/bookMarkSkilNoteContent')
     async toggleBookMarkForSkilNoteContent(
-        @Req() req: Request,
+        @Req() req,
         @Body() dto: { userId: number, skilNoteContentId: number }
 
     ) {

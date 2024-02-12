@@ -25,9 +25,9 @@ export class PostingsController {
     @Post()
     async createPosting(
         @Body() createPostingDto: CreatePostingDto,
-        @Req() req: Request
+        @Req() req
     ) {
-        const user = req['user'];
+        const user = req.user;
 
         if (!user) {
             // 유저 정보가 없을 때 처리 로직
@@ -60,9 +60,9 @@ export class PostingsController {
         @Param('userId') userId: string,
         @Query('pageNum') pageNum = '1',
         @Query('perPage') perPage = '10',
-        @Req() req: Request, // 요청 객체 주입
+        @Req() req, // 요청 객체 주입
     ) {
-        // console.log("req.user : ", req['user']);
+        // console.log("req.user : ", req.user);
         console.log("userId : ", userId);
 
         try {

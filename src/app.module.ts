@@ -9,7 +9,7 @@ import { TypeORMExceptionFilter } from "./filters/exceptions.filter";
 import { ConfigModule } from '@nestjs/config';
 import { UserPostingsModel } from "./postings/entities/user_postings.entity";
 import { PostingsModule } from './postings/postings.module';
-import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
 import { AuthMiddleware } from "./middlewares/AuthMiddleware";
 import { CloudflareModule } from './cloudflare/cloudflare.module';
 import { TodosModule } from './todos/todos.module';
@@ -76,24 +76,32 @@ import { SupplementaryTodoBriefingModel } from "./todos/entities/supplementary_t
 })
 // export class AppModule { }
 
+// export class AppModule implements NestModule {
+//   configure(consumer: MiddlewareConsumer) {
+//     consumer
+//       .apply(AuthMiddleware) // 사용할 미들웨어
+//       // .forRoutes('/users/login-check-by-accessToken');
+//       // .forRoutes(
+//       //   '/users/login-check-by-accessToken',
+//       //   '/users/login-check-by-refreshToken'
+//       // ); // 적용할 경로 설정
+//       .forRoutes(
+//         // '/users/login-check-by-accessToken',
+//         // '/users/login-check-by-refreshToken',
+//         '/technotes/saveTechNotes',
+//         '/skilnotes/saveRows',
+//         '/skilnotes/:skilNoteId/contents/:pageNum',
+//         '/skilnotes/content/:skilNoteContentId',
+//         '/skilnotes/content/deleteByCheckedIds',
+//         'todos/deleteTodosForCheckedRows'
+//       ); // 적용할 경로 설정
+//   }
+// }
+
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply(AuthMiddleware) // 사용할 미들웨어
-      // .forRoutes('/users/login-check-by-accessToken');
-      // .forRoutes(
-      //   '/users/login-check-by-accessToken',
-      //   '/users/login-check-by-refreshToken'
-      // ); // 적용할 경로 설정
-      .forRoutes(
-        // '/users/login-check-by-accessToken',
-        // '/users/login-check-by-refreshToken',
-        '/technotes/saveTechNotes',
-        '/skilnotes/saveRows',
-        '/skilnotes/:skilNoteId/contents/:pageNum',
-        '/skilnotes/content/:skilNoteContentId',
-        '/skilnotes/content/deleteByCheckedIds',
-        'todos/deleteTodosForCheckedRows'
-      ); // 적용할 경로 설정
+      .apply(AuthMiddleware)
+      .forRoutes({ path: '*', method: RequestMethod.ALL }); // 모든 경로에 대해 미들웨어 적용
   }
 }

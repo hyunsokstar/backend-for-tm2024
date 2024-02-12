@@ -31,8 +31,11 @@ export class TodosController {
         @Query('pageNum') pageNum = 1,
         @Query('perPage') perPage = 200,
         @Query('todoStatusOption') todoStatusOption,
+        @Req() req
     ): Promise<{ usersEmailInfo: string[], todoList: TodosModel[], totalCount: number, perPage: number }> {
-        // console.log("요청 확인 for todo list ???");
+        console.log("요청 확인 for todo list ???");
+        console.log("req.user : ", req.user);
+
         return this.todosService.getTodoListForUserId(pageNum, perPage, userId, todoStatusOption);
     }
 
@@ -56,9 +59,9 @@ export class TodosController {
     @Delete("/deleteTodosForCheckedRows") // DELETE 메서드로 새로운 엔드포인트를 정의합니다.
     async deleteTodosForCheckedIds(
         @Body('checkedIds') checkedIds: number[],
-        @Req() req: Request,
+        @Req() req,
     ) {
-        const loginUser = req['user'];
+        const loginUser = req.user;
         return this.todosService.deleteTodosForCheckedIds(checkedIds, loginUser);
     }
 
@@ -66,9 +69,9 @@ export class TodosController {
     @Delete("/deleteSupplementaryTodosForCheckedRows") // DELETE 메서드로 새로운 엔드포인트를 정의합니다.
     async deleteSupplementaryTodosForCheckedIds(
         @Body('checkedIds') checkedIds: number[],
-        @Req() req: Request,
+        @Req() req,
     ) {
-        const loginUser = req['user'];
+        const loginUser = req.user;
         return this.todosService.deleteSupplementaryTodosForCheckedIds(checkedIds, loginUser);
     }
 
@@ -127,8 +130,10 @@ export class TodosController {
     }
 
     @Post('/multiUpdateTodoRowsForChecked')
-    async multiUpdateTodoRowsForChecked(@Body() dtoForMultiUpdateTodoRowsForChecked: MultiUpdateTodoDto) {
+    async multiUpdateTodoRowsForChecked(@Body() dtoForMultiUpdateTodoRowsForChecked: MultiUpdateTodoDto, @Req() req) {
         console.log("dto check ??? : ", dtoForMultiUpdateTodoRowsForChecked);
+        console.log("req.user : ", req.user);
+
 
         const result = await this.todosService.multiUpdateTodoRowsForChecked(dtoForMultiUpdateTodoRowsForChecked);
 

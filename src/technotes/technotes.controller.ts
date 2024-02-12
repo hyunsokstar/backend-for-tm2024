@@ -15,9 +15,9 @@ export class TechnotesController {
         @Query('searchText') searchText = "",
         @Query('isBestByLikes') isBestByLikes = false,
         @Query('isBestByBookMarks') isBestByBookMarks = false,
-        @Req() req: Request
+        @Req() req
     ) {
-        // console.log("req['user'] 2: ", req['user']);
+        // console.log("req.user 2: ", req.user);
         return this.technotesService.getAllTechNotes(
             pageNum,
             perPage,
@@ -38,11 +38,11 @@ export class TechnotesController {
     }
 
     @Post('saveTechNotes') // API 엔드포인트 추가
-    async saveTodos(@Body() techNotesToSave: any, @Req() req: Request) {
+    async saveTodos(@Body() techNotesToSave: any, @Req() req) {
         console.log("techNotesToSave at controller : ", techNotesToSave);
-        console.log("req['user'] at save tech note : ", req['user']);
+        console.log("req.user at save tech note : ", req.user);
 
-        return this.technotesService.saveTechNotes(techNotesToSave, req['user']);
+        return this.technotesService.saveTechNotes(techNotesToSave, req.user);
     }
 
     @Delete('deleteCheckedRows')
@@ -76,7 +76,7 @@ export class TechnotesController {
     // service 와 연동
     @Post('/likeTechNote')
     async toggleLikeForTechNote(
-        @Req() req: Request,
+        @Req() req,
         @Body() dto: { userId: number, techNoteId: number }
 
     ) {
@@ -90,7 +90,7 @@ export class TechnotesController {
 
     @Post('/likeSkilNote')
     async toggleLikeForSkilNote(
-        @Req() req: Request,
+        @Req() req,
         @Body() dto: { userId: number, skilNoteId: number }
 
     ) {
@@ -104,7 +104,7 @@ export class TechnotesController {
 
     @Post('/bookMarkTechNote')
     async toggleBookMarkForTechNote(
-        @Req() req: Request,
+        @Req() req,
         @Body() dto: { userId: number, techNoteId: number }
 
     ) {
@@ -118,7 +118,7 @@ export class TechnotesController {
 
     @Post('/bookMarkSkilNote')
     async toggleBookMarkForSkilNote(
-        @Req() req: Request,
+        @Req() req,
         @Body() dto: { userId: number, skilNoteId: number }
     ) {
         const success = await this.technotesService.toggleBookMarkForSkilNote(dto.userId, dto.skilNoteId);

@@ -1,6 +1,15 @@
 import { Injectable, NestMiddleware, Res } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as jwt from 'jsonwebtoken';
+import { Request } from 'express'; import * as jwt from 'jsonwebtoken';
+
+
+declare global {
+    namespace Express {
+        interface Request {
+            user?: any; // 사용자 정보를 담을 속성 추가
+        }
+    }
+}
 
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {
@@ -9,7 +18,7 @@ export class AuthMiddleware implements NestMiddleware {
         private readonly configService: ConfigService
     ) { }
 
-    use(req: Request, res: any, next: Function) {
+    use(req, res: Response, next) {
         const accessTokenSecret = this.configService.get<string>('ACCESS_TOKEN_SECRET');
         // console.log("accessTokenSecret : ", accessTokenSecret);
 
@@ -23,14 +32,15 @@ export class AuthMiddleware implements NestMiddleware {
 
         try {
             const decoded = jwt.verify(token, accessTokenSecret);
-            // console.log("decoded : ", decoded);
+            console.log("decoded : ", decoded);
 
-            req['user'] = {
-                id: decoded['id'],
-                email: decoded['email']
-            };
+            // req.user = {
+            //     id: decoded['id'],
+            //     email: decoded['email']
+            // };
+            req.user = decoded
 
-            console.log("req['user'] ::: ", req['user']);
+            console.log("req.user ::: ", req.user);
         } catch (error) {
             // console.log("error :?? ", error);
             // console.log("token 유효 기간 지남");
