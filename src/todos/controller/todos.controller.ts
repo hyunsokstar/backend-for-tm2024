@@ -33,7 +33,6 @@ export class TodosController {
         @Query('todoStatusOption') todoStatusOption,
         @Req() req
     ): Promise<{ usersEmailInfo: string[], todoList: TodosModel[], totalCount: number, perPage: number }> {
-        console.log("요청 확인 for todo list ???");
         console.log("req.user : ", req.user);
 
         return this.todosService.getTodoListForUserId(pageNum, perPage, userId, todoStatusOption);
@@ -65,7 +64,6 @@ export class TodosController {
         return this.todosService.deleteTodosForCheckedIds(checkedIds, loginUser);
     }
 
-    // @UseGuards(AuthGuard)
     @Delete("/deleteSupplementaryTodosForCheckedRows") // DELETE 메서드로 새로운 엔드포인트를 정의합니다.
     async deleteSupplementaryTodosForCheckedIds(
         @Body('checkedIds') checkedIds: number[],
