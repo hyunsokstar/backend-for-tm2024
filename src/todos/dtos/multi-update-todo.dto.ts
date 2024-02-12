@@ -12,5 +12,6 @@ export class MultiUpdateTodoDto {
     defaultTodoStatus: string;
 
     @IsString()
+    @IsOptional()
     defaultUserEmail: string;
 }

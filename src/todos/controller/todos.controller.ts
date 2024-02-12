@@ -141,13 +141,19 @@ export class TodosController {
         }
     }
 
-    // @Post('/multiUpdateTodoRowsForChecked')
-    // async multiUpdateTodoRowsForChecked(@Body() dtoForMultiUpdateTodoRowsForChecked: any) {
-    //     console.log("Received data: ", dtoForMultiUpdateTodoRowsForChecked);
-    //     // 요청 데이터를 처리하는 로직을 추가하세요.
+    @Post('/multiUpdateSupplementaryTodoRowsForChecked')
+    async multiUpdateSupplementaryTodoRowsForChecked(@Body() dtoForMultiUpdateSupplementaryTodoRowsForChecked: MultiUpdateTodoDto, @Req() req) {
+        console.log("dto check ??? : ", dtoForMultiUpdateSupplementaryTodoRowsForChecked);
+        console.log("req.user : ", req.user);
 
-    //     // 클라이언트에 응답을 보내거나 추가적인 작업을 수행할 수 있습니다.
-    // }
+
+        const result = await this.todosService.multiUpdateSupplementaryTodoRowsForChecked(dtoForMultiUpdateSupplementaryTodoRowsForChecked);
+
+        return {
+            message: "multi update for todos for checked success",
+            result
+        }
+    }
 
 
 

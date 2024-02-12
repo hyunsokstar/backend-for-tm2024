@@ -85,6 +85,58 @@ export class TodosService {
         return dto;
     }
 
+    async multiUpdateSupplementaryTodoRowsForChecked(dto: MultiUpdateTodoDto) {
+        const {
+            selectedRowIdsArray,
+            defaultDeadLine,
+            defaultTodoStatus,
+            defaultUserEmail
+        } = dto;
+
+        // 사용자 정보 가져오기
+        const manager = await this.usersRepository.findOne({ where: { email: defaultUserEmail } });
+
+        let todoStatusOption;
+
+        if (defaultTodoStatus === "idea") {
+            todoStatusOption = TodoStatus.IDEA
+        } else if (defaultTodoStatus === "ready") {
+            todoStatusOption = TodoStatus.READY
+        } else if (defaultTodoStatus === "progress") {
+            todoStatusOption = TodoStatus.PROGRESS
+        } else if (defaultTodoStatus === "testing") {
+            todoStatusOption = TodoStatus.TESTING
+        } else if (defaultTodoStatus === "completed") {
+            todoStatusOption = TodoStatus.COMPLETED
+        }
+
+        // 선택된 각 Todo ID에 대해 업데이트 수행
+        for (const todoId of selectedRowIdsArray) {
+            // 해당하는 Todo를 찾습니다.
+            const todoToUpdate = await this.supplementaryTodosRepo.findOne({ where: { id: todoId } });
+
+            // 해당하는 Todo가 없으면 NotFoundException을 throw합니다.
+            if (!todoToUpdate) {
+                throw new NotFoundException(`Todo with ID ${todoId} not found.`);
+            }
+
+            // 만약에 업데이트할 값이 존재한다면, 해당 값으로 업데이트합니다.
+            if (defaultTodoStatus !== null && defaultTodoStatus !== "") {
+                todoToUpdate.status = todoStatusOption;
+            }
+            if (defaultDeadLine !== null && defaultDeadLine !== null) {
+                todoToUpdate.deadline = defaultDeadLine;
+            }
+            if (manager) {
+                todoToUpdate.manager = manager;
+            }
+
+            // Todo를 저장하여 업데이트합니다.
+            await this.supplementaryTodosRepo.save(todoToUpdate);
+        }
+
+        return dto;
+    }
 
     async deleteTodoById(todoId: any) {
         // 주어진 todoId로 할 일을 찾습니다.
@@ -594,17 +646,17 @@ export class TodosService {
                 'ASC'
             );
             mainQuery = mainQuery.addOrderBy('todo.id', 'DESC');
-            // mainQuery = mainQuery.addOrderBy(
-            //     `CASE 
-            //         WHEN supplementaryTodos.status = 'idea' THEN 1
-            //         WHEN supplementaryTodos.status = 'ready' THEN 2
-            //         WHEN supplementaryTodos.status = 'progress' THEN 3
-            //         WHEN supplementaryTodos.status = 'testing' THEN 4
-            //         WHEN supplementaryTodos.status = 'complete' THEN 5
-            //         ELSE 6
-            //         END`,
-            //     'ASC'
-            // );
+            mainQuery = mainQuery.addOrderBy(
+                `CASE 
+                    WHEN supplementaryTodos.status = 'idea' THEN 1
+                    WHEN supplementaryTodos.status = 'ready' THEN 2
+                    WHEN supplementaryTodos.status = 'progress' THEN 3
+                    WHEN supplementaryTodos.status = 'testing' THEN 4
+                    WHEN supplementaryTodos.status = 'complete' THEN 5
+                    ELSE 6
+                    END`,
+                'ASC'
+            );
             mainQuery = mainQuery.addOrderBy('supplementaryTodos.id', 'DESC');
 
         }
