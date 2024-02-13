@@ -759,9 +759,9 @@ export class TodosService {
             console.log("loginUser delete : ", loginUser);
 
             // 삭제할 Todo를 필터링하여 조건에 맞지 않는 경우 제외합니다.
-            const filteredTodosToDelete = todosToDelete.filter(todo => todo.manager.email === loginUser.email);
+            const filteredTodosToDelete = todosToDelete.filter(todo => todo.manager.email !== loginUser.email);
 
-            if (filteredTodosToDelete.length === 0) {
+            if (filteredTodosToDelete.length > 0) {
                 return {
                     success: false,
                     message: `삭제할 권한이 없습니다.`
@@ -788,11 +788,18 @@ export class TodosService {
     async deleteSupplementaryTodosForCheckedIds(checkedIds: number[], loginUser): Promise<any> {
         try {
             // 삭제할 Todo들을 조회합니다.
-            // const todosToDelete = await this.todosRepository.findByIds(checkedIds);
-            // const todosToDelete = await this.todosRepository.find({
-            //     where: { id: In(checkedIds) }, // In 연산자를 사용하여 checkedIds에 해당하는 Todo를 검색합니다.
-            //     relations: ['manager'], // manager와의 관계를 로드합니다.
-            // });
+            const todosToDelete = await this.supplementaryTodosRepo.find({
+                where: { id: In(checkedIds) },
+                relations: ['manager'],
+            });
+
+            const filteredTodosToDelete = todosToDelete.filter(todo => todo.manager.email !== loginUser.email);
+            if (filteredTodosToDelete.length > 0) {
+                return {
+                    success: false,
+                    message: `삭제할 권한이 없습니다.`
+                };
+            }
 
             // 삭제 권한이 있는 경우에만 Todo를 삭제합니다.
             const deleteResult = await this.supplementaryTodosRepo.delete(checkedIds);
@@ -801,7 +808,7 @@ export class TodosService {
                 throw new NotFoundException('삭제할 Todo를 찾을 수 없습니다.');
             }
 
-            return { message: `Todo 삭제 완료: ${deleteResult.affected}개의 Todo가 삭제되었습니다.` };
+            return { message: `Todo 삭제 완료: ${deleteResult.affected}개의 note가 삭제되었습니다.` };
         } catch (error) {
 
             throw new ForbiddenException(`${error.message}`);

@@ -46,13 +46,24 @@ export class TechnotesController {
     }
 
     @Delete('deleteCheckedRows')
-    async deleteUsersForCheckedIds(@Body('checkedIds') checkedIds: number[]) {
+    async deleteUsersForCheckedIds(@Body('checkedIds') checkedIds: number[], @Req() req) {
+
         try {
             console.log("유저 삭제 요청 받음");
-            const deletedCount = await this.technotesService.deleteForCheckNoteIdsForCheckedIds(checkedIds);
-            return {
-                message: `총 ${deletedCount}명의 유저가 삭제되었습니다.`,
-            };
+            const loginUser = req.user
+
+            if (!req.user) {
+                return {
+                    message: "로그인 하세요"
+                }
+            }
+
+            return await this.technotesService.deleteForCheckNoteIdsForCheckedIds(checkedIds, loginUser);
+
+            // return {
+            //     message: `총 ${deletedCount}명의 유저가 삭제되었습니다.`,
+            // };
+
         } catch (error) {
             throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
         }

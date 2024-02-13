@@ -156,42 +156,23 @@ export class SkilnotesController {
     // 스킬 노트 삭제 하기 
     // deleteCheckedRows
     @Delete('deleteCheckedRows')
-    async deleteUsersForCheckedIds(@Body('checkedIds') checkedIds: number[]) {
+    async deleteSkilNotesForCheckedIds(@Body('checkedIds') checkedIds: number[], @Req() req) {
         try {
-            console.log("스킬 노트 삭제 요청 받음 at deleteUsersForCheckedIds");
-            const deletedCount = await this.skilnoteService.deleteForCheckNoteIdsForCheckedIds(checkedIds);
-            return {
-                message: `총 ${deletedCount}명의 유저가 삭제되었습니다.`,
-            };
+
+            const loginUser = req.user
+
+            console.log("스킬 노트 삭제 요청 받음 at deleteSkilNoteForCheckedIds");
+            // const deletedCount = await this.skilnoteService.deleteForCheckNoteIdsForCheckedIds(checkedIds, loginUser);
+            return this.skilnoteService.deleteForCheckNoteIdsForCheckedIds(checkedIds, loginUser);
+            // return {
+            //     message: `총 ${deletedCount}명의 유저가 삭제되었습니다.`,
+            // };
         } catch (error) {
             throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
 
-    // async toggleBookMarkForTechNote(userId: number, skilNoteId: number): Promise<boolean> {
-    //     const user = await this.usersRepository.findOne({ where: { id: userId } });
-    //     const techNote = await this.techNotesRepo.findOne({ where: { id: skilNoteId } });
-
-    //     if (!user || !techNote) {
-    //         return false; // 사용자 또는 기술 노트가 없을 경우 실패
-    //     }
-
-    //     // 이미 좋아요를 했는지 확인
-    //     const existingBookMark = await this.bookMarksForTechNoteRepo.findOne({ where: { user, techNote } });
-
-    //     if (existingBookMark) {
-    //         // 이미 좋아요를 했을 경우 좋아요 취소
-    //         await this.bookMarksForTechNoteRepo.remove(existingBookMark);
-    //         return false;
-    //     }
-
-    //     // 좋아요 추가
-    //     const newLike = this.bookMarksForTechNoteRepo.create({ user, techNote });
-    //     await this.bookMarksForTechNoteRepo.save(newLike);
-
-    //     return true;
-    // }
     @Post('/bookMarkSkilNoteContent')
     async toggleBookMarkForSkilNoteContent(
         @Req() req,

@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TechNotesModel } from '../entities/technotes.entity';
-import { FindManyOptions, Repository } from 'typeorm';
+import { FindManyOptions, In, Repository } from 'typeorm';
 import { UsersModel } from 'src/users/entities/users.entity';
 import { SkilNotesModel } from '../entities/skilnotes.entity';
 import { dtoForCreateSkilNote } from '../dtos/dtoForCreateSkilNote.dto';
@@ -28,13 +28,30 @@ export class SkilnotesService {
 
     ) { }
 
-    async deleteForCheckNoteIdsForCheckedIds(checkedIds: number[]): Promise<number> {
+    async deleteForCheckNoteIdsForCheckedIds(checkedIds: number[], loginUser: { email: string }): Promise<number | { success: boolean; message: string; }> {
         try {
-            console.log("checkedIds : ", checkedIds);
-            const deleteResult = await this.skilNotesRepo.delete(checkedIds);
-            console.log("result for delete skilnote: ", deleteResult);
+            // console.log("checkedIds : ", checkedIds);
+            const notesToDelete = await this.skilNotesRepo.find({
+                where: { id: In(checkedIds) },
+                relations: ['writer'], // writer 관계를 가져옵니다.
+            });
 
-            return deleteResult.affected ?? 0;
+            // console.log("notesToDelete ?? : ", notesToDelete);
+
+            const filteredNotesToDelete = notesToDelete.filter(todo => todo.writer.email !== loginUser.email);
+            console.log("filteredTodosToDelete.length : ", filteredNotesToDelete.length);
+
+            if (filteredNotesToDelete.length > 0) {
+                return {
+                    success: false,
+                    message: `삭제할 권한이 없습니다.`
+                };
+            }
+            const deleteResult = await this.skilNotesRepo.delete(checkedIds);
+            // console.log("result for delete skilnote: ", deleteResult);
+            // return deleteResult.affected ?? 0;
+            const deletedCount = deleteResult.affected ?? 0;
+            return { success: true, message: `총 ${deletedCount}명의 note가 삭제되었습니다.` }
 
         } catch (error) {
             console.log("error : ", error);

@@ -70,6 +70,10 @@ export class TodosController {
         @Req() req,
     ) {
         const loginUser = req.user;
+
+        console.log("삭제 supplementary todo check ");
+
+
         return this.todosService.deleteSupplementaryTodosForCheckedIds(checkedIds, loginUser);
     }
 

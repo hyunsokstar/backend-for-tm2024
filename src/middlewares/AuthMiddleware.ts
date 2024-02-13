@@ -32,7 +32,7 @@ export class AuthMiddleware implements NestMiddleware {
 
         try {
             const decoded = jwt.verify(token, accessTokenSecret);
-            console.log("decoded : ", decoded);
+            // console.log("decoded : ", decoded);
 
             // req.user = {
             //     id: decoded['id'],
@@ -40,7 +40,7 @@ export class AuthMiddleware implements NestMiddleware {
             // };
             req.user = decoded
 
-            console.log("req.user ::: ", req.user);
+            // console.log("req.user ::: ", req.user);
         } catch (error) {
             // console.log("error :?? ", error);
             // console.log("token 유효 기간 지남");

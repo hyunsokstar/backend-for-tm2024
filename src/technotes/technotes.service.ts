@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { TechNotesModel } from './entities/technotes.entity';
 import { DtoForCreateTechNote } from './dtos/dtoForCreateTechNote.dto';
 import { UsersModel } from 'src/users/entities/users.entity';
@@ -149,13 +149,37 @@ export class TechnotesService {
     }
 
     // 1122
-    async deleteForCheckNoteIdsForCheckedIds(checkedIds: number[]): Promise<number> {
+    async deleteForCheckNoteIdsForCheckedIds(checkedIds: number[], loginUser): Promise<string | { success: boolean, message: string }> {
         try {
             console.log("checkedIds : ", checkedIds);
+            console.log("loginUser : ", loginUser);
+
+            // todo
+            // this.techNotesRepo 에서 checkedIds를 삭제 하되 각 note 의 writer 가 loginUser와 다를 경우 삭제 권한 없습니다 응답 하기 
+            // success: false, message:loginUser와 다를 경우 삭제 권한 없습니다
+            const notesToDelete = await this.techNotesRepo.find({
+                where: { id: In(checkedIds) },
+                relations: ['writer'], // writer 관계를 가져옵니다.
+            });
+
+            // console.log("notesToDelete ?? : ", notesToDelete);
+
+
+            const filteredNotesToDelete = notesToDelete.filter(todo => todo.writer.email !== loginUser.email);
+            console.log("filteredTodosToDelete.length : ", filteredNotesToDelete.length);
+
+            if (filteredNotesToDelete.length > 0) {
+                return {
+                    success: false,
+                    message: `삭제할 권한이 없습니다.`
+                };
+            }
+
             const deleteResult = await this.techNotesRepo.delete(checkedIds);
             console.log("result for delete techNoteRowsForCheckedIds: ", deleteResult);
 
-            return deleteResult.affected ?? 0;
+            const deletedCount = deleteResult.affected ?? 0;
+            return { success: true, message: `총 ${deletedCount}명의 note가 삭제되었습니다.` }
 
         } catch (error) {
             console.log("error : ", error);
