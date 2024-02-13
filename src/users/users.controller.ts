@@ -98,7 +98,7 @@ export class UsersController {
 
   @Post("login-check-by-accessToken")
   async loginCheckByAccessToken(@Req() req, @Res() response) {
-    console.log("login check by accessToken");
+    // console.log("login check by accessToken");
 
     try {
       const authorizationHeader = req.headers['authorization'] as string;

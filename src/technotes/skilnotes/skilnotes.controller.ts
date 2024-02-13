@@ -91,8 +91,8 @@ export class SkilnotesController {
         //     });
         // }
 
-        console.log("skilNoteId : ", skilNoteId);
-        console.log("skilnote content 입력 check !");
+        // console.log("skilNoteId : ", skilNoteId);
+        // console.log("skilnote content 입력 check !");
 
         const result = await this.skilnoteService.createSkilNoteContents(skilNoteId, pageNum, loginUser, dto);
         return response.status(HttpStatus.CREATED).json({ message: "create skilnote contents success", result: result });
@@ -141,8 +141,8 @@ export class SkilnotesController {
         if (!loginUser) {
         }
 
-        console.log("checkdIds : ", checkedIds);
-        console.log("skilnote content 입력 check !");
+        // console.log("checkdIds : ", checkedIds);
+        // console.log("skilnote content 입력 check !");
 
         // const result = await this.skilnoteService.deleteSkilNoteContentForCheckedIds(checkedIds, loginUser);
         // // return response.status(HttpStatus.CREATED).json({ message: "update skilnote content success", result: result });

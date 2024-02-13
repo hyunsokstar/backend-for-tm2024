@@ -43,10 +43,12 @@ export class SkilnotesService {
 
             if (filteredNotesToDelete.length > 0) {
                 return {
+
                     success: false,
                     message: `삭제할 권한이 없습니다.`
                 };
             }
+
             const deleteResult = await this.skilNotesRepo.delete(checkedIds);
             // console.log("result for delete skilnote: ", deleteResult);
             // return deleteResult.affected ?? 0;
@@ -173,7 +175,7 @@ export class SkilnotesService {
                     page: 'ASC'
                 }
             });
-        console.log("skilnoteContentsPagesInfo : ", skilnoteContentsPagesInfo);
+        // console.log("skilnoteContentsPagesInfo : ", skilnoteContentsPagesInfo);
 
         const skilNoteInfo = await this.skilNotesRepo
             .findOne({
@@ -188,7 +190,7 @@ export class SkilnotesService {
         // const skilnote_contents
 
 
-        console.log("skilnotePagesCount ?? ", skilnotePagesCount);
+        // console.log("skilnotePagesCount ?? ", skilnotePagesCount);
 
         const responseObj = {
             title: skilNoteInfo.title,
@@ -440,16 +442,21 @@ export class SkilnotesService {
         return update_result;
     }
 
+    // fix 
     async deleteSkilNoteContentForCheckedIds(
         { checkedIds }: DeleteSkilNoteContentsDto,
         loginUser
     ) {
         try {
             console.log("check by checked ids for skilnote contents : ", checkedIds);
+            console.log("loginUser.email : ", loginUser.email);
 
             // checkedIds에 해당하는 모든 ID에 대해 삭제
             for (const id of checkedIds) {
-                const content = await this.skilNoteContentsRepo.findOne({ where: { id: id } });
+                const content = await this.skilNoteContentsRepo.findOne({ where: { id: id }, relations: ['writer'], });
+
+                // console.log("content.writer.email : ", content.writer.email);
+
 
                 if (!content) {
                     throw new NotFoundException(`Content with ID ${id} not found.`);
@@ -463,7 +470,9 @@ export class SkilnotesService {
             }
             return { success: true };
         } catch (error) {
-            throw new Error(`Error deleting skilnote content: ${error.message}`);
+            // throw new Error(`Error deleting skilnote content: ${error.message}`);
+            throw new NotFoundException(`Error deleting skilnote content: ${error.message}`);
+
         }
     }
 
