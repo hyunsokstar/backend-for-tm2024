@@ -713,32 +713,7 @@ export class TodosService {
         }
     }
 
-    // async deleteTodosForCheckedIds(checkedIds: number[], loginUser): Promise<any> {
-    //     try {
-    //         // 삭제할 Todo들을 조회합니다.
-    //         // const todosToDelete = await this.todosRepository.findByIds(checkedIds);
-    //         const todosToDelete = await this.todosRepository.find({
-    //             where: { id: In(checkedIds) }, // In 연산자를 사용하여 checkedIds에 해당하는 Todo를 검색합니다.
-    //             relations: ['manager'], // manager와의 관계를 로드합니다.
-    //         });
-    //         console.log("loginUser delete : ", loginUser);
 
-    //         // 할일:
-    //         // this.todosRepository 에서 checkedIds 에 해당하는 데이터를 삭제 하되
-    //         // 각 todo.manager.email !=== loginUser.email 인 경우 즉 loginUser.email 인 사람이 작성한게 있을 경우 삭제 안된다고 응답 하게 하고 싶어
-
-    //         const deleteResult = await this.todosRepository.delete(checkedIds);
-
-    //         if (deleteResult.affected === 0) {
-    //             throw new NotFoundException('삭제할 Todo를 찾을 수 없습니다.');
-    //         }
-
-    //         return { message: `Todo 삭제 완료: ${deleteResult.affected}개의 Todo가 삭제되었습니다.` };
-    //     } catch (error) {
-
-    //         throw new ForbiddenException(`${error.message}`);
-    //     }
-    // }
 
     async deleteTodosForCheckedIds(checkedIds: number[], loginUser): Promise<any> {
         try {
@@ -747,20 +722,24 @@ export class TodosService {
                 where: { id: In(checkedIds) }, // In 연산자를 사용하여 checkedIds에 해당하는 Todo를 검색합니다.
                 relations: ['manager'], // manager와의 관계를 로드합니다.
             });
-            console.log("loginUser delete : ", loginUser);
 
             // 삭제할 Todo를 필터링하여 조건에 맞지 않는 경우 제외합니다.
-            const filteredTodosToDelete = todosToDelete.filter(todo => todo.manager.email !== loginUser.email);
+            const filteredTodosToDelete = await todosToDelete.filter(todo => todo.manager.email !== loginUser.email);
+            console.log("filteredTodosToDelete : ", filteredTodosToDelete.length);
+
 
             if (filteredTodosToDelete.length > 0) {
                 return {
                     success: false,
-                    message: `삭제할 권한이 없습니다.`
+                    message: `삭제할 권한이 없습니다?.`
                 };
             }
 
             // 삭제할 Todo들의 id를 추출합니다.
-            const idsToDelete = filteredTodosToDelete.map(todo => todo.id);
+            const idsToDelete = todosToDelete.map(todo => todo.id);
+
+            console.log("idsToDelete : ", idsToDelete);
+
 
             // Todo를 삭제합니다.
             const deleteResult = await this.todosRepository.delete(idsToDelete);

@@ -151,8 +151,8 @@ export class TechnotesService {
     // 1122
     async deleteForCheckNoteIdsForCheckedIds(checkedIds: number[], loginUser): Promise<string | { success: boolean, message: string }> {
         try {
-            console.log("checkedIds : ", checkedIds);
-            console.log("loginUser : ", loginUser);
+            // console.log("checkedIds : ", checkedIds);
+            // console.log("loginUser : ", loginUser);
 
             // todo
             // this.techNotesRepo 에서 checkedIds를 삭제 하되 각 note 의 writer 가 loginUser와 다를 경우 삭제 권한 없습니다 응답 하기 
