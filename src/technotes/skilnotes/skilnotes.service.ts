@@ -213,24 +213,39 @@ export class SkilnotesService {
         return saveResult;
     }
 
-    async getSkilNoteContentsBySkilNoteId(skilnoteId: any, pageNum: any) {
+    async getSkilNoteContentsBySkilNoteId(skilNoteId: any, pageNum: any) {
+        // 
+
+        // SkilNoteId로 SkilNote 가져오기
+        // const skilNote = await this.skilNotesRepo.findOne({ where: { id: skilNoteId } });
+        const skilNote = await this.skilNotesRepo.findOne({
+            where: { id: skilNoteId },
+            relations: ['techNote']
+        });
+
+        // SkilNote가 존재하는지 확인 후 처리
+        if (!skilNote) {
+            throw new Error('SkilNote not found');
+        }
+
+        const techNoteId = skilNote.techNote.id
+        console.log("techNoteId : ", techNoteId);
+
+        const relatedSkilnoteList = await this.skilNotesRepo.find({ where: { techNote: { id: techNoteId } } })
+        console.log("relatedSkilnoteList : ", relatedSkilnoteList);
+
         const options: FindManyOptions<SkilNoteContentsModel> = {
-            where: { skilNote: { id: parseInt(skilnoteId) }, page: pageNum },
+            where: { skilNote: { id: parseInt(skilNoteId) }, page: pageNum },
             order: { order: 'ASC' },
             relations: ['bookMarks', 'bookMarks.user', 'bookMarks.skilNoteContent'] // Include the user information
         };
 
         const skilnoteContents = await this.skilNoteContentsRepo.find(options);
 
-        // const countForSkilNoteContents = await this.skilNoteContentBookmarkRepo.find(
-        //     {where: {skilNoteContent:}}
-        // )
-
-        // fix 0205
         const skilnoteContentsPagesInfo =
             await this.skilNoteContentsRepo.find({
                 where: {
-                    skilNote: { id: parseInt(skilnoteId) },
+                    skilNote: { id: parseInt(skilNoteId) },
                     file: ".todo"
                 },
                 order: {
@@ -241,12 +256,12 @@ export class SkilnotesService {
 
         const skilNoteInfo = await this.skilNotesRepo
             .findOne({
-                where: { id: skilnoteId },
+                where: { id: skilNoteId },
                 relations: ['writer']
             });
 
         const skilnotePagesCount = await this.skilNoteContentsRepo.count({
-            where: { skilNote: { id: skilnoteId }, file: ".todo" }
+            where: { skilNote: { id: skilNoteId }, file: ".todo" }
         })
 
         // const skilnote_contents
@@ -260,7 +275,8 @@ export class SkilnotesService {
             countForSkilNoteContents: skilnoteContents.length,
             skilnoteContents: skilnoteContents,
             skilnoteContentsPagesInfo: skilnoteContentsPagesInfo,
-            skilnotePagesCount: skilnotePagesCount
+            skilnotePagesCount: skilnotePagesCount,
+            relatedSkilnoteList: relatedSkilnoteList
         };
 
         return responseObj;
