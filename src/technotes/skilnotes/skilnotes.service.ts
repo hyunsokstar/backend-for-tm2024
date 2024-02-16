@@ -10,6 +10,7 @@ import { dtoForCreateSkilNoteContent } from '../dtos/dtoForCreateSkilNoteContent
 import { dtoForReorderContents } from '../dtos/dtoForReorderContents';
 import { DeleteSkilNoteContentsDto } from 'src/users/dtos/DeleteSkilNoteContentsDto';
 import { BookMarksForSkilNoteContentsModel } from '../entities/bookMarksForSkilNoteContent.entity';
+import { DtoForChangePagesOrderForSkilNoteContent } from '../dtos/dtoForChangePagesOrderForSkilNote';
 
 @Injectable()
 export class SkilnotesService {
@@ -27,6 +28,92 @@ export class SkilnotesService {
         private readonly skilNoteContentBookmarkRepo: Repository<BookMarksForSkilNoteContentsModel>
 
     ) { }
+
+    // async changePagesOrderForSkilNoteContent({ skilNoteId, targetOrder, destinationOrder }: DtoForChangePagesOrderForSkilNoteContent) {
+    //     // 스킬 노트 객체를 찾기 위해 SkilNotesModel 리포지토리를 주입받아야 합니다.
+    //     const skilNote = await this.skilNotesRepo.findOne({ where: { id: skilNoteId } });
+
+    //     // 스킬 노트 객체가 없는 경우 처리
+    //     if (!skilNote) {
+    //         return { success: false, message: '해당하는 스킬 노트를 찾을 수 없습니다.', error: '스킬 노트를 찾을 수 없음' };
+    //     }
+    //     // skilNoteContentsRepo 를 조회해서 skilNote 가 skilNote 인것들중에
+    //     // 1. page 가 targetOrder 인것들은 destinationOrder 로 일괄 업데이트
+    //     // 2. page 가 destinationOrder 인것들은 targetOrder 로 일괄 업데이트
+    //     // (단 page가 원래 targetOrder 이었던것들 => destinationOrder)
+    //     // 근데 순차 업데이트이면 다시 돌아오게 되잖아 그게 아니라
+    //     // page가 원래 destinationOrder 이었던것들 => targetOrder 이렇게 교체가 되도록
+    //     // transaction 적용해서 중간에 에러 나도 롤백 되게
+    // }
+
+    async changePagesOrderForSkilNoteContent({ skilNoteId, targetOrder, destinationOrder }: DtoForChangePagesOrderForSkilNoteContent) {
+
+        console.log("skilNoteId : ", skilNoteId);
+        console.log("targetOrder : ", targetOrder);
+        console.log("destinationOrder : ", destinationOrder);
+
+
+        const skilNote = await this.skilNotesRepo.findOne({ where: { id: skilNoteId } });
+
+        // 스킬 노트 객체가 없는 경우 처리
+        if (!skilNote) {
+            return { success: false, message: '해당하는 스킬 노트를 찾을 수 없습니다.', error: '스킬 노트를 찾을 수 없음' };
+        }
+
+        // 트랜잭션 시작
+        const queryRunner = this.skilNotesRepo.manager.connection.createQueryRunner();
+        await queryRunner.startTransaction();
+
+        try {
+            // 대상 페이지의 내용을 가져옵니다.
+            const targetPages = await this.skilNoteContentsRepo.find({ where: { page: targetOrder, skilNote } });
+            console.log("targetPages : ", targetPages);
+
+            // 목적지 페이지의 내용을 가져옵니다.
+            const destinationPages = await this.skilNoteContentsRepo.find({ where: { page: destinationOrder, skilNote } });
+            console.log("destinationPages : ", destinationPages);
+
+            // 대상 및 목적지 페이지가 모두 존재하는지 확인합니다.
+            if (targetPages.length === 0 || destinationPages.length === 0) {
+                throw new Error('대상 페이지 또는 목적지 페이지를 찾을 수 없습니다.');
+            }
+
+            // 대상 페이지의 내용을 임시 변수에 저장합니다.
+            const tempPageContents = [];
+            for (const page of targetPages) {
+                tempPageContents.push({ ...page });
+            }
+
+            // 대상 페이지의 순서를 목적지 페이지로 변경합니다.
+            for (const page of targetPages) {
+                page.page = destinationOrder;
+            }
+
+            // // 목적지 페이지의 순서를 임시 변수에 저장된 내용으로 변경합니다.
+            for (const page of destinationPages) {
+                page.page = targetOrder
+            }
+
+            // 변경된 내용을 저장합니다.
+            await this.skilNoteContentsRepo.save([...targetPages, ...destinationPages]);
+
+            // 트랜잭션 커밋
+            await queryRunner.commitTransaction();
+
+            // 성공적으로 변경되었음을 반환
+            return { success: true, message: '페이지 순서가 성공적으로 변경되었습니다.' };
+        } catch (err) {
+            // 트랜잭션 롤백 및 에러 처리
+            await queryRunner.rollbackTransaction();
+            return { success: false, message: '페이지 순서 변경 중에 오류가 발생했습니다.', error: err.message };
+        } finally {
+            // 쿼리 러너 반환 및 연결 종료
+            await queryRunner.release();
+        }
+    }
+
+
+
 
     async deleteForCheckNoteIdsForCheckedIds(checkedIds: number[], loginUser: { email: string }): Promise<number | { success: boolean; message: string; }> {
         try {
@@ -125,31 +212,6 @@ export class SkilnotesService {
 
         return saveResult;
     }
-
-    // async getSkilNoteContentsBySkilNoteId(skilnoteId: any, pageNum: any) {
-    //     const options: FindManyOptions<SkilNoteContentsModel> = {
-    //         where: { skilNote: { id: parseInt(skilnoteId) }, page: pageNum },
-    //         order: { order: 'ASC' } // order 속성을 사용하여 오름차순 정렬
-    //     };
-
-    //     const skilnoteContents = await this.skilNoteContentsRepo.find(options)
-
-    //     const skilNoteInfo = await this.skilNotesRepo
-    //         .findOne({
-    //             where: { id: skilnoteId },
-    //             relations: ['writer'] // 작성자 정보를 포함하기 위한 관계 설정
-    //         })
-    //     console.log("skilNoteInfo : ", skilNoteInfo);
-
-    //     const responseObj = {
-    //         title: skilNoteInfo.title,
-    //         writer: skilNoteInfo.writer,
-    //         countForSkilNoteContents: (await skilnoteContents).length,
-    //         skilnoteContents: skilnoteContents
-    //     }
-
-    //     return responseObj;
-    // }
 
     async getSkilNoteContentsBySkilNoteId(skilnoteId: any, pageNum: any) {
         const options: FindManyOptions<SkilNoteContentsModel> = {
@@ -512,29 +574,6 @@ export class SkilnotesService {
         return true;
     }
 
-    // async reorderSkilNoteListOrder(contents: dtoForReorderContents[]) {
-    //     const updatedContents = [];
-    //     console.log("contents : ", contents);
-
-    //     for (const [index, content] of contents.entries()) {
-    //         const { id, order } = content;
-
-    //         await this.skilNoteContentsRepo.update(
-    //             { id }, // 해당 ID에 대해
-    //             { order: index + 1 }, // 주어진 order 값으로 업데이트
-    //         );
-
-    //         // 업데이트된 정보를 findOne 메서드로 얻기
-    //         const updatedContent =
-    //             await this.skilNoteContentsRepo.findOne({ where: { id } });
-    //         if (updatedContent) {
-    //             updatedContents.push(updatedContent);
-    //         } else {
-    //             console.error(`Failed to find updated content with ID ${id}`);
-    //         }
-    //     }
-    //     return updatedContents;
-    // }
     async reorderSkilNoteListOrder(contents: dtoForReorderContents[]) {
         const updatedContents = [];
         console.log("contents for reorder: ", contents);

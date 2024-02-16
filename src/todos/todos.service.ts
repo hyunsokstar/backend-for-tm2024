@@ -587,7 +587,6 @@ export class TodosService {
         perPage: number,
         usersEmailInfo: string[]
     }> {
-        // 사용자의 이메일 정보 조회
         const userEmailList = await this.usersRepository
             .createQueryBuilder('user')
             .select('user.email AS user_email')
@@ -630,11 +629,8 @@ export class TodosService {
             mainQuery = mainQuery.addOrderBy('todo.id', 'DESC');
         }
         else if (todoStatusOption === "all_uncompleted") {
-            // console.log("여기 인가 ??? : ", todoStatus);
             mainQuery = mainQuery.andWhere('todo.status IN (:...status)', { status: todoStatus })
-            // mainQuery = mainQuery.addOrderBy('todo.status', 'ASC')
             mainQuery = mainQuery.orderBy('manager.email')
-            // todo mainQuery = mainQuery.addOrderBy('todo.status', 'ASC')
             mainQuery = mainQuery.addOrderBy(
                 `CASE 
                 WHEN todo.status = 'idea' THEN 1 
@@ -663,7 +659,6 @@ export class TodosService {
         else {
             console.log("여기가 맞지 ??? : ", todoStatus);
             mainQuery = mainQuery.andWhere('todo.status IN (:...status)', { status: todoStatus })
-            // mainQuery = mainQuery.addOrderBy('todo.status', 'ASC')
             mainQuery = mainQuery.andWhere('manager.id = :userId', { userId })
             mainQuery = mainQuery.addOrderBy('todo.id', 'DESC');
             mainQuery = mainQuery.addOrderBy('supplementaryTodos.id', 'ASC');
@@ -671,10 +666,6 @@ export class TodosService {
         }
 
         const todoList = await mainQuery.getMany();
-
-        // console.log("todoStatus, todoList", todoStatus, todoList);
-        // console.log("todoList : ", todoList);
-        // console.log("mainQuery.getQuery() : ", mainQuery.getQuery());
 
         const totalCount = todoList.length;
 

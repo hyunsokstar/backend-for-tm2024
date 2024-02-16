@@ -5,6 +5,7 @@ import { dtoForCreateSkilNoteContent } from '../dtos/dtoForCreateSkilNoteContent
 import { AuthGuard } from 'src/guards/auth.guard';
 import { dtoForReorderContents } from '../dtos/dtoForReorderContents';
 import { DeleteSkilNoteContentsDto } from 'src/users/dtos/DeleteSkilNoteContentsDto';
+import { DtoForChangePagesOrderForSkilNoteContent } from '../dtos/dtoForChangePagesOrderForSkilNote';
 
 @Controller('skilnotes')
 export class SkilnotesController {
@@ -59,7 +60,7 @@ export class SkilnotesController {
         @Param('skilnoteId') skilnoteId: string,
         @Param('pageNum') pageNum: string
     ) {
-        console.log("hi");
+        // console.log("hi");
         return this.skilnoteService.getSkilNoteContentsBySkilNoteId(skilnoteId, pageNum);
     }
 
@@ -200,5 +201,23 @@ export class SkilnotesController {
         const updatedContents = await this.skilnoteService.reorderSkilNoteListOrder(contents);
         return updatedContents;
     }
+
+    @Post('changePagesOrderForSkilNoteContent')
+    async changePagesOrderForSkilNoteContent(@Body() dto: DtoForChangePagesOrderForSkilNoteContent) {
+        try {
+            const { skilNoteId, targetOrder, destinationOrder } = dto;
+
+            // 여기서 targetOrder와 destinationOrder를 사용하여 작업을 수행합니다.
+            // 예를 들어, 순서 변경 작업을 수행하고 결과를 반환할 수 있습니다.
+            const result = await this.skilnoteService.changePagesOrderForSkilNoteContent({ skilNoteId, targetOrder, destinationOrder });
+
+            // 작업에 성공했을 경우 결과를 클라이언트에 반환합니다.
+            return { success: true, message: '페이지 순서 변경 성공', data: result };
+        } catch (error) {
+            // 작업에 실패했을 경우 에러를 클라이언트에 반환합니다.
+            return { success: false, message: '페이지 순서 변경 실패', error: error.message };
+        }
+    }
+
 
 }
