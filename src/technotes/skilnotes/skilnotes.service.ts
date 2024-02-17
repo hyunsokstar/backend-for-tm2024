@@ -285,7 +285,11 @@ export class SkilnotesService {
     // fix 0217
     async getAllSkilNoteList(
         pageNum: number = 1,
-        perPage: number = 10
+        perPage: number = 10,
+        searchOption: string,
+        searchText: string,
+        isBestByLikes: any,
+        isBestByBookMarks: any
     ): Promise<{
         skilNoteList: SkilNotesModel[],
         totalCount: number,
@@ -308,6 +312,16 @@ export class SkilnotesService {
             .take(perPage)
             .orderBy('skilnotes.order', 'DESC');
 
+        if (searchOption && searchText) {
+            if (searchOption === "email") {
+                query = query
+                    .where('writer.email LIKE :searchText', { searchText: `%${searchText}%` });
+            } else {
+                query = query.where(`skilnotes.${searchOption} LIKE :searchText`, { searchText: `%${searchText}%` });
+
+            }
+        }
+
         const [skilNoteList, totalCount] = await query
             .leftJoinAndSelect('skilnotes.writer', 'writer')
             .leftJoinAndSelect('skilnotes.skilnote_contents', 'skilnote_contents')  // 주석 해제
@@ -328,6 +342,21 @@ export class SkilnotesService {
             }).length
             return skilNote;
         });
+
+        if (isBestByLikes == "true") {
+            console.log("excute check 11111");
+            /* The above code is a comment in TypeScript. It is not performing any specific action or
+            functionality in the code. It is used to provide information or explanations about the
+            code to other developers who may read it. */
+            skilNoteListWithCounts.sort((a, b) => b.countForLikes - a.countForLikes);
+        }
+
+        // isBestByBookMarks 가 true 일 경우 countForBookMarks 기준으로 큰거부터
+        if (isBestByBookMarks == "true") {
+            console.log("excute check 22222");
+            skilNoteListWithCounts.sort((a, b) => b.countForBookMarks - a.countForBookMarks);
+        }
+        // console.log("skilNoteListWithCounts : ", skilNoteListWithCounts);
 
         return {
             skilNoteList: skilNoteListWithCounts,

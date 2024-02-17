@@ -11,16 +11,25 @@ import { DtoForChangePagesOrderForSkilNoteContent } from '../dtos/dtoForChangePa
 export class SkilnotesController {
     constructor(private readonly skilnoteService: SkilnotesService) { }
 
+    // fix 02027
     @Get()
     async getAllSkilNoteList(
         @Query('pageNum') pageNum = 1,
         @Query('perPage') perPage = 10,
+        @Query('searchOption') searchOption = "",
+        @Query('searchText') searchText = "",
+        @Query('isBestByLikes') isBestByLikes = false,
+        @Query('isBestByBookMarks') isBestByBookMarks = false,
         @Req() req
     ) {
 
         console.log("pageNum at controller : ", pageNum);
 
-        return this.skilnoteService.getAllSkilNoteList(pageNum, perPage);
+        return this.skilnoteService.getAllSkilNoteList(
+            pageNum, perPage, searchOption, searchText,
+            isBestByLikes,
+            isBestByBookMarks
+        );
     }
 
     @Post() // POST 요청을 처리하는 엔드포인트 추가
