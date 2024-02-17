@@ -282,29 +282,55 @@ export class SkilnotesService {
         return responseObj;
     }
 
-
+    // fix 0217
     async getAllSkilNoteList(
         pageNum: number = 1,
         perPage: number = 10
     ): Promise<{
-        skilnoteList: SkilNotesModel[],
+        skilNoteList: SkilNotesModel[],
         totalCount: number,
         perPage: number,
     }> {
         // return this.techNotesRepo.find();
         console.log("pageNum at all skilnote list: ", pageNum);
 
-        const [skilnoteList, totalCount] = await this.skilNotesRepo.findAndCount({
-            skip: (pageNum - 1) * perPage,
-            take: perPage,
-            relations: ['writer'], // 이 부분이 추가된 부분입니다. User 정보를 가져오도록 설정합니다.
-            order: {
-                id: 'DESC'
-            }
+        // const [skilNoteList, totalCount] = await this.skilNotesRepo.findAndCount({
+        //     skip: (pageNum - 1) * perPage,
+        //     take: perPage,
+        //     relations: ['writer'], // 이 부분이 추가된 부분입니다. User 정보를 가져오도록 설정합니다.
+        //     order: {
+        //         id: 'DESC'
+        //     }
+        // });
+
+        let query = this.skilNotesRepo.createQueryBuilder('skilnotes')
+            .skip((pageNum - 1) * perPage)
+            .take(perPage)
+            .orderBy('skilnotes.order', 'DESC');
+
+        const [skilNoteList, totalCount] = await query
+            .leftJoinAndSelect('skilnotes.writer', 'writer')
+            .leftJoinAndSelect('skilnotes.skilnote_contents', 'skilnote_contents')  // 주석 해제
+            .leftJoinAndSelect('skilnotes.likes', 'likes')
+            .leftJoinAndSelect('likes.user', 'likeUser')
+            .leftJoinAndSelect('skilnotes.bookMarks', 'bookMarks')
+            .leftJoinAndSelect('bookMarks.user', 'bookMarksUser')
+            .getManyAndCount();
+
+        const skilNoteListWithCounts = skilNoteList.map(skilNote => {
+            skilNote.countForLikes = skilNote.likes.length; // 수정 필요
+            skilNote.countForBookMarks = skilNote.bookMarks.length; // 수정 필요
+            skilNote.countForSkilNoteContents = skilNote.skilnote_contents.length;
+            skilNote.countForSkilNoteContentsPages = skilNote.skilnote_contents.filter((contents) => {
+                if (contents.file === ".todo") {
+                    return contents
+                }
+            }).length
+            return skilNote;
         });
 
         return {
-            skilnoteList,
+            skilNoteList: skilNoteListWithCounts,
             totalCount,
             perPage
         }

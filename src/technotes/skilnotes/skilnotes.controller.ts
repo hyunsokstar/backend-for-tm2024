@@ -12,7 +12,7 @@ export class SkilnotesController {
     constructor(private readonly skilnoteService: SkilnotesService) { }
 
     @Get()
-    async getAllTechNoteList(
+    async getAllSkilNoteList(
         @Query('pageNum') pageNum = 1,
         @Query('perPage') perPage = 10,
         @Req() req
