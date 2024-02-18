@@ -1,3 +1,4 @@
+// src\technotes\entities\roadMap.entity.ts
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
 import { UsersModel } from '../../users/entities/users.entity';
 import { TechNotesModel } from './technotes.entity';

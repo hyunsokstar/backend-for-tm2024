@@ -342,10 +342,8 @@ export class TechnotesService {
 
     // saveTechNotes
     async saveTechNotes(techNotesToSave: any[], loginUser: UsersModel): Promise<any> {
-
-        console.log("techNotesToSave : ", techNotesToSave);
-        console.log("todoRowsForSave.length : ", techNotesToSave.length);
-
+        // console.log("techNotesToSave : ", techNotesToSave);
+        // console.log("todoRowsForSave.length : ", techNotesToSave.length);
         let count = 0;
 
         for (const note of techNotesToSave) {
