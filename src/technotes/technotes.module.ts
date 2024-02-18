@@ -14,11 +14,15 @@ import { bookMarksForTechNoteModel } from './entities/bookMarks.entity';
 import { LikesModelForSkilNote } from './entities/likesForSkilNote.entity';
 import { BookMarksForSkilNoteModel } from './entities/bookMarksForSkilNote.entity';
 import { BookMarksForSkilNoteContentsModel } from './entities/bookMarksForSkilNoteContent.entity';
+import { RoadMapModel } from './entities/roadMap.entity';
+import { RoadmapController } from './roadmap/roadmap.controller';
+import { RoadmapService } from './roadmap/roadmap.service';
 
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
+      RoadMapModel,
       TechNotesModel,
       UsersModel,
       SkilNotesModel,
@@ -30,8 +34,8 @@ import { BookMarksForSkilNoteContentsModel } from './entities/bookMarksForSkilNo
       BookMarksForSkilNoteContentsModel
     ])
   ],
-  controllers: [TechnotesController, SkilnotesController],
-  providers: [TechnotesService, SkilnotesService, AuthGuard]
+  controllers: [TechnotesController, SkilnotesController, RoadmapController],
+  providers: [TechnotesService, SkilnotesService, AuthGuard, RoadmapService]
 })
 
 

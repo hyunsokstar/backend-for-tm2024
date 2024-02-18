@@ -27,6 +27,7 @@ import { BookMarksForSkilNoteModel } from "./technotes/entities/bookMarksForSkil
 import { BookMarksForSkilNoteContentsModel } from "./technotes/entities/bookMarksForSkilNoteContent.entity";
 import { SupplementaryTodosModel } from "./todos/entities/supplementary_todos.entity";
 import { SupplementaryTodoBriefingModel } from "./todos/entities/supplementary_todo_briefing.entity";
+import { RoadMapModel } from "./technotes/entities/roadMap.entity";
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { SupplementaryTodoBriefingModel } from "./todos/entities/supplementary_t
         TodosModel,
         SupplementaryTodosModel,
         SupplementaryTodoBriefingModel,
+        RoadMapModel,
         TechNotesModel,
         SkilNotesModel,
         SkilNoteContentsModel,

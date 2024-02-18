@@ -3,13 +3,14 @@ import { UsersModel } from '../../users/entities/users.entity';
 import { SkilNotesModel } from './skilnotes.entity';
 import { LikesModelForTechNote } from './likesForTechNote.entity';
 import { bookMarksForTechNoteModel } from './bookMarks.entity';
+import { RoadMapModel } from './roadMap.entity';
 
-export enum TodoStatus {
-    READY = 'ready',
-    PROGRESS = 'progress',
-    TESTING = 'testing',
-    COMPLETED = 'complete',
-}
+// export enum TodoStatus {
+//     READY = 'ready',
+//     PROGRESS = 'progress',
+//     TESTING = 'testing',
+//     COMPLETED = 'complete',
+// }
 
 @Entity()
 export class TechNotesModel {
@@ -34,8 +35,12 @@ export class TechNotesModel {
     @ManyToOne(() => UsersModel, { onDelete: 'CASCADE', nullable: true })
     writer: UsersModel;
 
+    @ManyToOne(() => RoadMapModel, { onDelete: 'CASCADE', nullable: true })
+    roadMap: RoadMapModel;
+
     @OneToMany(() => SkilNotesModel, skilnote => skilnote.techNote)
     skilnotes: SkilNotesModel[]
+    //
 
     @OneToMany(() => LikesModelForTechNote, likes => likes.techNote)
     likes: LikesModelForTechNote[]

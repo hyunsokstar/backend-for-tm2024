@@ -18,7 +18,6 @@ export class TechnotesService {
         private techNotesRepo: Repository<TechNotesModel>,
         @InjectRepository(SkilNotesModel)
         private skilNotesRepo: Repository<SkilNotesModel>,
-
         @InjectRepository(UsersModel)
         private readonly usersRepository: Repository<UsersModel>,
 
