@@ -55,7 +55,7 @@ import { RoadMapModel } from "./technotes/entities/roadMap.entity";
         BookMarksForSkilNoteModel,
         BookMarksForSkilNoteContentsModel
       ],
-      synchronize: true,
+      synchronize: false,
     }),
     ConfigModule.forRoot({
       isGlobal: true, // 어디서든 사용할 수 있도록 설정
