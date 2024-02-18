@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RoadMapModel } from '../entities/roadMap.entity';
 import { CreateRoadMapDto } from '../dtos/createRoadMapDto.dto';
@@ -112,4 +112,36 @@ export class RoadmapService {
 
         return await this.roadMapRepo.save(roadMap);
     }
+
+    // deleteRoadMapsForCheckedRows
+    async deleteForRoadMapsForCheckedIds(checkedIds: number[], loginUser): Promise<string | { success: boolean, message: string }> {
+        try {
+            const notesToDelete = await this.roadMapRepo.find({
+                where: { id: In(checkedIds) },
+                relations: ['writer'], // writer 관계를 가져옵니다.
+            });
+
+            const filteredNotesToDelete = notesToDelete.filter(todo => todo.writer.email !== loginUser.email);
+            console.log("filteredTodosToDelete.length : ", filteredNotesToDelete.length);
+
+            if (filteredNotesToDelete.length > 0) {
+                return {
+                    success: false,
+                    message: `삭제할 권한이 없습니다.`
+                };
+            }
+
+            const deleteResult = await this.roadMapRepo.delete(checkedIds);
+            console.log("result for delete techNoteRowsForCheckedIds: ", deleteResult);
+
+            const deletedCount = deleteResult.affected ?? 0;
+            return { success: true, message: `총 ${deletedCount}개의 roadmap이 삭제되었습니다.` }
+
+        } catch (error) {
+            console.log("error : ", error);
+
+            throw new Error('삭제 중 오류가 발생했습니다.');
+        }
+    }
+
 }
