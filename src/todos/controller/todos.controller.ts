@@ -33,7 +33,7 @@ export class TodosController {
         @Query('todoStatusOption') todoStatusOption,
         @Req() req
     ): Promise<{ usersEmailInfo: string[], todoList: TodosModel[], totalCount: number, perPage: number }> {
-        console.log("req.user : ", req.user);
+        // console.log("req.user : ", req.user);
 
         return this.todosService.getTodoListForUserId(pageNum, perPage, userId, todoStatusOption);
     }
@@ -134,7 +134,7 @@ export class TodosController {
     @Post('/multiUpdateTodoRowsForChecked')
     async multiUpdateTodoRowsForChecked(@Body() dtoForMultiUpdateTodoRowsForChecked: MultiUpdateTodoDto, @Req() req) {
         console.log("dto check ??? : ", dtoForMultiUpdateTodoRowsForChecked);
-        console.log("req.user : ", req.user);
+        // console.log("req.user : ", req.user);
 
 
         const result = await this.todosService.multiUpdateTodoRowsForChecked(dtoForMultiUpdateTodoRowsForChecked);
@@ -148,7 +148,6 @@ export class TodosController {
     @Post('/multiUpdateSupplementaryTodoRowsForChecked')
     async multiUpdateSupplementaryTodoRowsForChecked(@Body() dtoForMultiUpdateSupplementaryTodoRowsForChecked: MultiUpdateTodoDto, @Req() req) {
         console.log("dto check ??? : ", dtoForMultiUpdateSupplementaryTodoRowsForChecked);
-        console.log("req.user : ", req.user);
 
 
         const result = await this.todosService.multiUpdateSupplementaryTodoRowsForChecked(dtoForMultiUpdateSupplementaryTodoRowsForChecked);

@@ -660,6 +660,16 @@ export class TodosService {
             console.log("여기가 맞지 ??? : ", todoStatus);
             mainQuery = mainQuery.andWhere('todo.status IN (:...status)', { status: todoStatus })
             mainQuery = mainQuery.andWhere('manager.id = :userId', { userId })
+            mainQuery = mainQuery.addOrderBy(
+                `CASE 
+                WHEN todo.status = 'idea' THEN 1 
+                WHEN todo.status = 'ready' THEN 2
+                WHEN todo.status = 'progress' THEN 3
+                WHEN todo.status = 'testing' THEN 4
+                ELSE 4
+                END`,
+                'ASC'
+            );
             mainQuery = mainQuery.addOrderBy('todo.id', 'DESC');
             mainQuery = mainQuery.addOrderBy('supplementaryTodos.id', 'ASC');
 
