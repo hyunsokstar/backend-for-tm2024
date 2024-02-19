@@ -91,9 +91,19 @@ export class RoadmapService {
         const [roadMapList, totalCount] = await query
             .leftJoinAndSelect('roadMap.writer', 'writer')
             .leftJoinAndSelect('roadMap.techNotes', 'techNotes')
+            .leftJoinAndSelect('techNotes.skilnotes', 'techNote.skilnotes')
             .getManyAndCount();
 
         // console.log("roadMapList ??? ", roadMapList);
+        // const techNoteListWithCounts = roadMapList.map(roadMap => {
+        //     let techNotes = roadMap.techNotes.map(techNote => {
+        //         techNote.countForSkilNotes = techNote.skilnotes.length; // 수정 필요
+        //     })
+        //     return {
+        //         ...roadMap,
+        //         techNotes
+        //     }
+        // });
 
         return {
             perPage: perPage,
