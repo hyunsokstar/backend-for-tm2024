@@ -14,4 +14,7 @@ export class DtoForCreateTechNote {
 
     @IsNumber()
     writerId: number;
+
+    @IsNumber()
+    roadMapId?: number;
 }

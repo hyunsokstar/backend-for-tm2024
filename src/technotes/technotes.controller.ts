@@ -7,6 +7,13 @@ export class TechnotesController {
 
     constructor(private readonly technotesService: TechnotesService) { }
 
+    @Post() // POST 요청을 처리하는 엔드포인트 추가
+    async createTechNoteForRoadMap(@Body() dto: DtoForCreateTechNote) {
+        return this.technotesService.createTechNote(dto);
+    }
+
+    //
+
     @Get()
     async getAllTechNoteList(
         @Query('pageNum') pageNum = 1,
@@ -32,9 +39,9 @@ export class TechnotesController {
     // post, /likeTechNote
     // service 와 연동
 
-    @Post() // POST 요청을 처리하는 엔드포인트 추가
+    @Post('create/forRoadMap') // POST 요청을 처리하는 엔드포인트 추가
     async createTechNote(@Body() dto: DtoForCreateTechNote) {
-        return this.technotesService.createTechNote(dto);
+        return this.technotesService.createTechNoteForRoadMap(dto);
     }
 
     @Post('saveTechNotes') // API 엔드포인트 추가

@@ -12,6 +12,7 @@ export class RoadmapController {
     async getAllRoadMapList(
         @Query('pageNum') pageNum: number,
     ) {
+        // console.log("controller 실행 check for get roadmap list");
         const perPage = 20;
         const response = await this.roadMapService.getAllRoadMapList({ pageNum, perPage });
         return response;
@@ -37,20 +38,15 @@ export class RoadmapController {
 
     @Delete('deleteRoadMapsForCheckedRows')
     async deleteRoadMapsForCheckedRows(@Body('checkedIds') checkedIds: number[], @Req() req) {
-
         try {
             console.log("유저 삭제 요청 받음");
             const loginUser = req.user
-
             if (!req.user) {
                 return {
                     message: "로그인 하세요"
                 }
             }
-
             return await this.roadMapService.deleteForRoadMapsForCheckedIds(checkedIds, loginUser);
-
-
         } catch (error) {
             throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
         }

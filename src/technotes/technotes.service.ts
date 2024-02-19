@@ -9,6 +9,7 @@ import { LikesModelForTechNote } from './entities/likesForTechNote.entity';
 import { bookMarksForTechNoteModel } from './entities/bookMarks.entity';
 import { LikesModelForSkilNote } from './entities/likesForSkilNote.entity';
 import { BookMarksForSkilNoteModel } from './entities/bookMarksForSkilNote.entity';
+import { RoadMapModel } from './entities/roadMap.entity';
 
 @Injectable()
 export class TechnotesService {
@@ -16,6 +17,9 @@ export class TechnotesService {
     constructor(
         @InjectRepository(TechNotesModel)
         private techNotesRepo: Repository<TechNotesModel>,
+        @InjectRepository(RoadMapModel)
+        private roadMapsRepo: Repository<RoadMapModel>,
+
         @InjectRepository(SkilNotesModel)
         private skilNotesRepo: Repository<SkilNotesModel>,
         @InjectRepository(UsersModel)
@@ -207,35 +211,25 @@ export class TechnotesService {
         return this.techNotesRepo.save(techNote);
     }
 
-    // async getAllTechNotes(
-    //     pageNum: number = 1,
-    //     perPage: number = 10,
-    //     searchOption: string,
-    //     earchText: string
+    async createTechNoteForRoadMap(dto: DtoForCreateTechNote) {
+        const { title, description, category, writerId, roadMapId } = dto;
+        const writer = await this.usersRepository.findOne({ where: { id: writerId } });
+        const roadmapObj = await this.roadMapsRepo.findOne({ where: { id: roadMapId } });
 
-    // ): Promise<{
-    //     techNoteList: TechNotesModel[],
-    //     totalCount: number,
-    //     perPage: number,
-    // }> {
-    //     // return this.techNotesRepo.find();
+        const techNote = new TechNotesModel();
+        techNote.title = title;
+        techNote.description = description;
+        techNote.category = category;
 
-    //     const [techNoteList, totalCount] = await this.techNotesRepo.findAndCount({
-    //         skip: (pageNum - 1) * perPage,
-    //         take: perPage,
-    //         relations: ['writer', 'skilnotes'], // 이 부분이 추가된 부분입니다. User 정보를 가져오도록 설정합니다.
-    //         order: {
-    //             id: 'DESC'
-    //         }
-    //     });
+        if (!writer) {
+            throw new Error('Writer not found'); // 작가를 찾을 수 없는 경우 예외 처리
+        }
 
-    //     return {
-    //         techNoteList,
-    //         totalCount,
-    //         perPage
-    //     }
+        techNote.writer = writer; // Assign the writer object to the tech note
+        techNote.roadMap = roadmapObj;
 
-    // }
+        return this.techNotesRepo.save(techNote);
+    }
 
     async getAllTechNotes(
         pageNum: number = 1,
