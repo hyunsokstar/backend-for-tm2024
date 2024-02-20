@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query, Req } from '@nestjs/common';
 import { ShortcutsService } from './shortcuts.service';
 import { ShortCutsModel } from '../entities/shortCut.entity';
 import { CreateOneShortCutDto } from '../dtos/CreateOneShortCut.dto';
+import { SaveShortCutsDto } from '../dtos/saveShortCut.dto';
 
 @Controller('shortcuts')
 export class ShortcutsController {
@@ -26,5 +27,17 @@ export class ShortcutsController {
         return this.shortcutsService.createShortcut(createOneShortCutDto);
     }
 
+    @Post('saveShortCuts')
+    async saveShortCuts(
+        @Body() dataForSaveShortCuts: SaveShortCutsDto[],
+        @Req() req
+    ) {
+        return this.shortcutsService.saveShortCuts(
+            {
+                dataForSaveShortCuts,
+                loginUser: req.user
+            }
+        );
+    }
 
 }
