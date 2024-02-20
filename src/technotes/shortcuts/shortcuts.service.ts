@@ -22,19 +22,28 @@ export class ShortcutsService {
         const skip = (pageNum - 1) * perPage;
 
         // 실제 데이터베이스에서 단축키 목록을 가져옵니다.
-        const [shortcuts, totalCount] = await this.shortcutsRepository.findAndCount({
-            skip: skip,
-            take: perPage,
-            order: { id: 'DESC' }, // 필요에 따라 정렬 조건을 변경할 수 있습니다.
-        });
+        // const [shortcuts, totalCount] = await this.shortcutsRepository.findAndCount({
+        //     skip: skip,
+        //     take: perPage,
+        //     order: { id: 'DESC' }, // 필요에 따라 정렬 조건을 변경할 수 있습니다.
+        // });
 
-        // 가져온 단축키 데이터를 응답 형식에 맞게 가공합니다.
-        const shortCutList: ITypeForShortCutRow[] = shortcuts.map(shortcut => ({
-            id: shortcut.id,
-            shortcut: shortcut.shortcut,
-            description: shortcut.description,
-            category: shortcut.category,
-        }));
+        // const shortCutList: ITypeForShortCutRow[] = shortcuts.map(shortcut => ({
+        //     id: shortcut.id,
+        //     shortcut: shortcut.shortcut,
+        //     description: shortcut.description,
+        //     category: shortcut.category,
+        // }));
+
+        let query = this.shortcutsRepository.createQueryBuilder('shortCut')
+            .skip((pageNum - 1) * perPage)
+            .take(perPage)
+            .orderBy('shortCut.id', 'DESC');
+
+        const [shortCutList, totalCount] = await query
+            .leftJoinAndSelect('shortCut.writer', 'writer')
+            .getManyAndCount();
+
 
         // 응답 객체를 생성하여 반환합니다.
         const response: ReponseTypeForGetAllShortCutList = {
