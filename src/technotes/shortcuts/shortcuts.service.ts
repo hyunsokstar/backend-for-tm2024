@@ -1,7 +1,7 @@
 import { shortCutListDto } from './../dtos/shortCutList.dto';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { ShortCutsModel } from '../entities/shortCut.entity';
 import { CreateOneShortCutDto } from '../dtos/CreateOneShortCut.dto';
 import { UsersModel } from 'src/users/entities/users.entity';
@@ -143,6 +143,36 @@ export class ShortcutsService {
         return {
             success: true,
             message: `road map save is successfully excuted for count ${count_for_update}`
+        }
+    }
+
+    async deleteForShortCutsForCheckedIds(checkedIds: number[], loginUser): Promise<string | { success: boolean, message: string }> {
+        try {
+            const notesToDelete = await this.shortcutsRepository.find({
+                where: { id: In(checkedIds) },
+                relations: ['writer'], // writer 관계를 가져옵니다.
+            });
+
+            const filteredNotesToDelete = notesToDelete.filter(todo => todo.writer.email !== loginUser.email);
+            console.log("filteredTodosToDelete.length : ", filteredNotesToDelete.length);
+
+            if (filteredNotesToDelete.length > 0) {
+                return {
+                    success: false,
+                    message: `삭제할 권한이 없습니다.`
+                };
+            }
+
+            const deleteResult = await this.shortcutsRepository.delete(checkedIds);
+            console.log("result for delete techNoteRowsForCheckedIds: ", deleteResult);
+
+            const deletedCount = deleteResult.affected ?? 0;
+            return { success: true, message: `총 ${deletedCount}개의 roadmap이 삭제되었습니다.` }
+
+        } catch (error) {
+            console.log("error : ", error);
+
+            throw new Error('삭제 중 오류가 발생했습니다.');
         }
     }
 
