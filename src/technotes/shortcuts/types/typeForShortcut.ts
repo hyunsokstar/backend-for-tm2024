@@ -12,4 +12,4 @@ export interface ReponseTypeForGetAllShortCutList {
     perPage: number;
     totalCount: number;
     shortCutList: ITypeForShortCutRow[];
-}
+}   
