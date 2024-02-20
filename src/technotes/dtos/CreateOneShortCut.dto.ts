@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateOneShortCutDto {
     @IsNotEmpty()
@@ -7,9 +7,6 @@ export class CreateOneShortCutDto {
     @IsNotEmpty()
     readonly description: string;
 
-    @IsNotEmpty()
-    readonly category: string;
-
-    @IsNumber()
-    readonly writerId: number;
+    @IsOptional() // IsOptional을 사용하여 속성이 필수가 아니라는 것을 나타냅니다.
+    readonly category?: string;
 }

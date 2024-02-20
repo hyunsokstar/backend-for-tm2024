@@ -60,18 +60,17 @@ export class ShortcutsService {
         return this.shortcutsRepository.findOne({ where: { id } });
     }
 
-    async createShortcut(createOneShortCutDto: CreateOneShortCutDto): Promise<ShortCutsModel> {
-        const { shortcut, description, category, writerId } = createOneShortCutDto;
+    async createShortcut(createOneShortCutDto: CreateOneShortCutDto, loginUser: UsersModel): Promise<ShortCutsModel> {
+        const { shortcut, description, category } = createOneShortCutDto;
 
         // 사용자 ID를 기반으로 사용자 찾기
-        const writer = await this.usersRepo.findOne({ where: { id: writerId } });
 
         // ShortCutsModel 인스턴스 생성 및 속성 설정
         const shortcutEntity = new ShortCutsModel();
         shortcutEntity.shortcut = shortcut;
         shortcutEntity.description = description;
         shortcutEntity.category = category;
-        shortcutEntity.writer = writer; // 작성자 할당
+        shortcutEntity.writer = loginUser; // 작성자 할당
 
         // ShortCutsModel 저장 후 반환
         return this.shortcutsRepository.save(shortcutEntity);

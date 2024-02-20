@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Param, Query, Req, Delete, HttpStatus, HttpException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query, Req, Delete, HttpStatus, HttpException, UseGuards } from '@nestjs/common';
 import { ShortcutsService } from './shortcuts.service';
 import { ShortCutsModel } from '../entities/shortCut.entity';
 import { CreateOneShortCutDto } from '../dtos/CreateOneShortCut.dto';
 import { SaveShortCutsDto } from '../dtos/saveShortCut.dto';
+import { AuthGuard } from 'src/guards/auth.guard';
 
 @Controller('shortcuts')
 export class ShortcutsController {
@@ -22,9 +23,12 @@ export class ShortcutsController {
         return this.shortcutsService.getShortcutById(id);
     }
 
+    @UseGuards(AuthGuard)
     @Post()
-    async createOne(@Body() createOneShortCutDto: CreateOneShortCutDto): Promise<ShortCutsModel> {
-        return this.shortcutsService.createShortcut(createOneShortCutDto);
+    async createOneShortCut(@Body() createOneShortCutDto: CreateOneShortCutDto, @Req() req): Promise<ShortCutsModel> {
+        const loginUser = req.user
+
+        return this.shortcutsService.createShortcut(createOneShortCutDto, loginUser);
     }
 
     @Post('saveShortCuts')
