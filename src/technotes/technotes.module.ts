@@ -17,6 +17,9 @@ import { BookMarksForSkilNoteContentsModel } from './entities/bookMarksForSkilNo
 import { RoadMapModel } from './entities/roadMap.entity';
 import { RoadmapController } from './roadmap/roadmap.controller';
 import { RoadmapService } from './roadmap/roadmap.service';
+import { ShortCutsModel } from './entities/shortCut.entity';
+import { ShortcutsController } from './shortcuts/shortcuts.controller';
+import { ShortcutsService } from './shortcuts/shortcuts.service';
 
 
 @Module({
@@ -27,6 +30,7 @@ import { RoadmapService } from './roadmap/roadmap.service';
       UsersModel,
       SkilNotesModel,
       SkilNoteContentsModel,
+      ShortCutsModel,
       LikesModelForTechNote,
       bookMarksForTechNoteModel,
       LikesModelForSkilNote,
@@ -34,8 +38,8 @@ import { RoadmapService } from './roadmap/roadmap.service';
       BookMarksForSkilNoteContentsModel
     ])
   ],
-  controllers: [TechnotesController, SkilnotesController, RoadmapController],
-  providers: [TechnotesService, SkilnotesService, AuthGuard, RoadmapService]
+  controllers: [TechnotesController, SkilnotesController, RoadmapController, ShortcutsController],
+  providers: [TechnotesService, SkilnotesService, AuthGuard, RoadmapService, ShortcutsService]
 })
 
 

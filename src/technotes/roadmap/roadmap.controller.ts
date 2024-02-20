@@ -12,7 +12,6 @@ export class RoadmapController {
     async getAllRoadMapList(
         @Query('pageNum') pageNum: number,
     ) {
-        // console.log("controller 실행 check for get roadmap list");
         const perPage = 20;
         const response = await this.roadMapService.getAllRoadMapList({ pageNum, perPage });
         return response;

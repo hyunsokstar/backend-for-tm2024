@@ -28,6 +28,7 @@ import { BookMarksForSkilNoteContentsModel } from "./technotes/entities/bookMark
 import { SupplementaryTodosModel } from "./todos/entities/supplementary_todos.entity";
 import { SupplementaryTodoBriefingModel } from "./todos/entities/supplementary_todo_briefing.entity";
 import { RoadMapModel } from "./technotes/entities/roadMap.entity";
+import { ShortCutsModel } from "./technotes/entities/shortCut.entity";
 
 @Module({
   imports: [
@@ -53,7 +54,8 @@ import { RoadMapModel } from "./technotes/entities/roadMap.entity";
         bookMarksForTechNoteModel,
         LikesModelForSkilNote,
         BookMarksForSkilNoteModel,
-        BookMarksForSkilNoteContentsModel
+        BookMarksForSkilNoteContentsModel,
+        ShortCutsModel
       ],
       synchronize: true,
     }),
