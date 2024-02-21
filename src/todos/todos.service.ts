@@ -404,7 +404,6 @@ export class TodosService {
             const hoursDifference = Math.floor(timeDifferenceInMilliseconds / (1000 * 60 * 60)); // 시간
             const minutesDifference = Math.floor((timeDifferenceInMilliseconds % (1000 * 60 * 60)) / (1000 * 60)); // 분
 
-            // 이메일로 해당하는 유저를 찾음
             const manager = await this.usersRepository.findOne({ where: { email: todo.email } });
             console.log("manager : ", manager);
 
@@ -414,7 +413,7 @@ export class TodosService {
 
             if (manager) {
                 if (id) {
-                    const parentTodoObj = await this.todosRepository.findOne({ where: { id: parentTodoId } }); // 변경된 부분
+                    const parentTodoObj = await this.todosRepository.findOne({ where: { id: parentTodoId }, relations: ["supplementaryTodos"] });
                     const existingTodo = await this.supplementaryTodosRepo.findOne({ where: { id: id } }); // 변경된 부분
                     if (existingTodo) {
 
@@ -429,6 +428,15 @@ export class TodosService {
                                 // deadline: null,
                                 elapsedTime: null,
                             });
+
+                            console.log("parentTodoObj.supplementaryTodos ?", parentTodoObj.supplementaryTodos);
+                            const allReady = await parentTodoObj.supplementaryTodos.every(todo => todo.status === TodoStatus.READY);
+                            console.log("allRedady ?", allReady);
+
+                            if (allReady) {
+                                await this.todosRepository.update(parentTodoId, { status: TodoStatus.READY });
+                            }
+
                         }
                         else if (todo.status === "progress") {
                             count += 1
@@ -441,6 +449,13 @@ export class TodosService {
                                 // deadline: null,
                                 elapsedTime: null,
                             });
+
+                            // todo
+                            // parentTodoObj.status 를 "progress 로 update"
+                            if (todo.status === "progress") {
+                                await this.todosRepository.update(parentTodoId, { status: TodoStatus.PROGRESS });
+                            }
+
                         }
                         else if (todo.status === "testing") {
                             await this.supplementaryTodosRepo.update(id, {
