@@ -29,6 +29,7 @@ import { SupplementaryTodosModel } from "./todos/entities/supplementary_todos.en
 import { SupplementaryTodoBriefingModel } from "./todos/entities/supplementary_todo_briefing.entity";
 import { RoadMapModel } from "./technotes/entities/roadMap.entity";
 import { ShortCutsModel } from "./technotes/entities/shortCut.entity";
+import { SubShortCutsModel } from "./technotes/entities/subShortCut.entity";
 
 @Module({
   imports: [
@@ -45,6 +46,8 @@ import { ShortCutsModel } from "./technotes/entities/shortCut.entity";
         TodosModel,
         SupplementaryTodosModel,
         SupplementaryTodoBriefingModel,
+        ShortCutsModel,
+        SubShortCutsModel,
         RoadMapModel,
         TechNotesModel,
         SkilNotesModel,
@@ -55,7 +58,6 @@ import { ShortCutsModel } from "./technotes/entities/shortCut.entity";
         LikesModelForSkilNote,
         BookMarksForSkilNoteModel,
         BookMarksForSkilNoteContentsModel,
-        ShortCutsModel
       ],
       synchronize: true,
     }),

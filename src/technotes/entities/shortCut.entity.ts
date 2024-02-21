@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
 import { UsersModel } from '../../users/entities/users.entity';
+import { SubShortCutsModel } from './subShortCut.entity';
 
 @Entity()
 export class ShortCutsModel {
@@ -18,4 +19,6 @@ export class ShortCutsModel {
     @ManyToOne(() => UsersModel, { onDelete: 'CASCADE', nullable: true })
     writer: UsersModel;
 
+    @OneToMany(() => SubShortCutsModel, subShortcut => subShortcut.parentShortcut)
+    subShortCuts: SubShortCutsModel[]
 }

@@ -20,7 +20,7 @@ export class ShortcutsService {
 
     async getAllShortcuts(shortCutListDto: shortCutListDto): Promise<ReponseTypeForGetAllShortCutList> {
         const { pageNum, perPage } = shortCutListDto;
-        const skip = (pageNum - 1) * perPage;
+        // const skip = (pageNum - 1) * perPage;
 
         // 실제 데이터베이스에서 단축키 목록을 가져옵니다.
         // const [shortcuts, totalCount] = await this.shortcutsRepository.findAndCount({
@@ -36,6 +36,10 @@ export class ShortcutsService {
         //     category: shortcut.category,
         // }));
 
+        console.log(typeof pageNum, pageNum);
+        console.log(typeof perPage, perPage);
+
+
         let query = this.shortcutsRepository.createQueryBuilder('shortCut')
             .skip((pageNum - 1) * perPage)
             .take(perPage)
@@ -43,6 +47,7 @@ export class ShortcutsService {
 
         const [shortCutList, totalCount] = await query
             .leftJoinAndSelect('shortCut.writer', 'writer')
+            .leftJoinAndSelect('shortCut.subShortCuts', 'subShortCuts')
             .getManyAndCount();
 
 
