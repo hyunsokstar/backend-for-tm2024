@@ -19,5 +19,5 @@ export class SimpleCreateTodoDto {
     rowNum: number; // managerId로 수정
 
     @IsString()
-    todoStatusOption: "idea" | "uncompleted" | "completed"
+    todoStatusOption: "idea" | "uncompleted" | "completed" | "entry"
 }

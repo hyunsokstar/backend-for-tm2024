@@ -34,7 +34,6 @@ export class TodosController {
         @Req() req
     ): Promise<{ usersEmailInfo: string[], todoList: TodosModel[], totalCount: number, perPage: number }> {
         // console.log("req.user : ", req.user);
-
         return this.todosService.getTodoListForUserId(pageNum, perPage, userId, todoStatusOption);
     }
 
@@ -99,7 +98,6 @@ export class TodosController {
     }
 
     // post, "/simpleInsertTodo"
-    // body json 으로 받음 <=> manager(string), task(string), deadline: time, rowNum: number
     @Post("/simpleCreateTodo")
     async simpleCreateTodo(
         @Body() createTodoDto: SimpleCreateTodoDto,
@@ -111,7 +109,6 @@ export class TodosController {
     }
 
     // @Delete, Body 로 todoId 받아서 todosService.deleteTodById 요청
-    // 컨트롤러 함수 이름 deleteTodoById
     @Delete("deleteTodoById")
     async deleteTodoById(
         @Body('todoId') todoId: number,

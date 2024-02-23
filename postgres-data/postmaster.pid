@@ -1,29 +1,8 @@
 1
 /var/lib/postgresql/data
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-1708575536
-5432
-/var/run/postgresql
-*
-   252926         0
-=======
->>>>>>> 0f866f62dda521f3209ec5cdf16f081857882728
-1708668064
+1708693245
 5432
 /var/run/postgresql
 *
   3410636         0
-<<<<<<< HEAD
-=======
-1708575536
-5432
-/var/run/postgresql
-*
-   252926         0
->>>>>>> 812738ffa942fae635f3a5bed06a28abb2d41cc5
-=======
->>>>>>> 13de99aec0e3d1dfc559373a0e3b3bcd382630ec
->>>>>>> 0f866f62dda521f3209ec5cdf16f081857882728
 ready   

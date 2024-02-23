@@ -839,9 +839,14 @@ export class TodosService {
         let statusOption;
         if (todoStatusOption === "idea") {
             statusOption = TodoStatus.IDEA
-        } else if (todoStatusOption === "uncompleted") {
+        }
+        else if (todoStatusOption === "entry") {
+            statusOption = TodoStatus.ENTRY
+        }
+        else if (todoStatusOption === "uncompleted") {
             statusOption = TodoStatus.READY
-        } else if (todoStatusOption === "completed") {
+        }
+        else if (todoStatusOption === "completed") {
             statusOption = TodoStatus.COMPLETED
         }
 
@@ -862,7 +867,7 @@ export class TodosService {
             const todo = this.todosRepository.create({
                 task,
                 deadline,
-                manager: managerObj,
+                manager: statusOption === "entry" ? null : managerObj,
                 status: statusOption
             });
             todoPromises.push(this.todosRepository.save(todo));
