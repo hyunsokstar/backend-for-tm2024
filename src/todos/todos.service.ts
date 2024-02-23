@@ -297,9 +297,9 @@ export class TodosService {
             // 이메일로 해당하는 유저를 찾음
             const manager = await this.usersRepository.findOne({ where: { email: todo.email } });
 
-            if (!manager) {
-                throw new NotFoundException('User not found email is required !!');
-            }
+            // if (!manager) {
+            //     throw new NotFoundException('User not found email is required !!');
+            // }
 
             if (manager) {
                 if (id) {
@@ -376,10 +376,18 @@ export class TodosService {
                         // return { message: 'New Todo created successfully' };
                     }
                 } else {
+
                     console.log(`ID가 없습니다.`);
                 }
             } else {
                 console.log(`유저 이메일 '${todo.email}'을(를) 찾을 수 없습니다.`);
+                await this.todosRepository.update(id, {
+                    manager: null, // manager 속성을 null로 설정
+                    task: todo.task,
+                    status: todo.status,
+                    startTime: new Date(),
+                    elapsedTime: null,
+                });
             }
         }
         return { message: `Todos saved successfully ${count}` };
@@ -595,7 +603,7 @@ export class TodosService {
         pageNum: number = 1,
         perPage: number = 20,
         userId: number,
-        todoStatusOption: "all_uncompleted" | "all_completed" | "idea" | "uncompleted" | "completed"
+        todoStatusOption: "all_uncompleted" | "all_completed" | "idea" | "uncompleted" | "completed" | "entry"
     ): Promise<{
         todoList: TodosModel[],
         totalCount: number,
@@ -614,6 +622,11 @@ export class TodosService {
         if (todoStatusOption === "all_uncompleted") {
             todoStatus = [TodoStatus.IDEA, TodoStatus.READY, TodoStatus.PROGRESS, TodoStatus.TESTING]; // IDEA와 COMPLETED를 제외한 나머지 상태를 가져옴
         }
+
+        if (todoStatusOption === "entry") {
+            todoStatus = [TodoStatus.ENTRY]; // IDEA와 COMPLETED를 제외한 나머지 상태를 가져옴
+        }
+
         if (todoStatusOption === "all_completed") {
             todoStatus = [TodoStatus.COMPLETED]; // IDEA와 COMPLETED를 제외한 나머지 상태를 가져옴
         }
@@ -643,6 +656,14 @@ export class TodosService {
             mainQuery = mainQuery.addOrderBy('todo.completedAt', 'ASC')
             mainQuery = mainQuery.addOrderBy('todo.id', 'DESC');
         }
+
+        if (todoStatusOption === "entry") {
+            // console.log("이게 실행 됐나?");
+            mainQuery = mainQuery.andWhere('todo.status IN (:...status)', { status: todoStatus })
+            mainQuery = mainQuery.addOrderBy('todo.completedAt', 'ASC')
+            mainQuery = mainQuery.addOrderBy('todo.id', 'DESC');
+        }
+
         else if (todoStatusOption === "all_uncompleted") {
             mainQuery = mainQuery.andWhere('todo.status IN (:...status)', { status: todoStatus })
             mainQuery = mainQuery.orderBy('manager.email')

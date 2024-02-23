@@ -5,6 +5,7 @@ import { SkilNotesModel } from 'src/technotes/entities/skilnotes.entity';
 import { SupplementaryTodosModel } from './supplementary_todos.entity';
 
 export enum TodoStatus {
+    ENTRY = 'entry',
     IDEA = 'idea',
     READY = 'ready',
     PROGRESS = 'progress',
@@ -19,6 +20,12 @@ export class TodosModel {
 
     @Column()
     task: string;
+
+    @Column({ nullable: true, default: false })
+    isForToday: string
+
+    @Column({ nullable: true, default: false })
+    isUrgent: boolean;
 
     @Column({ nullable: true })
     details: string;
