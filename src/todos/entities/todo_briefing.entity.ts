@@ -1,6 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, UpdateDateColumn, CreateDateColumn, ManyToOne } from 'typeorm';
 import { TodosModel } from './todos.entity';
 import { UsersModel } from 'src/users/entities/users.entity';
+import { IsString } from 'class-validator';
 
 export enum Position {
     Manager = "manager",
@@ -30,4 +31,9 @@ export class TodoBriefingModel {
     @ManyToOne(() => UsersModel, { onDelete: 'CASCADE', nullable: true })
     writer: UsersModel
     user: UsersModel
+
+    @Column({ type: 'varchar', nullable: true })
+    refImage: string;
+
+
 }
