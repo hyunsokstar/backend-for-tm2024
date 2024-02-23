@@ -6,6 +6,7 @@ import { TodosModel } from './todos.entity';
 import { SupplementaryTodoBriefingModel } from './supplementary_todo_briefing.entity';
 
 export enum TodoStatus {
+    ENTRY = 'entry',
     IDEA = 'idea',
     READY = 'ready',
     PROGRESS = 'progress',
