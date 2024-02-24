@@ -30,4 +30,7 @@ export class SupplementaryTodoBriefingModel {
     @ManyToOne(() => UsersModel, { onDelete: 'CASCADE', nullable: true })
     writer: UsersModel
     user: UsersModel
+
+    @Column({ type: 'varchar', nullable: true })
+    refImage: string;
 }

@@ -57,6 +57,7 @@ export class TodoBriefingService {
             const newBriefing = new SupplementaryTodoBriefingModel();
             newBriefing.content = briefingDto.content;
             newBriefing.position = briefingDto.position;
+            newBriefing.refImage = briefingDto.refImage;
             newBriefing.todo = todoObj;
             newBriefing.writer = userObj;
 
