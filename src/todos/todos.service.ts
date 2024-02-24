@@ -40,6 +40,9 @@ export class TodosService {
             defaultUserEmail
         } = dto;
 
+        console.log("dto : ", dto);
+
+
         // 사용자 정보 가져오기
         const manager = await this.usersRepository.findOne({ where: { email: defaultUserEmail } });
 
@@ -53,7 +56,7 @@ export class TodosService {
             todoStatusOption = TodoStatus.PROGRESS
         } else if (defaultTodoStatus === "testing") {
             todoStatusOption = TodoStatus.TESTING
-        } else if (defaultTodoStatus === "completed") {
+        } else if (defaultTodoStatus === "complete") {
             todoStatusOption = TodoStatus.COMPLETED
         }
 

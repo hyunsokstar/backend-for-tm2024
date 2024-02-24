@@ -133,6 +133,7 @@ export class TodosController {
     async multiUpdateTodoRowsForChecked(@Body() dtoForMultiUpdateTodoRowsForChecked: MultiUpdateTodoDto, @Req() req) {
         console.log("dto check ??? : ", dtoForMultiUpdateTodoRowsForChecked);
         // console.log("req.user : ", req.user);
+        console.log("multi update check ???");
 
 
         const result = await this.todosService.multiUpdateTodoRowsForChecked(dtoForMultiUpdateTodoRowsForChecked);
