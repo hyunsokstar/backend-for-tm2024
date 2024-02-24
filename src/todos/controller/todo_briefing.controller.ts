@@ -1,10 +1,19 @@
 import { Controller, Post, Body, Param, UseGuards, Req, Get, NotFoundException } from '@nestjs/common';
 import { TodoBriefingService } from '../todo_briefing.services';
 import { AddTodoBriefingDto } from '../dtos/todo-briefing.dto';
+import { SelectNoteForTodoDto } from '../dtos/selectNoteForTodo.dto';
+import { SelectManagerForUnsignedTodoDto } from '../dtos/SelectManagerDto.dto';
 
 @Controller('todos')
 export class TodoBriefingController {
     constructor(private readonly todoBriefingService: TodoBriefingService) { }
+
+    @Post('selectManagerForUnsignedTask')
+    async selectManagerForUnsginedTask(
+        @Body() selectNoteForTodoDto: SelectManagerForUnsignedTodoDto, // 요청 본문 데이터
+    ): Promise<any> {
+        return this.todoBriefingService.selectManagerForUnsginedTask(selectNoteForTodoDto);
+    }
 
     @Post(':todoId/create/briefing')
     async addBriefingToTodo(

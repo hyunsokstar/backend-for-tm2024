@@ -4,7 +4,7 @@ import { IsInt, IsNumber } from 'class-validator';
 
 export class SelectNoteForTodoDto {
     @IsNumber()
-    toDoId: number;
+    todoId: number;
 
     @IsNumber()
     skilNoteId: number;

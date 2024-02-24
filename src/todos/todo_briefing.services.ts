@@ -1,12 +1,14 @@
 import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
-import { TodosModel } from './entities/todos.entity';
+import { TodoStatus, TodosModel } from './entities/todos.entity';
 import { UsersModel } from 'src/users/entities/users.entity';
 import { TodoBriefingModel } from './entities/todo_briefing.entity';
 import { AddTodoBriefingDto } from './dtos/todo-briefing.dto';
 import { SupplementaryTodosModel } from './entities/supplementary_todos.entity';
 import { SupplementaryTodoBriefingModel } from './entities/supplementary_todo_briefing.entity';
+import { SelectNoteForTodoDto } from './dtos/selectNoteForTodo.dto';
+import { SelectManagerForUnsignedTodoDto } from './dtos/SelectManagerDto.dto';
 
 @Injectable()
 export class TodoBriefingService {
@@ -22,6 +24,37 @@ export class TodoBriefingService {
         @InjectRepository(SupplementaryTodoBriefingModel)
         private readonly supplementaryTodoBriefingRepo: Repository<SupplementaryTodoBriefingModel>,
     ) { }
+
+    async selectManagerForUnsginedTask(selectManagerForUnsignedTodoDto: SelectManagerForUnsignedTodoDto): Promise<any> {
+        try {
+            const { todoId, writerId } = selectManagerForUnsignedTodoDto;
+
+            // 주어진 todoId에 해당하는 엔터티를 찾습니다.
+            const todoEntity = await this.todosRepository.findOne({ where: { id: todoId } });
+
+            if (!todoEntity) {
+                throw new Error('해당하는 todo가 존재하지 않습니다.');
+            }
+
+            // 주어진 writerId에 해당하는 유저를 찾습니다.
+            const writerEntity = await this.usersRepository.findOne({ where: { id: writerId } });
+
+            if (!writerEntity) {
+                throw new Error('해당하는 작성자가 존재하지 않습니다.');
+            }
+
+            // todoEntity의 매니저를 writerEntity로 업데이트합니다.
+            todoEntity.manager = writerEntity;
+            todoEntity.status = TodoStatus.READY;
+
+            // 업데이트된 엔터티를 저장합니다.
+            await this.todosRepository.save(todoEntity);
+
+            return { message: '매니저가 선택되었습니다.' };
+        } catch (error) {
+            throw new Error('매니저를 선택하는 중에 오류가 발생했습니다.');
+        }
+    }
 
     async addTodoBriefing(todoId, briefingDto: AddTodoBriefingDto): Promise<TodoBriefingModel | SupplementaryTodoBriefingModel> {
         const { content, position, isMainOrSub } = briefingDto;
