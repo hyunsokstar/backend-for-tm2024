@@ -1,11 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { StarterProjectsService } from './starter-projects.service';
 import { CreateStarterProjectDto } from './dto/create-starter-project.dto';
 import { UpdateStarterProjectDto } from './dto/update-starter-project.dto';
 
-@Controller('starter-projects')
+@Controller('starterkits')
 export class StarterProjectsController {
-  constructor(private readonly starterProjectsService: StarterProjectsService) {}
+  constructor(private readonly starterProjectsService: StarterProjectsService) { }
 
   @Post()
   create(@Body() createStarterProjectDto: CreateStarterProjectDto) {
@@ -13,8 +13,12 @@ export class StarterProjectsController {
   }
 
   @Get()
-  findAll() {
-    return this.starterProjectsService.findAll();
+  findAllStarterKitsWithPagination(
+    @Query('pageNum') pageNum: number,
+  ) {
+    const perPage = 20;
+
+    return this.starterProjectsService.findAllStarterKitsWithPagination({ pageNum, perPage });
   }
 
   @Get(':id')

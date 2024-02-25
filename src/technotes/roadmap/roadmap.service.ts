@@ -86,7 +86,6 @@ export class RoadmapService {
             .take(perPage)
             .orderBy('roadMap.id', 'DESC');
 
-        // .leftJoinAndSelect('techNotes.skilnotes', 'skilnotes')
 
         const [roadMapList, totalCount] = await query
             .leftJoinAndSelect('roadMap.writer', 'writer')
