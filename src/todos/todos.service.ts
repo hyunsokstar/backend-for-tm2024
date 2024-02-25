@@ -109,7 +109,7 @@ export class TodosService {
             todoStatusOption = TodoStatus.PROGRESS
         } else if (defaultTodoStatus === "testing") {
             todoStatusOption = TodoStatus.TESTING
-        } else if (defaultTodoStatus === "completed") {
+        } else if (defaultTodoStatus === "complete") {
             todoStatusOption = TodoStatus.COMPLETED
         }
 
@@ -654,20 +654,11 @@ export class TodosService {
             .leftJoinAndSelect('briefings.writer', 'writer')
 
         if (todoStatusOption === "all_completed") {
-            // console.log("이게 실행 됐나?");
+            console.log("complete list 왜 안가져오지?");
             mainQuery = mainQuery.andWhere('todo.status IN (:...status)', { status: todoStatus })
             mainQuery = mainQuery.addOrderBy('todo.completedAt', 'ASC')
             mainQuery = mainQuery.addOrderBy('todo.id', 'DESC');
-        }
-
-        if (todoStatusOption === "entry") {
-            // console.log("이게 실행 됐나?");
-            mainQuery = mainQuery.andWhere('todo.status IN (:...status)', { status: todoStatus })
-            mainQuery = mainQuery.addOrderBy('todo.completedAt', 'ASC')
-            mainQuery = mainQuery.addOrderBy('todo.id', 'DESC');
-        }
-
-        else if (todoStatusOption === "all_uncompleted") {
+        } else if (todoStatusOption === "all_uncompleted") {
             mainQuery = mainQuery.andWhere('todo.status IN (:...status)', { status: todoStatus })
             mainQuery = mainQuery.orderBy('manager.email')
             mainQuery = mainQuery.addOrderBy(
@@ -694,7 +685,13 @@ export class TodosService {
             );
             mainQuery = mainQuery.addOrderBy('supplementaryTodos.id', 'DESC');
 
+        } else if (todoStatusOption === "entry") {
+            // console.log("이게 실행 됐나?");
+            mainQuery = mainQuery.andWhere('todo.status IN (:...status)', { status: todoStatus })
+            mainQuery = mainQuery.addOrderBy('todo.completedAt', 'ASC')
+            mainQuery = mainQuery.addOrderBy('todo.id', 'DESC');
         }
+
         else {
             console.log("여기가 맞지 ??? : ", todoStatus);
             mainQuery = mainQuery.andWhere('todo.status IN (:...status)', { status: todoStatus })
