@@ -606,7 +606,7 @@ export class TodosService {
         pageNum: number = 1,
         perPage: number = 20,
         userId: number,
-        todoStatusOption: "all_uncompleted" | "all_completed" | "idea" | "uncompleted" | "completed" | "entry"
+        todoStatusOption: "all_uncompleted" | "all_completed" | "idea" | "uncompleted" | "complete" | "entry"
     ): Promise<{
         todoList: TodosModel[],
         totalCount: number,
@@ -635,7 +635,7 @@ export class TodosService {
         }
         else if (todoStatusOption === 'uncompleted') {
             todoStatus = [TodoStatus.READY, TodoStatus.PROGRESS, TodoStatus.TESTING]; // IDEA와 COMPLETED를 제외한 나머지 상태를 가져옴
-        } else if (todoStatusOption === 'completed') {
+        } else if (todoStatusOption === 'complete') {
             todoStatus = [TodoStatus.COMPLETED]
         } else if (todoStatusOption === 'idea') {
             todoStatus = [TodoStatus.IDEA]
@@ -690,6 +690,21 @@ export class TodosService {
             mainQuery = mainQuery.andWhere('todo.status IN (:...status)', { status: todoStatus })
             mainQuery = mainQuery.addOrderBy('todo.completedAt', 'ASC')
             mainQuery = mainQuery.addOrderBy('todo.id', 'DESC');
+        } else if (todoStatusOption === "uncompleted") {
+            // console.log("이게 실행 됐나?");
+            mainQuery = mainQuery.andWhere('todo.status IN (:...status)', { status: todoStatus })
+            mainQuery = mainQuery.addOrderBy('todo.completedAt', 'ASC')
+            mainQuery = mainQuery.addOrderBy('todo.id', 'DESC');
+        } else if (todoStatusOption === "complete") {
+            // console.log("이게 실행 됐나?");
+            mainQuery = mainQuery.andWhere('todo.status IN (:...status)', { status: todoStatus })
+            mainQuery = mainQuery.addOrderBy('todo.completedAt', 'ASC')
+            mainQuery = mainQuery.addOrderBy('todo.id', 'DESC');
+        } else if (todoStatusOption === "idea") {
+            // console.log("이게 실행 됐나?");
+            mainQuery = mainQuery.andWhere('todo.status IN (:...status)', { status: todoStatus })
+            mainQuery = mainQuery.addOrderBy('todo.completedAt', 'ASC')
+            mainQuery = mainQuery.addOrderBy('todo.id', 'DESC');
         }
 
         else {
@@ -712,6 +727,9 @@ export class TodosService {
         }
 
         const todoList = await mainQuery.getMany();
+
+        console.log("todoList ?? ", todoList);
+
 
         const totalCount = todoList.length;
 
