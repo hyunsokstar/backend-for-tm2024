@@ -31,6 +31,7 @@ import { RoadMapModel } from "./technotes/entities/roadMap.entity";
 import { ShortCutsModel } from "./technotes/entities/shortCut.entity";
 import { SubShortCutsModel } from "./technotes/entities/subShortCut.entity";
 import { StarterProjectsModule } from './starter-projects/starter-projects.module';
+import { StarterKitsModel } from "./starter-projects/entities/starter-project.entity";
 
 @Module({
   imports: [
@@ -59,6 +60,7 @@ import { StarterProjectsModule } from './starter-projects/starter-projects.modul
         LikesModelForSkilNote,
         BookMarksForSkilNoteModel,
         BookMarksForSkilNoteContentsModel,
+        StarterKitsModel
       ],
       synchronize: true,
     }),
