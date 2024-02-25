@@ -30,6 +30,7 @@ import { SupplementaryTodoBriefingModel } from "./todos/entities/supplementary_t
 import { RoadMapModel } from "./technotes/entities/roadMap.entity";
 import { ShortCutsModel } from "./technotes/entities/shortCut.entity";
 import { SubShortCutsModel } from "./technotes/entities/subShortCut.entity";
+import { StarterProjectsModule } from './starter-projects/starter-projects.module';
 
 @Module({
   imports: [
@@ -71,6 +72,7 @@ import { SubShortCutsModel } from "./technotes/entities/subShortCut.entity";
     CloudflareModule,
     TechnotesModule,
     GuardsModule,
+    StarterProjectsModule,
   ],
   controllers: [AppController],
   providers: [AppService,
