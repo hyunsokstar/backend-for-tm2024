@@ -91,6 +91,7 @@ export class RoadmapService {
         const [roadMapList, totalCount] = await query
             .leftJoinAndSelect('roadMap.writer', 'writer')
             .leftJoinAndSelect('roadMap.techNotes', 'techNotes')
+            .leftJoinAndSelect('techNotes.writer', 'techNoteWriter')
             .leftJoinAndSelect('techNotes.skilnotes', 'techNote.skilnotes')
             .getManyAndCount();
 

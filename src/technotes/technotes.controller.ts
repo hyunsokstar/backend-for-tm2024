@@ -45,12 +45,17 @@ export class TechnotesController {
     }
 
     @Post('saveTechNotes') // API 엔드포인트 추가
-    async saveTodos(@Body() techNotesToSave: any, @Req() req) {
-        console.log("techNotesToSave at controller : ", techNotesToSave);
+    async saveTechNotes(@Body() requestBody: any, @Req() req) {
+        const { techNotesToSave, roadMapId } = requestBody; // 요청 본문에서 techNotesToSave와 roadMapId 추출
+
+        // console.log("techNotesToSave at controller : ", techNotesToSave);
+        console.log("RoadMapId at controller : ", roadMapId); // roadMapId 출력
+
         console.log("req.user at save tech note : ", req.user);
 
-        return this.technotesService.saveTechNotes(techNotesToSave, req.user);
+        return this.technotesService.saveTechNotes(techNotesToSave, req.user, roadMapId);
     }
+
 
     @Delete('deleteCheckedRows')
     async deleteUsersForCheckedIds(@Body('checkedIds') checkedIds: number[], @Req() req) {

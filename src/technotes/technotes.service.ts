@@ -335,10 +335,16 @@ export class TechnotesService {
     }
 
     // saveTechNotes
-    async saveTechNotes(techNotesToSave: any[], loginUser: UsersModel): Promise<any> {
+    async saveTechNotes(techNotesToSave: any[], loginUser: UsersModel, roadMapId?: any): Promise<any> {
         // console.log("techNotesToSave : ", techNotesToSave);
         // console.log("todoRowsForSave.length : ", techNotesToSave.length);
         let count = 0;
+
+        let roadMapObj;
+
+        if (roadMapId) {
+            roadMapObj = await this.roadMapsRepo.findOne({ where: { id: roadMapId } })
+        }
 
         for (const note of techNotesToSave) {
             const { id, title, description, category, email, ...data } = note;
@@ -371,15 +377,29 @@ export class TechnotesService {
                         return { status: "error", message: `login is required to add tech note` }
                     }
 
-                    await this.techNotesRepo.save({
-                        title: title,
-                        description: description,
-                        category: category,
-                        createdAt: new Date(),
-                        writer: loginUser
-                    });
-                }
+                    if (roadMapObj !== null) {
+                        console.log("로드맵 저장 실행 된것을 확인? ", roadMapObj);
 
+                        await this.techNotesRepo.save({
+                            title: title,
+                            description: description,
+                            category: category,
+                            createdAt: new Date(),
+                            writer: loginUser,
+                            roadMap: roadMapObj
+                        });
+                    } else {
+                        await this.techNotesRepo.save({
+                            title: title,
+                            description: description,
+                            category: category,
+                            createdAt: new Date(),
+                            writer: loginUser,
+                            // roadmap: roadMapObj
+                        });
+                    }
+
+                }
 
             }
         }
