@@ -60,7 +60,6 @@ export class RoadmapController {
         // ParticipantsForRoadMapModel에 등록하는 로직을 작성합니다.
 
         return await this.roadMapService.addParticipantsToRoadMap(roadMapId, userId);
-
     }
 
 
