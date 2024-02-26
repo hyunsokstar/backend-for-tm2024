@@ -1,3 +1,4 @@
+import { ParticipantsForRoadMapModel } from './../entities/participantsForRoadMap.entity';
 import { Injectable } from '@nestjs/common';
 import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -15,6 +16,9 @@ export class RoadmapService {
         private roadMapRepo: Repository<RoadMapModel>,
         @InjectRepository(UsersModel)
         private usersRepo: Repository<UsersModel>,
+
+        @InjectRepository(ParticipantsForRoadMapModel)
+        private ParticipantsForRoadRepo: Repository<ParticipantsForRoadMapModel>
     ) { }
 
     async saveRoadMaps({ dtoForSaveRoadMaps, loginUser }: IParameterForSaveRoadMaps): Promise<ResponseTypeForSaveRoadMaps> {
@@ -86,10 +90,11 @@ export class RoadmapService {
             .take(perPage)
             .orderBy('roadMap.id', 'DESC');
 
-
         const [roadMapList, totalCount] = await query
             .leftJoinAndSelect('roadMap.writer', 'writer')
             .leftJoinAndSelect('roadMap.techNotes', 'techNotes')
+            .leftJoinAndSelect('roadMap.participants', 'participants')
+            .leftJoinAndSelect('participants.user', 'participants.user')
             .leftJoinAndSelect('techNotes.writer', 'techNoteWriter')
             .leftJoinAndSelect('techNotes.skilnotes', 'techNote.skilnotes')
             .getManyAndCount();
@@ -157,5 +162,52 @@ export class RoadmapService {
             throw new Error('삭제 중 오류가 발생했습니다.');
         }
     }
+
+
+    // ParticipantsForRoadRepo
+    async addParticipantsToRoadMap(roadMapId: number, userId: number) {
+        // roadMapId로 roadMapObj 찾기
+        const roadMap = await this.roadMapRepo.findOne({ where: { id: roadMapId } });
+        if (!roadMap) {
+            throw new Error('RoadMap not found');
+        }
+
+        // userId로 userObj 찾기
+        const user = await this.usersRepo.findOne({ where: { id: userId } });
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        try {
+            // 이미 해당 유저에 대한 ParticipantsForRoadMapModel 데이터가 있는지 확인
+            const existingParticipant = await this.ParticipantsForRoadRepo.findOne({ where: { user: user } });
+
+            if (existingParticipant) {
+                // 이미 해당 유저에 대한 데이터가 있으면 삭제
+                await this.ParticipantsForRoadRepo.remove(existingParticipant);
+                return {
+                    message: `Removed existing participant for ${roadMap.title}`
+                };
+            } else {
+                // ParticipantsForRoadMapModel에 데이터 추가
+                const participant = new ParticipantsForRoadMapModel();
+                participant.roadMap = roadMap;
+                participant.user = user;
+                // 추가적으로 필요한 데이터가 있다면 여기에 추가
+
+                // ParticipantsForRoadMapModel 저장
+                await this.ParticipantsForRoadRepo.save(participant);
+
+                // 성공적으로 추가되었음을 반환
+                return {
+                    message: `Added participant for ${roadMap.title} success`
+                };
+            }
+        } catch (error) {
+            // 오류 발생 시 예외 처리
+            throw new Error(`Failed to add participant to RoadMap: ${error.message}`);
+        }
+    }
+
 
 }

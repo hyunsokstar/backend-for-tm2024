@@ -51,4 +51,17 @@ export class RoadmapController {
         }
     }
 
+    // roadMapId 와 userId 를 받아서 user 를 roadMap 의 participant model 인 ParticipantsForRoadMapModel 에 등록 하려고 해 
+    // 그렇다면 컨트롤러에서 roadMapId 와 userId 를 어떻게 받아야 될까?
+    // axios api 요청은 어떻게 날려야 될까?
+    @Post('participants')
+    async addParticipantsToRoadMap(@Body() data: any) {
+        const { roadMapId, userId } = data; // 요청 바디에서 roadMapId와 userId를 추출합니다.
+        // ParticipantsForRoadMapModel에 등록하는 로직을 작성합니다.
+
+        return await this.roadMapService.addParticipantsToRoadMap(roadMapId, userId);
+
+    }
+
+
 }

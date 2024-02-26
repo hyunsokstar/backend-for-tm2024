@@ -11,14 +11,14 @@ export class ParticipantsForRoadMapModel {
     @JoinColumn({ name: 'user_id' })
     user: UsersModel;
 
-    @Column({ nullable: false })
-    currentNote: string;
-
-    @Column({ nullable: false })
-    authorityForEdit: boolean;
-
     @ManyToOne(() => RoadMapModel, roadMap => roadMap.participants, { onDelete: 'CASCADE', nullable: false })
     roadMap: RoadMapModel;
+
+    @Column({ nullable: true })
+    currentNote: string;
+
+    @Column({ default: false })
+    authorityForEdit: boolean;
 
     @CreateDateColumn({ name: 'created_at' })
     createdAt: Date;

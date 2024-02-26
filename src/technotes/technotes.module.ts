@@ -23,6 +23,7 @@ import { ShortcutsService } from './shortcuts/shortcuts.service';
 import { SubShortCutsModel } from './entities/subShortCut.entity';
 import { SubShortCutController } from './sub-short-cut/sub-short-cut.controller';
 import { SubShortCutService } from './sub-short-cut/sub-short-cut.service';
+import { ParticipantsForRoadMapModel } from './entities/participantsForRoadMap.entity';
 
 
 @Module({
@@ -39,7 +40,8 @@ import { SubShortCutService } from './sub-short-cut/sub-short-cut.service';
       bookMarksForTechNoteModel,
       LikesModelForSkilNote,
       BookMarksForSkilNoteModel,
-      BookMarksForSkilNoteContentsModel
+      BookMarksForSkilNoteContentsModel,
+      ParticipantsForRoadMapModel
     ])
   ],
   controllers: [
