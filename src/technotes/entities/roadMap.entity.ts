@@ -2,6 +2,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
 import { UsersModel } from '../../users/entities/users.entity';
 import { TechNotesModel } from './technotes.entity';
+import { ParticipantsForRoadMapModel } from './participantsForRoadMap.entity';
 
 @Entity()
 export class RoadMapModel {
@@ -28,4 +29,9 @@ export class RoadMapModel {
 
     @OneToMany(() => TechNotesModel, techNote => techNote.roadMap)
     techNotes: TechNotesModel[]
+
+    // participants
+    @OneToMany(() => ParticipantsForRoadMapModel, techNote => techNote.roadMap)
+    participants: ParticipantsForRoadMapModel[]
+
 }
