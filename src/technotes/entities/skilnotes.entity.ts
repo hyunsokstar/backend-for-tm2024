@@ -5,6 +5,7 @@ import { SkilNoteContentsModel } from './skilnote_contents.entity';
 import { TechNotesModel } from './technotes.entity';
 import { LikesModelForSkilNote } from './likesForSkilNote.entity';
 import { BookMarksForSkilNoteModel } from './bookMarksForSkilNote.entity';
+import { ParticipantsForSkilNoteModel } from './participantsForSkilNote.entity';
 
 
 @Entity()
@@ -44,6 +45,9 @@ export class SkilNotesModel {
 
     @OneToMany(() => BookMarksForSkilNoteModel, bookmarks => bookmarks.skilNote)
     bookMarks: BookMarksForSkilNoteModel[]
+
+    @OneToMany(() => ParticipantsForSkilNoteModel, participants => participants.skilNote)
+    participants: ParticipantsForSkilNoteModel[]
 
     countForLikes: any;
     countForBookMarks: number;

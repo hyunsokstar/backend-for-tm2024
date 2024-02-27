@@ -33,6 +33,7 @@ import { SubShortCutsModel } from "./technotes/entities/subShortCut.entity";
 import { StarterProjectsModule } from './starter-projects/starter-projects.module';
 import { StarterKitsModel } from "./starter-projects/entities/starter-project.entity";
 import { ParticipantsForRoadMapModel } from "./technotes/entities/participantsForRoadMap.entity";
+import { ParticipantsForSkilNoteModel } from "./technotes/entities/participantsForSkilNote.entity";
 
 @Module({
   imports: [
@@ -62,7 +63,8 @@ import { ParticipantsForRoadMapModel } from "./technotes/entities/participantsFo
         BookMarksForSkilNoteModel,
         BookMarksForSkilNoteContentsModel,
         StarterKitsModel,
-        ParticipantsForRoadMapModel
+        ParticipantsForRoadMapModel,
+        ParticipantsForSkilNoteModel
       ],
       synchronize: true,
     }),
