@@ -229,4 +229,15 @@ export class SkilnotesController {
     }
 
 
+    @Post('participants')
+    async addParticipantsForSkilnote(@Body() data: any) {
+        const { skilNoteId, userId } = data; // 요청 바디에서 roadMapId와 userId를 추출합니다.
+        // ParticipantsForRoadMapModel에 등록하는 로직을 작성합니다.
+
+        console.log("skilNoteId : ", skilNoteId);
+
+
+        return await this.skilnoteService.addParticipantsForSkilnote(skilNoteId, userId);
+    }
+
 }

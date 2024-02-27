@@ -11,6 +11,7 @@ import { dtoForReorderContents } from '../dtos/dtoForReorderContents';
 import { DeleteSkilNoteContentsDto } from 'src/users/dtos/DeleteSkilNoteContentsDto';
 import { BookMarksForSkilNoteContentsModel } from '../entities/bookMarksForSkilNoteContent.entity';
 import { DtoForChangePagesOrderForSkilNoteContent } from '../dtos/dtoForChangePagesOrderForSkilNote';
+import { ParticipantsForSkilNoteModel } from '../entities/participantsForSkilNote.entity';
 
 @Injectable()
 export class SkilnotesService {
@@ -25,26 +26,12 @@ export class SkilnotesService {
         private readonly usersRepository: Repository<UsersModel>,
 
         @InjectRepository(BookMarksForSkilNoteContentsModel)
-        private readonly skilNoteContentBookmarkRepo: Repository<BookMarksForSkilNoteContentsModel>
+        private readonly skilNoteContentBookmarkRepo: Repository<BookMarksForSkilNoteContentsModel>,
+
+        @InjectRepository(ParticipantsForSkilNoteModel)
+        private ParticipantsForSkilNoteRepo: Repository<ParticipantsForSkilNoteModel>
 
     ) { }
-
-    // async changePagesOrderForSkilNoteContent({ skilNoteId, targetOrder, destinationOrder }: DtoForChangePagesOrderForSkilNoteContent) {
-    //     // 스킬 노트 객체를 찾기 위해 SkilNotesModel 리포지토리를 주입받아야 합니다.
-    //     const skilNote = await this.skilNotesRepo.findOne({ where: { id: skilNoteId } });
-
-    //     // 스킬 노트 객체가 없는 경우 처리
-    //     if (!skilNote) {
-    //         return { success: false, message: '해당하는 스킬 노트를 찾을 수 없습니다.', error: '스킬 노트를 찾을 수 없음' };
-    //     }
-    //     // skilNoteContentsRepo 를 조회해서 skilNote 가 skilNote 인것들중에
-    //     // 1. page 가 targetOrder 인것들은 destinationOrder 로 일괄 업데이트
-    //     // 2. page 가 destinationOrder 인것들은 targetOrder 로 일괄 업데이트
-    //     // (단 page가 원래 targetOrder 이었던것들 => destinationOrder)
-    //     // 근데 순차 업데이트이면 다시 돌아오게 되잖아 그게 아니라
-    //     // page가 원래 destinationOrder 이었던것들 => targetOrder 이렇게 교체가 되도록
-    //     // transaction 적용해서 중간에 에러 나도 롤백 되게
-    // }
 
     async changePagesOrderForSkilNoteContent({ skilNoteId, targetOrder, destinationOrder }: DtoForChangePagesOrderForSkilNoteContent) {
 
@@ -324,7 +311,9 @@ export class SkilnotesService {
 
         const [skilNoteList, totalCount] = await query
             .leftJoinAndSelect('skilnotes.writer', 'writer')
-            .leftJoinAndSelect('skilnotes.skilnote_contents', 'skilnote_contents')  // 주석 해제
+            .leftJoinAndSelect('skilnotes.skilnote_contents', 'skilnote_contents')
+            .leftJoinAndSelect('skilnotes.participants', 'participants')
+            .leftJoinAndSelect('participants.user', 'user')
             .leftJoinAndSelect('skilnotes.likes', 'likes')
             .leftJoinAndSelect('likes.user', 'likeUser')
             .leftJoinAndSelect('skilnotes.bookMarks', 'bookMarks')
@@ -673,5 +662,50 @@ export class SkilnotesService {
         }
         return updatedContents;
     }
+
+
+    async addParticipantsForSkilnote(skilNoteId: number, userId: number) {
+        const skilNoteObj = await this.skilNotesRepo.findOne({ where: { id: skilNoteId } });
+        if (!skilNoteObj) {
+            throw new Error('SkilNote not found');
+        }
+
+        // userId로 userObj 찾기
+        const user = await this.usersRepository.findOne({ where: { id: userId } });
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        try {
+            // 이미 해당 유저에 대한 ParticipantsForRoadMapModel 데이터가 있는지 확인
+            const existingParticipant = await this.ParticipantsForSkilNoteRepo.findOne({ where: { user: user } });
+
+            if (existingParticipant) {
+                // 이미 해당 유저에 대한 데이터가 있으면 삭제
+                await this.ParticipantsForSkilNoteRepo.remove(existingParticipant);
+                return {
+                    message: `Cancle Particlpate for SkilNote : ${skilNoteObj.title}`
+                };
+            } else {
+                // ParticipantsForRoadMapModel에 데이터 추가
+                const participant = new ParticipantsForSkilNoteModel();
+                participant.skilNote = skilNoteObj;
+                participant.user = user;
+                // 추가적으로 필요한 데이터가 있다면 여기에 추가
+
+                // ParticipantsForRoadMapModel 저장
+                await this.ParticipantsForSkilNoteRepo.save(participant);
+
+                // 성공적으로 추가되었음을 반환
+                return {
+                    message: `Success Participate for SkilNote : ${skilNoteObj.title}`
+                };
+            }
+        } catch (error) {
+            // 오류 발생 시 예외 처리
+            throw new Error(`Failed to add participant to SkilNote: ${error.message}`);
+        }
+    }
+
 
 }
