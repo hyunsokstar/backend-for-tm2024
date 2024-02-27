@@ -10,6 +10,7 @@ import { bookMarksForTechNoteModel } from './entities/bookMarks.entity';
 import { LikesModelForSkilNote } from './entities/likesForSkilNote.entity';
 import { BookMarksForSkilNoteModel } from './entities/bookMarksForSkilNote.entity';
 import { RoadMapModel } from './entities/roadMap.entity';
+import { ParticipantsForTechNoteModel } from './entities/participantsForTechNote.entity';
 
 @Injectable()
 export class TechnotesService {
@@ -35,6 +36,9 @@ export class TechnotesService {
 
         @InjectRepository(BookMarksForSkilNoteModel)
         private readonly bookMarksForSkilNoteRepo: Repository<BookMarksForSkilNoteModel>,
+
+        @InjectRepository(ParticipantsForTechNoteModel)
+        private readonly participantsForTechNoteRepo: Repository<ParticipantsForTechNoteModel>,
 
     ) { }
 
@@ -268,6 +272,8 @@ export class TechnotesService {
         const [techNoteList, totalCount] = await query
             .leftJoinAndSelect('techNotes.writer', 'writer')
             .leftJoinAndSelect('techNotes.skilnotes', 'skilnotes')
+            .leftJoinAndSelect('techNotes.participants', 'participants')
+            .leftJoinAndSelect('participants.user', 'user')
             .leftJoinAndSelect('techNotes.likes', 'likes')
             .leftJoinAndSelect('likes.user', 'likeUser')
             .leftJoinAndSelect('techNotes.bookMarks', 'bookMarks')
@@ -404,6 +410,49 @@ export class TechnotesService {
             }
         }
         return { message: `Todos updated successfully ${count}` };
+    }
+
+    async addParticipantsForTechNote(skilNoteId: number, userId: number) {
+        const techNoteObj = await this.techNotesRepo.findOne({ where: { id: skilNoteId } });
+        if (!techNoteObj) {
+            throw new Error('SkilNote not found');
+        }
+
+        // userId로 userObj 찾기
+        const user = await this.usersRepository.findOne({ where: { id: userId } });
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        try {
+            // 이미 해당 유저에 대한 ParticipantsForRoadMapModel 데이터가 있는지 확인
+            const existingParticipant = await this.participantsForTechNoteRepo.findOne({ where: { user: user } });
+
+            if (existingParticipant) {
+                // 이미 해당 유저에 대한 데이터가 있으면 삭제
+                await this.participantsForTechNoteRepo.remove(existingParticipant);
+                return {
+                    message: `Cancle Particlpate for TechNote : ${techNoteObj.title}`
+                };
+            } else {
+                // ParticipantsForRoadMapModel에 데이터 추가
+                const participant = new ParticipantsForTechNoteModel();
+                participant.techNote = techNoteObj;
+                participant.user = user;
+                // 추가적으로 필요한 데이터가 있다면 여기에 추가
+
+                // ParticipantsForRoadMapModel 저장
+                await this.participantsForTechNoteRepo.save(participant);
+
+                // 성공적으로 추가되었음을 반환
+                return {
+                    message: `Success Participate for TechNote : ${techNoteObj.title}`
+                };
+            }
+        } catch (error) {
+            // 오류 발생 시 예외 처리
+            throw new Error(`Failed to add participant to TechNote: ${error.message}`);
+        }
     }
 
 }
