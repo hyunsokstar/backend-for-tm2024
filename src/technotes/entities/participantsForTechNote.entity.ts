@@ -1,7 +1,14 @@
+<<<<<<< HEAD
 import { UsersModel } from 'src/users/entities/users.entity';
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { RoadMapModel } from './roadMap.entity';
 import { SkilNotesModel } from './skilnotes.entity';
+=======
+
+
+import { UsersModel } from 'src/users/entities/users.entity';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+>>>>>>> 79e69bf046c65b12e7f22dc37e153da14699aa56
 import { TechNotesModel } from './technotes.entity';
 
 @Entity()
@@ -27,5 +34,11 @@ export class ParticipantsForTechNoteModel {
 
     @UpdateDateColumn({ name: 'updated_at' })
     updatedAt: Date;
+<<<<<<< HEAD
 
 }
+=======
+}
+
+
+>>>>>>> 79e69bf046c65b12e7f22dc37e153da14699aa56

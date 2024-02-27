@@ -663,7 +663,7 @@ export class SkilnotesService {
         return updatedContents;
     }
 
-
+    // addParticipantsForTechNote
     async addParticipantsForSkilnote(skilNoteId: number, userId: number) {
         const skilNoteObj = await this.skilNotesRepo.findOne({ where: { id: skilNoteId } });
         if (!skilNoteObj) {

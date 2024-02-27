@@ -1,3 +1,4 @@
+import { ParticipantsForTechNoteModel } from './entities/participantsForTechNote.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
@@ -412,10 +413,21 @@ export class TechnotesService {
         return { message: `Todos updated successfully ${count}` };
     }
 
+<<<<<<< HEAD
     async addParticipantsForTechNote(skilNoteId: number, userId: number) {
         const techNoteObj = await this.techNotesRepo.findOne({ where: { id: skilNoteId } });
         if (!techNoteObj) {
             throw new Error('SkilNote not found');
+=======
+    async addParticipantsForTechNote(techNoteId: number, userId: number) {
+
+        console.log("techNoteId ??? ", techNoteId);
+
+
+        const techNoteObj = await this.techNotesRepo.findOne({ where: { id: techNoteId } });
+        if (!techNoteObj) {
+            throw new Error('TechNote not found');
+>>>>>>> 79e69bf046c65b12e7f22dc37e153da14699aa56
         }
 
         // userId로 userObj 찾기
@@ -425,14 +437,21 @@ export class TechnotesService {
         }
 
         try {
+<<<<<<< HEAD
             // 이미 해당 유저에 대한 ParticipantsForRoadMapModel 데이터가 있는지 확인
+=======
+>>>>>>> 79e69bf046c65b12e7f22dc37e153da14699aa56
             const existingParticipant = await this.participantsForTechNoteRepo.findOne({ where: { user: user } });
 
             if (existingParticipant) {
                 // 이미 해당 유저에 대한 데이터가 있으면 삭제
                 await this.participantsForTechNoteRepo.remove(existingParticipant);
                 return {
+<<<<<<< HEAD
                     message: `Cancle Particlpate for TechNote : ${techNoteObj.title}`
+=======
+                    message: `Cancle Particlpate for SkilNote : ${techNoteObj.title}`
+>>>>>>> 79e69bf046c65b12e7f22dc37e153da14699aa56
                 };
             } else {
                 // ParticipantsForRoadMapModel에 데이터 추가
