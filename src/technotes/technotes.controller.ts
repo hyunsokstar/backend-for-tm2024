@@ -153,7 +153,6 @@ export class TechnotesController {
     }
 
     @Post('participants')
-<<<<<<< HEAD
     async addParticipantsForTechNote(@Body() data: any) {
         const { skilNoteId, userId } = data; // 요청 바디에서 roadMapId와 userId를 추출합니다.
         // ParticipantsForRoadMapModel에 등록하는 로직을 작성합니다.
@@ -162,14 +161,6 @@ export class TechnotesController {
 
 
         return await this.technotesService.addParticipantsForTechNote(skilNoteId, userId);
-=======
-    async addParticipantsForSkilnote(@Body() data: any) {
-        const { techNoteId, userId } = data; // 요청 바디에서 roadMapId와 userId를 추출합니다.
-        // ParticipantsForRoadMapModel에 등록하는 로직을 작성합니다.
-        console.log("techNotId : ", techNoteId);
-
-        return await this.technotesService.addParticipantsForTechNote(techNoteId, userId);
->>>>>>> 79e69bf046c65b12e7f22dc37e153da14699aa56
     }
 
 }
