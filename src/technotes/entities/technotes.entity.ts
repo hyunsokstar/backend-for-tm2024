@@ -4,6 +4,7 @@ import { SkilNotesModel } from './skilnotes.entity';
 import { LikesModelForTechNote } from './likesForTechNote.entity';
 import { bookMarksForTechNoteModel } from './bookMarks.entity';
 import { RoadMapModel } from './roadMap.entity';
+import { ParticipantsForTechNoteModel } from './participantsForTechNote.entity';
 
 // export enum TodoStatus {
 //     READY = 'ready',
@@ -40,7 +41,9 @@ export class TechNotesModel {
 
     @OneToMany(() => SkilNotesModel, skilnote => skilnote.techNote)
     skilnotes: SkilNotesModel[]
-    //
+
+    @OneToMany(() => ParticipantsForTechNoteModel, participant => participant.techNote)
+    participants: ParticipantsForTechNoteModel[]
 
     @OneToMany(() => LikesModelForTechNote, likes => likes.techNote)
     likes: LikesModelForTechNote[]

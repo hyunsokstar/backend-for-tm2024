@@ -152,10 +152,14 @@ export class TechnotesController {
         }
     }
 
-    // @Get('/likesForBest20')
-    // async getBest20LikesForTechNote() {
-    //     const best20TechNotes = await this.technotesService.getBest20LikesForTechNote();
-    //     return best20TechNotes;
-    // }
+    @Post('participants')
+    async addParticipantsForSkilnote(@Body() data: any) {
+        const { techNoteId, userId } = data; // 요청 바디에서 roadMapId와 userId를 추출합니다.
+        // ParticipantsForRoadMapModel에 등록하는 로직을 작성합니다.
+
+        console.log("techNotId : ", techNoteId);
+
+        return await this.technotesService.addParticipantsForTechNote(techNoteId, userId);
+    }
 
 }

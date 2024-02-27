@@ -25,6 +25,7 @@ import { SubShortCutController } from './sub-short-cut/sub-short-cut.controller'
 import { SubShortCutService } from './sub-short-cut/sub-short-cut.service';
 import { ParticipantsForRoadMapModel } from './entities/participantsForRoadMap.entity';
 import { ParticipantsForSkilNoteModel } from './entities/participantsForSkilNote.entity';
+import { ParticipantsForTechNoteModel } from './entities/participantsForTechNote.entity';
 
 
 @Module({
@@ -43,7 +44,8 @@ import { ParticipantsForSkilNoteModel } from './entities/participantsForSkilNote
       BookMarksForSkilNoteModel,
       BookMarksForSkilNoteContentsModel,
       ParticipantsForRoadMapModel,
-      ParticipantsForSkilNoteModel
+      ParticipantsForSkilNoteModel,
+      ParticipantsForTechNoteModel
     ])
   ],
   controllers: [
