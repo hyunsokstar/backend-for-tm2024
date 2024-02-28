@@ -667,6 +667,10 @@ export class SkilnotesService {
 
     // addParticipantsForTechNote
     async addParticipantsForSkilnote(skilNoteId: number, userId: number, techNoteId?: number) {
+
+        console.log("techNoteId : ", techNoteId);
+
+
         const skilNoteObj = await this.skilNotesRepo.findOne({ where: { id: skilNoteId } });
         if (!skilNoteObj) {
             throw new Error('SkilNote not found');
