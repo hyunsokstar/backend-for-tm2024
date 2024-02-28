@@ -6,6 +6,7 @@ import { UserPostingsModel } from "../../postings/entities/user_postings.entity"
 import { TodosModel } from "src/todos/entities/todos.entity";
 import { BookMarksForSkilNoteContentsModel } from "src/technotes/entities/bookMarksForSkilNoteContent.entity";
 import { SupplementaryTodosModel } from "src/todos/entities/supplementary_todos.entity";
+import { ParticipantsForSkilNoteModel } from "src/technotes/entities/participantsForSkilNote.entity";
 
 @Entity()
 @Unique(["email", "nickname"])
@@ -96,4 +97,6 @@ export class UsersModel {
     @OneToMany(() => BookMarksForSkilNoteContentsModel, bookmark => bookmark.user)
     myBookMarksForSkilNoteContents: BookMarksForSkilNoteContentsModel[]
 
+    @OneToMany(() => ParticipantsForSkilNoteModel, particiPateForSkilNote => particiPateForSkilNote.user)
+    takenCoursesForSkilNote: ParticipantsForSkilNoteModel
 }

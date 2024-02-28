@@ -274,6 +274,7 @@ export class TechnotesService {
             .leftJoinAndSelect('techNotes.skilnotes', 'skilnotes')
             .leftJoinAndSelect('techNotes.participants', 'participants')
             .leftJoinAndSelect('participants.user', 'user')
+            // .leftJoinAndSelect('user.takenCoursesForSkilNote', 'takenCoursesForSkilNote')
             .leftJoinAndSelect('techNotes.likes', 'likes')
             .leftJoinAndSelect('likes.user', 'likeUser')
             .leftJoinAndSelect('techNotes.bookMarks', 'bookMarks')
