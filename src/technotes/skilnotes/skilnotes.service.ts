@@ -414,7 +414,9 @@ export class SkilnotesService {
 
         const [skilNoteList, totalCount] = await query
             .leftJoinAndSelect('skilnotes.writer', 'writer')
-            .leftJoinAndSelect('skilnotes.skilnote_contents', 'skilnote_contents')  // 주석 해제
+            .leftJoinAndSelect('skilnotes.skilnote_contents', 'skilnote_contents')
+            .leftJoinAndSelect('skilnotes.participants', 'participants')
+            .leftJoinAndSelect('participants.user', 'user')
             .leftJoinAndSelect('skilnotes.likes', 'likes')
             .leftJoinAndSelect('likes.user', 'likeUser')
             .leftJoinAndSelect('skilnotes.bookMarks', 'bookMarks')
@@ -664,10 +666,18 @@ export class SkilnotesService {
     }
 
     // addParticipantsForTechNote
-    async addParticipantsForSkilnote(skilNoteId: number, userId: number) {
+    async addParticipantsForSkilnote(skilNoteId: number, userId: number, techNoteId?: number) {
         const skilNoteObj = await this.skilNotesRepo.findOne({ where: { id: skilNoteId } });
         if (!skilNoteObj) {
             throw new Error('SkilNote not found');
+        }
+        let techNoteObj;
+        if (techNoteId) {
+            techNoteObj = await this.techNotesRepo.findOne({
+                where: {
+                    id: techNoteId
+                }
+            });
         }
 
         // userId로 userObj 찾기
@@ -691,6 +701,7 @@ export class SkilnotesService {
                 const participant = new ParticipantsForSkilNoteModel();
                 participant.skilNote = skilNoteObj;
                 participant.user = user;
+                participant.techNote = techNoteObj ? techNoteObj : null
                 // 추가적으로 필요한 데이터가 있다면 여기에 추가
 
                 // ParticipantsForRoadMapModel 저장
