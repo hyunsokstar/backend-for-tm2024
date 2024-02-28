@@ -1,5 +1,5 @@
 import { ParticipantsForTechNoteModel } from './entities/participantsForTechNote.entity';
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { TechNotesModel } from './entities/technotes.entity';
@@ -11,6 +11,7 @@ import { bookMarksForTechNoteModel } from './entities/bookMarks.entity';
 import { LikesModelForSkilNote } from './entities/likesForSkilNote.entity';
 import { BookMarksForSkilNoteModel } from './entities/bookMarksForSkilNote.entity';
 import { RoadMapModel } from './entities/roadMap.entity';
+import { ParticipantsForSkilNoteModel } from './entities/participantsForSkilNote.entity';
 
 @Injectable()
 export class TechnotesService {
@@ -39,6 +40,8 @@ export class TechnotesService {
 
         @InjectRepository(ParticipantsForTechNoteModel)
         private readonly participantsForTechNoteRepo: Repository<ParticipantsForTechNoteModel>,
+        @InjectRepository(ParticipantsForSkilNoteModel)
+        private readonly participantsForSkilNoteRepo: Repository<ParticipantsForSkilNoteModel>,
 
     ) { }
 
@@ -155,7 +158,6 @@ export class TechnotesService {
         return query;
     }
 
-    // 1122
     async deleteForCheckNoteIdsForCheckedIds(checkedIds: number[], loginUser): Promise<string | { success: boolean, message: string }> {
         try {
             // console.log("checkedIds : ", checkedIds);
@@ -422,7 +424,7 @@ export class TechnotesService {
         // userId로 userObj 찾기
         const user = await this.usersRepository.findOne({ where: { id: userId } });
         if (!user) {
-            throw new Error('User not found');
+            throw new HttpException('User not found', HttpStatus.NOT_FOUND);
         }
 
         try {
@@ -455,5 +457,31 @@ export class TechnotesService {
             throw new Error(`Failed to add participant to TechNote: ${error.message}`);
         }
     }
+
+    async getAllCorriculmnsForUserCorricumnsForSkilNotes(techNoteId: number, userId: { techNoteId: number, userId: number }) {
+        console.log("techNoteId", techNoteId);
+        console.log("userId", userId);
+
+        try {
+            // ParticipantsForSkilNoteModel에서 techNoteId와 userId에 해당하는 데이터 가져오기
+            const participants = await this.participantsForSkilNoteRepo.find({
+                where: {
+                    techNote: { id: techNoteId },
+                    user: { id: userId.userId }, // userId.userId를 사용하여 유저 아이디를 가져옴
+                },
+                relations: ['skilNote']
+            });
+
+            // 가져온 데이터를 반환
+            return {
+                message: "success",
+                participants: participants
+            };
+        } catch (error) {
+            // 에러 처리
+            throw error;
+        }
+    }
+
 
 }

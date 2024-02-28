@@ -96,6 +96,8 @@ export class RoadmapService {
             .leftJoinAndSelect('roadMap.participants', 'participants')
             .leftJoinAndSelect('participants.user', 'participants.user')
             .leftJoinAndSelect('techNotes.writer', 'techNoteWriter')
+            .leftJoinAndSelect('techNotes.participants', 'participantsForTechNote')
+            .leftJoinAndSelect('participantsForTechNote.user', 'participantsUserForTechNote')
             .leftJoinAndSelect('techNotes.skilnotes', 'techNote.skilnotes')
             .getManyAndCount();
 

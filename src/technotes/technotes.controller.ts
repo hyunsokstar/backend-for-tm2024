@@ -7,12 +7,27 @@ export class TechnotesController {
 
     constructor(private readonly technotesService: TechnotesService) { }
 
+
+    // techNoteId 와 userId 받아서
+    // getAllCorriculmnsForUserCorricumnsForSkilNotes
+
+    @Get('/corriculmnsForSkilnote')
+    async getAllCorriculmnsForUserCorricumnsForSkilNotes(
+        @Query('techNoteId') techNoteId,
+        @Query('userId') userId,
+        @Req() req
+    ) {
+        const response = await this.technotesService.getAllCorriculmnsForUserCorricumnsForSkilNotes(
+            techNoteId, userId
+        );
+
+        return response
+    }
+
     @Post() // POST 요청을 처리하는 엔드포인트 추가
     async createTechNoteForRoadMap(@Body() dto: DtoForCreateTechNote) {
         return this.technotesService.createTechNote(dto);
     }
-
-    //
 
     @Get()
     async getAllTechNoteList(

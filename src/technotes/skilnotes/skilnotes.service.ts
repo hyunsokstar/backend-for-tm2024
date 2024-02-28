@@ -668,12 +668,13 @@ export class SkilnotesService {
     // addParticipantsForTechNote
     async addParticipantsForSkilnote(skilNoteId: number, userId: number, techNoteId?: number) {
 
+        console.log("skilNoteId : ", skilNoteId);
+        console.log("userId : ", userId);
         console.log("techNoteId : ", techNoteId);
-
 
         const skilNoteObj = await this.skilNotesRepo.findOne({ where: { id: skilNoteId } });
         if (!skilNoteObj) {
-            throw new Error('SkilNote not found');
+            throw new HttpException('SkilNote not found', HttpStatus.NOT_FOUND);
         }
         let techNoteObj;
         if (techNoteId) {
@@ -687,12 +688,12 @@ export class SkilnotesService {
         // userId로 userObj 찾기
         const user = await this.usersRepository.findOne({ where: { id: userId } });
         if (!user) {
-            throw new Error('User not found');
+            throw new HttpException('User not found', HttpStatus.NOT_FOUND);
         }
 
         try {
             // 이미 해당 유저에 대한 ParticipantsForRoadMapModel 데이터가 있는지 확인
-            const existingParticipant = await this.ParticipantsForSkilNoteRepo.findOne({ where: { user: user } });
+            const existingParticipant = await this.ParticipantsForSkilNoteRepo.findOne({ where: { skilNote: skilNoteObj } });
 
             if (existingParticipant) {
                 // 이미 해당 유저에 대한 데이터가 있으면 삭제
