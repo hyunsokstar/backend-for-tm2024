@@ -43,7 +43,7 @@ export class SkilnotesController {
     async getSkilnotesForTechNote(
         @Param('techNoteId') techNoteId: number,
         @Query('pageNum') pageNum = 1,
-        @Query('perPage') perPage = 10,
+        @Query('perPage') perPage = 30,
         @Query('searchOption') searchOption = "",
         @Query('searchText') searchText = "",
         @Query('isBestByLikes') isBestByLikes = false,

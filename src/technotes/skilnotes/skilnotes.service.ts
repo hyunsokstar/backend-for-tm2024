@@ -383,7 +383,7 @@ export class SkilnotesService {
     async getSkilnotesForTechNote(
         techNoteId: number,
         pageNum: number = 1,
-        perPage: number = 10,
+        perPage: number = 30,
         searchOption: string,
         searchText: string,
         isBestByLikes: any,
