@@ -11,7 +11,7 @@ async function bootstrap() {
   app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
   // 여러 주소를 포함하는 CORS 설정
-  const allowedOrigins = ['http://127.0.0.1:3000', 'http://127.0.0.1:3010', 'http://13.209.211.181:3000'];
+  const allowedOrigins = ['http://127.0.0.1:3000', 'http://127.0.0.1:3001', 'http://13.209.211.181:3000'];
 
   app.enableCors({
     origin: allowedOrigins, // 여러 주소를 배열로 추가
