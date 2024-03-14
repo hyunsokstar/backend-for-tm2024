@@ -67,10 +67,17 @@ export class SkilnotesController {
     @Get(':skilnoteId/contents/:pageNum')
     async getSkilNoteContents(
         @Param('skilnoteId') skilnoteId: string,
-        @Param('pageNum') pageNum: string
+        @Param('pageNum') pageNum: string,
+        @Req() req
     ) {
-        // console.log("hi");
-        return this.skilnoteService.getSkilNoteContentsBySkilNoteId(skilnoteId, pageNum);
+
+        const loginUser = req.user
+
+        return this.skilnoteService.getSkilNoteContentsBySkilNoteId(
+            skilnoteId,
+            pageNum,
+            loginUser
+        );
     }
 
     @Post('saveRows')

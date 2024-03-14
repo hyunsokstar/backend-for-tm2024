@@ -200,9 +200,8 @@ export class SkilnotesService {
         return saveResult;
     }
 
-    async getSkilNoteContentsBySkilNoteId(skilNoteId: any, pageNum: any) {
+    async getSkilNoteContentsBySkilNoteId(skilNoteId: any, pageNum: any, loginUser) {
         // 
-
         // SkilNoteId로 SkilNote 가져오기
         // const skilNote = await this.skilNotesRepo.findOne({ where: { id: skilNoteId } });
         const skilNote = await this.skilNotesRepo.findOne({
@@ -219,12 +218,16 @@ export class SkilnotesService {
         console.log("techNoteId : ", techNoteId);
 
         const relatedSkilnoteList = await this.skilNotesRepo.find({ where: { techNote: { id: techNoteId } } })
-        console.log("relatedSkilnoteList : ", relatedSkilnoteList);
+        // console.log("relatedSkilnoteList : ", relatedSkilnoteList);
 
         const options: FindManyOptions<SkilNoteContentsModel> = {
             where: { skilNote: { id: parseInt(skilNoteId) }, page: pageNum },
             order: { order: 'ASC' },
-            relations: ['bookMarks', 'bookMarks.user', 'bookMarks.skilNoteContent'] // Include the user information
+            relations: [
+                'bookMarks',
+                'bookMarks.user',
+                'bookMarks.skilNoteContent'
+            ]
         };
 
         const skilnoteContents = await this.skilNoteContentsRepo.find(options);
@@ -251,9 +254,17 @@ export class SkilnotesService {
             where: { skilNote: { id: skilNoteId }, file: ".todo" }
         })
 
+        console.log("loginUser for skilnote contents: ", loginUser);
+
+        const myBookMarks = await this.skilNoteContentBookmarkRepo.find({
+            where: { user: { email: loginUser.email } },
+            relations: [
+                'skilNoteContent',
+                'skilNoteContent.skilNote'
+            ]
+        });
+
         // const skilnote_contents
-
-
         // console.log("skilnotePagesCount ?? ", skilnotePagesCount);
 
         const responseObj = {
@@ -263,7 +274,8 @@ export class SkilnotesService {
             skilnoteContents: skilnoteContents,
             skilnoteContentsPagesInfo: skilnoteContentsPagesInfo,
             skilnotePagesCount: skilnotePagesCount,
-            relatedSkilnoteList: relatedSkilnoteList
+            relatedSkilnoteList: relatedSkilnoteList,
+            myBookMarks: myBookMarks
         };
 
         return responseObj;
