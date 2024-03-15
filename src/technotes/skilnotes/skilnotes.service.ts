@@ -255,14 +255,18 @@ export class SkilnotesService {
         })
 
         console.log("loginUser for skilnote contents: ", loginUser);
-
-        const myBookMarks = await this.skilNoteContentBookmarkRepo.find({
-            where: { user: { email: loginUser.email } },
-            relations: [
-                'skilNoteContent',
-                'skilNoteContent.skilNote'
-            ]
-        });
+        let myBookMarks;
+        if (loginUser) {
+            myBookMarks = await this.skilNoteContentBookmarkRepo.find({
+                where: { user: { email: loginUser.email } },
+                relations: [
+                    'skilNoteContent',
+                    'skilNoteContent.skilNote'
+                ]
+            });
+        } else {
+            myBookMarks = []
+        }
 
         // const skilnote_contents
         // console.log("skilnotePagesCount ?? ", skilnotePagesCount);
