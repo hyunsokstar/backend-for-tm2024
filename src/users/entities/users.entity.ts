@@ -24,6 +24,9 @@ export class UsersModel {
     @Column()
     nickname: string;
 
+    @Column({ default: 0 })
+    cashPoints: number;
+
     @Column({
         type: "enum",
         enum: RolesEnum,

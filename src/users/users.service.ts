@@ -100,6 +100,7 @@ export class UsersService {
             .leftJoinAndSelect('user.followers', 'followers')
             .leftJoinAndSelect('user.following', 'following')
             .leftJoinAndSelect('user.myBookMarksForSkilNoteContents', 'myBookMarksForSkilNoteContents')
+            .select(['user.id', 'user.email', 'user.nickname', 'user.cashPoints', 'followers', 'following', 'myBookMarksForSkilNoteContents'])
             .getOne();
     }
 
@@ -241,7 +242,7 @@ export class UsersService {
 
             const user = await this.getUserByEmailWithEmailRelations(userEmail); // 해당 이메일로 사용자 정보 가져오기
 
-            // console.log("user for login check: ", user);
+            console.log("user for login check: ", user);
 
 
             if (!user) {
