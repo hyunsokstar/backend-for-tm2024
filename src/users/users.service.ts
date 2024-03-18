@@ -18,6 +18,36 @@ export class UsersService {
 
         private readonly configService: ConfigService
     ) { }
+    // updateUserCashPoints
+
+    async updateUserCashPoints({ loginUser, cashPointsToBuy }): Promise<number> {
+
+        console.log("cashPointsToBuy : ", cashPointsToBuy);
+
+
+        try {
+            // loginUser에 해당하는 사용자를 데이터베이스에서 찾습니다.
+            const user = await this.usersRepository.findOne({ where: { id: loginUser.id } });
+
+            // 사용자가 존재하지 않으면 에러를 발생시킵니다.
+            if (!user) {
+                throw new Error("사용자를 찾을 수 없습니다.");
+            }
+
+            // 사용자의 cashPoints에 cashPointsToBuy를 더합니다.
+            user.cashPoints += parseInt(cashPointsToBuy);
+
+            // 변경된 사용자 정보를 데이터베이스에 저장합니다.
+            await this.usersRepository.save(user);
+
+            // 변경된 cashPoints 값을 리턴합니다.
+            return user.cashPoints;
+        } catch (error) {
+            // 에러 발생 시 콘솔에 로그를 출력하고 예외를 다시 던집니다.
+            console.error("updateUserCashPoints 오류:", error);
+            throw error;
+        }
+    }
 
     async getUserEmails(): Promise<string[]> {
         const query = this.usersRepository.createQueryBuilder("user")
@@ -100,7 +130,7 @@ export class UsersService {
             .leftJoinAndSelect('user.followers', 'followers')
             .leftJoinAndSelect('user.following', 'following')
             .leftJoinAndSelect('user.myBookMarksForSkilNoteContents', 'myBookMarksForSkilNoteContents')
-            .select(['user.id', 'user.email', 'user.nickname', 'user.cashPoints', 'followers', 'following', 'myBookMarksForSkilNoteContents'])
+            // .select(['user.id', 'user.email', 'user.nickname', 'user.cashPoints', 'followers', 'following', 'myBookMarksForSkilNoteContents'])
             .getOne();
     }
 

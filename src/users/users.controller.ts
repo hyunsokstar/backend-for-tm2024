@@ -115,7 +115,6 @@ export class UsersController {
 
       // console.log("userOrError.user : ", userOrError.user);
 
-
       if (!userOrError.success) {
         return response.status(HttpStatus.UNAUTHORIZED).json({
           success: false,
@@ -292,7 +291,44 @@ export class UsersController {
     const userEmails = await this.usersService.getUserEmails()
     console.log("userEmails : ", userEmails);
 
-    // return userEmails;
     return res.status(HttpStatus.OK).json(userEmails);
   }
+
+  @Put('/buyPoints')
+  async updateUserCashPoints(
+    @Body('cashPointsToBuy') cashPointsToBuy: number,
+    @Req() req, @Res() response
+  ) {
+    console.log("cashPointsToBuy:", cashPointsToBuy);
+    const loginUser = req.user
+
+    try {
+      // 로그인하지 않은 경우 에러 처리
+      if (!loginUser) {
+        throw new Error("로그인된 사용자만 캐시를 구입할 수 있습니다.");
+      }
+
+      // cashPoints를 업데이트하고 업데이트된 값을 가져옵니다.
+      const cashPointsAfterUpdate = await this.usersService.updateUserCashPoints({ loginUser, cashPointsToBuy });
+
+      // 적절한 응답을 보냅니다.
+      return response.status(200).json({
+        success: true,
+        message: `${req.user.email} 님은 cashPoint ${cashPointsToBuy} 원을 구입 했습니다. 총 잔액: ${cashPointsAfterUpdate} `
+      });
+    } catch (error) {
+      // 에러 메시지를 콘솔에 기록합니다.
+      console.error("updateUserCashPoints 오류:", error.message);
+
+      // 적절한 에러 응답을 보냅니다.
+      return response.status(400).json({
+        success: false,
+        message: error.message
+      });
+    }
+  }
+
+
+
+
 }
