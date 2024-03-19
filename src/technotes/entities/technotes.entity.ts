@@ -45,7 +45,6 @@ export class TechNotesModel {
     @OneToMany(() => ParticipantsForTechNoteModel, participant => participant.techNote)
     participants: ParticipantsForTechNoteModel[]
 
-
     @OneToMany(() => LikesModelForTechNote, likes => likes.techNote)
     likes: LikesModelForTechNote[]
 

@@ -58,7 +58,7 @@ export class UsersController {
 
     // 이메일로 사용자 찾기
     const user = await this.usersService.getUserByEmailWithEmailRelations(email);
-    console.log("user : ", user);
+    // console.log("user : ", user);
     // 사용자가 존재하지 않으면 에러 처리
     if (!user) {
       return response.status(HttpStatus.UNAUTHORIZED).json({
@@ -297,6 +297,7 @@ export class UsersController {
   @Put('/buyPoints')
   async updateUserCashPoints(
     @Body('cashPointsToBuy') cashPointsToBuy: number,
+    @Body('merchantUid') merchantUid: number,
     @Req() req, @Res() response
   ) {
     console.log("cashPointsToBuy:", cashPointsToBuy);
@@ -309,7 +310,7 @@ export class UsersController {
       }
 
       // cashPoints를 업데이트하고 업데이트된 값을 가져옵니다.
-      const cashPointsAfterUpdate = await this.usersService.updateUserCashPoints({ loginUser, cashPointsToBuy });
+      const cashPointsAfterUpdate = await this.usersService.updateUserCashPoints({ loginUser, cashPointsToBuy, merchantUid });
 
       // 적절한 응답을 보냅니다.
       return response.status(200).json({
@@ -328,7 +329,20 @@ export class UsersController {
     }
   }
 
+  @Get('payment-history')
+  async getUsersPaymentHistory(@Req() req, @Res() response) {
+    const userId = req.user.id;
 
+    if (!userId) {
+      return response.status(HttpStatus.UNAUTHORIZED).json({ success: false, message: '로그인이 필요합니다.' });
+    }
 
+    try {
+      const paymentHistory = await this.usersService.getUsersPaymentHistory(userId);
+      return response.status(HttpStatus.OK).json({ success: true, paymentHistory });
+    } catch (error) {
+      return response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ success: false, message: error.message });
+    }
+  }
 
 }

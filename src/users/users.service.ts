@@ -8,6 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import * as jwt from 'jsonwebtoken';
 import { UpdateUserDTO } from './dtos/UpdateUserDTO';
 import { FollowUserDto } from './dtos/FollowUser.dto';
+import { PaymentsModelForCashPoints } from './entities/payment.entity';
 
 @Injectable()
 export class UsersService {
@@ -15,14 +16,25 @@ export class UsersService {
     constructor(
         @InjectRepository(UsersModel)
         private readonly usersRepository: Repository<UsersModel>,
-
-        private readonly configService: ConfigService
+        private readonly configService: ConfigService,
+        @InjectRepository(PaymentsModelForCashPoints)
+        private readonly paymentsForCashPointsRepo: Repository<PaymentsModelForCashPoints>
     ) { }
+
+    async getUsersPaymentHistory(userId: number) {
+        const user = await this.usersRepository.findOne({ where: { id: userId } });
+        if (!user) {
+            throw new Error('사용자를 찾을 수 없습니다.');
+        }
+
+        const paymentHistory = await this.paymentsForCashPointsRepo.find({ where: { user } });
+        return paymentHistory;
+    }
+
     // updateUserCashPoints
-
-    async updateUserCashPoints({ loginUser, cashPointsToBuy }): Promise<number> {
-
+    async updateUserCashPoints({ loginUser, cashPointsToBuy, merchantUid }): Promise<number> {
         console.log("cashPointsToBuy !!", cashPointsToBuy);
+        console.log("check for merchantUid at user service : ", merchantUid);
 
         try {
             // loginUser에 해당하는 사용자를 데이터베이스에서 찾습니다.
@@ -32,6 +44,27 @@ export class UsersService {
             if (!user) {
                 throw new Error("사용자를 찾을 수 없습니다.");
             }
+
+            // 이미 해당 사용자가 동일한 결제 정보를 가지고 있는지 확인합니다.
+            const existingPayment = await this.paymentsForCashPointsRepo.findOne({ where: { user: user, merchantUid } });
+
+            if (existingPayment) {
+                throw new Error("이미 해당 사용자가 동일한 결제 정보를 가지고 있습니다.");
+            }
+
+            // 결제 정보를 저장합니다.
+            await this.paymentsForCashPointsRepo.save({
+                user: user,
+                merchantUid,
+                paymentAmount: parseInt(cashPointsToBuy)
+            });
+
+            // paymentsForCashPointsRepo 에 데이터 추가
+            // user 는 loginUser
+            // merchantUid 는 merchantUid
+            // paymentAmount 는 cashPointsToBuy
+            // 단 이미 user 는 loginUser 이면서 merchatUid 는 merchantUid 인거 있으면 
+            // 이미 데이터 있습니다 http 에러 응답
 
             // 사용자의 cashPoints에 cashPointsToBuy를 더합니다.
             user.cashPoints += parseInt(cashPointsToBuy);
@@ -271,7 +304,7 @@ export class UsersService {
 
             const user = await this.getUserByEmailWithEmailRelations(userEmail); // 해당 이메일로 사용자 정보 가져오기
 
-            console.log("user for login check: ", user);
+            // console.log("user for login check: ", user);
 
 
             if (!user) {
@@ -361,6 +394,7 @@ export class UsersService {
         try {
             user.profileImage = image; // 사용자의 프로필 이미지 업데이트
             return await this.usersRepository.save(user);
+
         } catch (error) {
             console.error('Error updating profile image:', error);
             throw new InternalServerErrorException('프로필 이미지 업데이트 중 오류가 발생했습니다.');

@@ -35,6 +35,7 @@ import { StarterKitsModel } from "./starter-projects/entities/starter-project.en
 import { ParticipantsForRoadMapModel } from "./technotes/entities/participantsForRoadMap.entity";
 import { ParticipantsForSkilNoteModel } from "./technotes/entities/participantsForSkilNote.entity";
 import { ParticipantsForTechNoteModel } from "./technotes/entities/participantsForTechNote.entity";
+import { PaymentsModelForCashPoints } from "./users/entities/payment.entity";
 
 @Module({
   imports: [
@@ -66,7 +67,8 @@ import { ParticipantsForTechNoteModel } from "./technotes/entities/participantsF
         StarterKitsModel,
         ParticipantsForRoadMapModel,
         ParticipantsForSkilNoteModel,
-        ParticipantsForTechNoteModel
+        ParticipantsForTechNoteModel,
+        PaymentsModelForCashPoints
       ],
       synchronize: true,
     }),

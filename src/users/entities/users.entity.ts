@@ -7,6 +7,7 @@ import { TodosModel } from "src/todos/entities/todos.entity";
 import { BookMarksForSkilNoteContentsModel } from "src/technotes/entities/bookMarksForSkilNoteContent.entity";
 import { SupplementaryTodosModel } from "src/todos/entities/supplementary_todos.entity";
 import { ParticipantsForSkilNoteModel } from "src/technotes/entities/participantsForSkilNote.entity";
+import { PaymentsModelForCashPoints } from "./payment.entity";
 
 @Entity()
 @Unique(["email", "nickname"])
@@ -102,4 +103,8 @@ export class UsersModel {
 
     @OneToMany(() => ParticipantsForSkilNoteModel, particiPateForSkilNote => particiPateForSkilNote.user)
     takenCoursesForSkilNote: ParticipantsForSkilNoteModel
+
+    @OneToMany(() => PaymentsModelForCashPoints, paymentsModelForCashPoints => paymentsModelForCashPoints.user)
+    paymentsForCashPoints: PaymentsModelForCashPoints
+
 }
