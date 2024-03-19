@@ -22,8 +22,7 @@ export class UsersService {
 
     async updateUserCashPoints({ loginUser, cashPointsToBuy }): Promise<number> {
 
-        console.log("cashPointsToBuy : ", cashPointsToBuy);
-
+        console.log("cashPointsToBuy !", cashPointsToBuy);
 
         try {
             // loginUser에 해당하는 사용자를 데이터베이스에서 찾습니다.
