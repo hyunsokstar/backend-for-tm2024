@@ -30,6 +30,7 @@ export class ChallengesService {
     }
 
     console.log("create 111");
+    console.log("createChallengeDto.prize : ", createChallengeDto.prize);
 
 
     const challenge = new ChallengesModel();

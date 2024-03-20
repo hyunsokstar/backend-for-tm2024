@@ -10,7 +10,6 @@ export class CreateChallengeDto {
     description: string;
 
     @IsNumber()
-    @Min(0)
     prize: number;
 
     @IsDateString()

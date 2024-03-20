@@ -15,6 +15,8 @@ export class ChallengesController {
   ) {
     const loginUser = req.user;
     console.log('loginUser : ', loginUser);
+    console.log("createChallenge check");
+
 
     if (!loginUser) {
       throw new HttpException(
