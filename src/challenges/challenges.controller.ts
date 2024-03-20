@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { ChallengesService } from './challenges.service';
 import { CreateChallengeDto } from './dto/create-challenge.dto';
 import { UpdateChallengeDto } from './dto/update-challenge.dto';
@@ -13,8 +13,8 @@ export class ChallengesController {
   }
 
   @Get()
-  async findAllChallenges() {
-    return this.challengesService.findAllChallenges();
+  async findAllChallenges(@Query('pageNum') pageNum: number) {
+    return this.challengesService.findAllChallenges(pageNum);
   }
 
   @Get(':id')

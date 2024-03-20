@@ -36,8 +36,22 @@ export class ChallengesService {
     return this.challengesRepo.save(challenge);
   }
 
-  async findAllChallenges(): Promise<ChallengesModel[]> {
-    return this.challengesRepo.find();
+  async findAllChallenges(pageNum: number = 1):
+    Promise<{ challengeList: ChallengesModel[], totalCount: number, perPage: number }> {
+    const perPage = 20;
+    const skip = (pageNum - 1) * perPage;
+
+    console.log("perPage : ", perPage);
+    console.log("perPage : ", typeof perPage);
+
+    const [challengeList, totalCount] = await this.challengesRepo
+      .createQueryBuilder('challenge')
+      .leftJoinAndSelect('challenge.writer', 'writer')
+      .skip(skip)
+      .take(perPage)
+      .getManyAndCount();
+
+    return { challengeList, totalCount, perPage };
   }
 
   findOne(id: number) {
