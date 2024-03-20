@@ -1,5 +1,4 @@
 import { IsNotEmpty, IsString, IsNumber, Min, IsDateString } from 'class-validator';
-import { UsersModel } from 'src/users/entities/users.entity';
 
 export class CreateChallengeDto {
     @IsNotEmpty()
@@ -18,7 +17,7 @@ export class CreateChallengeDto {
     @IsNotEmpty()
     deadline: string;
 
-    @IsNumber()
-    @IsNotEmpty()
-    writerId: number;
+    // @IsNumber()
+    // @IsNotEmpty()
+    // writerId: number;
 }

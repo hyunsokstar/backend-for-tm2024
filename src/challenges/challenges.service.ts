@@ -19,12 +19,18 @@ export class ChallengesService {
   ) { }
 
   // challenge 하나 입력 구현
-  async createChallenge(createChallengeDto: CreateChallengeDto): Promise<ChallengesModel> {
-    const writer = await this.usersRepository.findOne({ where: { id: createChallengeDto.writerId } });
+  async createChallenge(loginUser: UsersModel, createChallengeDto: CreateChallengeDto): Promise<ChallengesModel> {
+    console.log("create challenge check !!");
+
+    const writer = await this.usersRepository.findOne({ where: { id: loginUser.id } });
+    console.log("create challenge check !! ", writer);
 
     if (!writer) {
       throw new HttpException('Writer not found', HttpStatus.NOT_FOUND);
     }
+
+    console.log("create 111");
+
 
     const challenge = new ChallengesModel();
     challenge.challengeName = createChallengeDto.challengeName;
@@ -33,8 +39,12 @@ export class ChallengesService {
     challenge.deadline = new Date(createChallengeDto.deadline);
     challenge.writer = writer;
 
-    return this.challengesRepo.save(challenge);
+    const savedChallenge = await this.challengesRepo.save(challenge);
+
+    // 클라이언트에게 생성된 챌린지 정보를 반환합니다.
+    return savedChallenge;
   }
+
 
   async findAllChallenges(pageNum: number = 1):
     Promise<{ challengeList: ChallengesModel[], totalCount: number, perPage: number }> {
