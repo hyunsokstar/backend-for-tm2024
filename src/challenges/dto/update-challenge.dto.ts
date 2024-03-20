@@ -1,15 +1,20 @@
-import { IsNotEmpty, IsString, IsNumber, Min, IsDateString } from 'class-validator';
+import { IsOptional, IsString, IsNumber, Min, IsDateString } from 'class-validator';
 
 export class UpdateChallengeDto {
     @IsString()
-    challengeName: string;
+    @IsOptional()
+    challengeName?: string;
 
     @IsString()
-    description: string;
+    @IsOptional()
+    description?: string;
 
-    @IsString()
-    prize: number;
+    @IsNumber()
+    @Min(0)
+    @IsOptional()
+    prize?: number;
 
     @IsDateString()
-    deadline: string;
+    @IsOptional()
+    deadline?: string;
 }
