@@ -18,6 +18,37 @@ export class ChallengesService {
 
   ) { }
 
+  async updateChallenge(id: string, updateChallengeDto: UpdateChallengeDto): Promise<ChallengesModel> {
+    console.log("check for update challenge id : ", id);
+
+    const challenge = await this.challengesRepo.findOne({ where: { id } });
+
+    if (!challenge) {
+      console.log("check for id : ", id);
+
+      throw new HttpException('Challenge not found', HttpStatus.NOT_FOUND);
+    }
+
+    // 업데이트할 필드들만 설정
+    if (updateChallengeDto.challengeName) {
+      challenge.challengeName = updateChallengeDto.challengeName;
+    }
+    if (updateChallengeDto.description) {
+      challenge.description = updateChallengeDto.description;
+    }
+    if (updateChallengeDto.prize) {
+      challenge.prize = updateChallengeDto.prize;
+    }
+    if (updateChallengeDto.deadline) {
+      challenge.deadline = new Date(updateChallengeDto.deadline);
+    }
+
+    const updatedChallenge = await this.challengesRepo.save(challenge);
+
+    return updatedChallenge;
+  }
+
+
   async deleteChallenge(id: string): Promise<void> {
     // 챌린지 id로 챌린지를 찾습니다.
     const challenge = await this.challengesRepo.findOne({ where: { id } });

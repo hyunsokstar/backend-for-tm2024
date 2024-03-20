@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req, Res, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req, Res, HttpException, HttpStatus, Put } from '@nestjs/common';
 import { ChallengesService } from './challenges.service';
 import { CreateChallengeDto } from './dto/create-challenge.dto';
 import { UpdateChallengeDto } from './dto/update-challenge.dto';
@@ -6,6 +6,42 @@ import { UpdateChallengeDto } from './dto/update-challenge.dto';
 @Controller('challenges')
 export class ChallengesController {
   constructor(private readonly challengesService: ChallengesService) { }
+
+  @Put(':id')
+  async updateChallenge(
+    @Param('id') id: string,
+    @Body() updateChallengeDto: UpdateChallengeDto,
+    @Req() req,
+    @Res() response,
+  ) {
+    const loginUser = req.user;
+    console.log("id check for challenge update : ", id);
+
+    if (!loginUser) {
+      throw new HttpException(
+        '로그인된 사용자만 챌린지를 업데이트할 수 있습니다.',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    try {
+      const updatedChallenge = await this.challengesService.updateChallenge(
+        id,
+        updateChallengeDto,
+      );
+      return response.status(HttpStatus.OK).json(updatedChallenge);
+
+    } catch (error) {
+      console.log("error : ", error);
+
+      return response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message: '챌린지 업데이트 중 오류가 발생했습니다.',
+        error: error.message, // 에러 메시지 포함
+      });
+
+    }
+  }
+
 
   @Delete(':id')
   async deleteChallenge(

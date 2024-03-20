@@ -16,7 +16,4 @@ export class CreateChallengeDto {
     @IsNotEmpty()
     deadline: string;
 
-    // @IsNumber()
-    // @IsNotEmpty()
-    // writerId: number;
 }
