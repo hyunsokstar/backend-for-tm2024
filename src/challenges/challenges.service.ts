@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreateChallengeDto } from './dto/create-challenge.dto';
 import { UpdateChallengeDto } from './dto/update-challenge.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -17,6 +17,19 @@ export class ChallengesService {
     private readonly usersRepository: Repository<UsersModel>,
 
   ) { }
+
+  async deleteChallenge(id: string): Promise<void> {
+    // 챌린지 id로 챌린지를 찾습니다.
+    const challenge = await this.challengesRepo.findOne({ where: { id } });
+
+    // 챌린지가 없으면 예외를 던집니다.
+    if (!challenge) {
+      throw new NotFoundException(`해당 ID(${id})의 챌린지를 찾을 수 없습니다.`);
+    }
+
+    // 챌린지를 삭제합니다.
+    await this.challengesRepo.delete(id);
+  }
 
   // challenge 하나 입력 구현
   async createChallenge(loginUser: UsersModel, createChallengeDto: CreateChallengeDto): Promise<ChallengesModel> {
@@ -73,7 +86,4 @@ export class ChallengesService {
     return `This action updates a #${id} challenge`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} challenge`;
-  }
 }
