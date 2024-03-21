@@ -4,12 +4,14 @@ import { ChallengesController } from './challenges.controller';
 import { ChallengesModel } from './entities/challenge.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModel } from 'src/users/entities/users.entity';
+import { SubChallengesModel } from './entities/sub_challenge.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
+      UsersModel,
       ChallengesModel,
-      UsersModel
+      SubChallengesModel
     ])
   ],
   controllers: [ChallengesController],

@@ -2,10 +2,44 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req, Res, Htt
 import { ChallengesService } from './challenges.service';
 import { CreateChallengeDto } from './dto/create-challenge.dto';
 import { UpdateChallengeDto } from './dto/update-challenge.dto';
+import { CreateSubChallengeDto } from './dto/create-sub-challenge.dto';
 
 @Controller('challenges')
 export class ChallengesController {
   constructor(private readonly challengesService: ChallengesService) { }
+
+  @Post(':id/subChallenges')
+  async createSubChallenge(
+    @Param('id') challengeId: string,
+    @Body() createSubChallengeDto: CreateSubChallengeDto,
+    @Res() response,
+  ) {
+    try {
+      const createdSubChallenge = await this.challengesService.createSubChallenge(challengeId, createSubChallengeDto);
+      return response.status(HttpStatus.CREATED).json(createdSubChallenge);
+    } catch (error) {
+      if (error instanceof HttpException) {
+        return response.status(error.getStatus()).send(error.message);
+      }
+      return response.status(HttpStatus.INTERNAL_SERVER_ERROR).send('서버 오류가 발생했습니다.');
+    }
+  }
+
+  @Get(':id/subChallenges')
+  async findAllSubChallenges(
+    @Param('id') challengeId: string,
+    @Res() response,
+  ) {
+    try {
+      const subChallenges = await this.challengesService.findAllSubChallenges(challengeId);
+      return response.status(HttpStatus.OK).json(subChallenges);
+    } catch (error) {
+      if (error instanceof HttpException) {
+        return response.status(error.getStatus()).send(error.message);
+      }
+      return response.status(HttpStatus.INTERNAL_SERVER_ERROR).send('서버 오류가 발생했습니다.');
+    }
+  }
 
   @Put(':id')
   async updateChallenge(
@@ -109,16 +143,6 @@ export class ChallengesController {
   @Get()
   async findAllChallenges(@Query('pageNum') pageNum: number) {
     return this.challengesService.findAllChallenges(pageNum);
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.challengesService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateChallengeDto: UpdateChallengeDto) {
-    return this.challengesService.update(+id, updateChallengeDto);
   }
 
 }

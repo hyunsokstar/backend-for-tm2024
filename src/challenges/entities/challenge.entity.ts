@@ -6,7 +6,9 @@ import {
     CreateDateColumn,
     UpdateDateColumn,
     ManyToOne,
+    OneToMany,
 } from 'typeorm';
+import { SubChallengesModel } from './sub_challenge.entity';
 
 @Entity('challenges')
 export class ChallengesModel {
@@ -36,5 +38,11 @@ export class ChallengesModel {
 
     @UpdateDateColumn()
     updatedAt: Date;
+
+    @OneToMany(() => SubChallengesModel, subChallenge => subChallenge.challenge, {
+        nullable: true,
+    })
+    subChallenges: SubChallengesModel[];
+
 
 }

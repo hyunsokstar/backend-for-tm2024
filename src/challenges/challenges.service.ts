@@ -5,6 +5,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ChallengesModel } from './entities/challenge.entity';
 import { Repository } from 'typeorm';
 import { UsersModel } from 'src/users/entities/users.entity';
+import { SubChallengesModel } from './entities/sub_challenge.entity';
+import { CreateSubChallengeDto } from './dto/create-sub-challenge.dto';
 
 @Injectable()
 export class ChallengesService {
@@ -12,11 +14,40 @@ export class ChallengesService {
   constructor(
     @InjectRepository(ChallengesModel)
     private challengesRepo: Repository<ChallengesModel>,
-
+    @InjectRepository(SubChallengesModel)
+    private SubChallengesRepo: Repository<SubChallengesModel>,
     @InjectRepository(UsersModel)
     private readonly usersRepository: Repository<UsersModel>,
-
   ) { }
+
+  async createSubChallenge(challengeId: string, createSubChallengeDto: CreateSubChallengeDto): Promise<SubChallengesModel> {
+    const challenge = await this.challengesRepo.findOne({ where: { id: challengeId } });
+
+    if (!challenge) {
+      throw new NotFoundException(`해당 ID(${challengeId})의 챌린지를 찾을 수 없습니다.`);
+    }
+
+    const subChallenge = new SubChallengesModel();
+    subChallenge.subChallengeName = createSubChallengeDto.subChallengeName;
+    subChallenge.description = createSubChallengeDto.description;
+    subChallenge.prize = createSubChallengeDto.prize;
+    subChallenge.deadline = new Date(createSubChallengeDto.deadline);
+    subChallenge.challenge = challenge;
+
+    const savedSubChallenge = await this.SubChallengesRepo.save(subChallenge);
+
+    return savedSubChallenge;
+  }
+
+  async findAllSubChallenges(challengeId: string): Promise<SubChallengesModel[]> {
+    const challenge = await this.challengesRepo.findOne({ where: { id: challengeId }, relations: ['subChallenges'] });
+
+    if (!challenge) {
+      throw new NotFoundException(`해당 ID(${challengeId})의 챌린지를 찾을 수 없습니다.`);
+    }
+
+    return challenge.subChallenges;
+  }
 
   async updateChallenge(id: string, updateChallengeDto: UpdateChallengeDto): Promise<ChallengesModel> {
     console.log("check for update challenge id : ", id);
