@@ -145,4 +145,5 @@ export class ChallengesController {
     return this.challengesService.findAllChallenges(pageNum);
   }
 
+
 }

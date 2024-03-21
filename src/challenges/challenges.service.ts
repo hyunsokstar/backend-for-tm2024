@@ -133,6 +133,7 @@ export class ChallengesService {
     const [challengeList, totalCount] = await this.challengesRepo
       .createQueryBuilder('challenge')
       .leftJoinAndSelect('challenge.writer', 'writer')
+      .leftJoinAndSelect('challenge.subChallenges', 'subChallenges')
       .skip(skip)
       .take(perPage)
       .getManyAndCount();
