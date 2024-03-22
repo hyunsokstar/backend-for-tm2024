@@ -8,7 +8,7 @@ export class SubChallengesModel {
     id: string;
 
     @Column()
-    subChallengeName: string;
+    challengeName: string;
 
     @Column()
     description: string;

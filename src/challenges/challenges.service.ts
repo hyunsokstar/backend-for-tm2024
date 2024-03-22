@@ -15,7 +15,7 @@ export class ChallengesService {
     @InjectRepository(ChallengesModel)
     private challengesRepo: Repository<ChallengesModel>,
     @InjectRepository(SubChallengesModel)
-    private SubChallengesRepo: Repository<SubChallengesModel>,
+    private subChallengesRepo: Repository<SubChallengesModel>,
     @InjectRepository(UsersModel)
     private readonly usersRepository: Repository<UsersModel>,
   ) { }
@@ -28,13 +28,13 @@ export class ChallengesService {
     }
 
     const subChallenge = new SubChallengesModel();
-    subChallenge.subChallengeName = createSubChallengeDto.subChallengeName;
+    subChallenge.challengeName = createSubChallengeDto.challengeName;
     subChallenge.description = createSubChallengeDto.description;
     subChallenge.prize = createSubChallengeDto.prize;
     subChallenge.deadline = new Date(createSubChallengeDto.deadline);
     subChallenge.challenge = challenge;
 
-    const savedSubChallenge = await this.SubChallengesRepo.save(subChallenge);
+    const savedSubChallenge = await this.subChallengesRepo.save(subChallenge);
 
     return savedSubChallenge;
   }
@@ -49,7 +49,7 @@ export class ChallengesService {
     return challenge.subChallenges;
   }
 
-  async updateChallenge(id: string, updateChallengeDto: UpdateChallengeDto): Promise<ChallengesModel> {
+  async updateMainChallenge(id: string, updateChallengeDto: UpdateChallengeDto): Promise<ChallengesModel> {
     console.log("check for update challenge id : ", id);
 
     const challenge = await this.challengesRepo.findOne({ where: { id } });
@@ -78,9 +78,38 @@ export class ChallengesService {
 
     return updatedChallenge;
   }
+  async updateSubChallenge(id: string, updateChallengeDto: UpdateChallengeDto): Promise<SubChallengesModel> {
+    console.log("check for update challenge id : ", id);
+
+    const challenge = await this.subChallengesRepo.findOne({ where: { id } });
+
+    if (!challenge) {
+      console.log("check for id : ", id);
+
+      throw new HttpException('Challenge not found', HttpStatus.NOT_FOUND);
+    }
+
+    // 업데이트할 필드들만 설정
+    if (updateChallengeDto.challengeName) {
+      challenge.challengeName = updateChallengeDto.challengeName;
+    }
+    if (updateChallengeDto.description) {
+      challenge.description = updateChallengeDto.description;
+    }
+    if (updateChallengeDto.prize) {
+      challenge.prize = updateChallengeDto.prize;
+    }
+    if (updateChallengeDto.deadline) {
+      challenge.deadline = new Date(updateChallengeDto.deadline);
+    }
+
+    const updatedSubChallenge = await this.subChallengesRepo.save(challenge);
+
+    return updatedSubChallenge;
+  }
 
 
-  async deleteChallenge(id: string): Promise<void> {
+  async deleteMainChallenge(id: string): Promise<void> {
     // 챌린지 id로 챌린지를 찾습니다.
     const challenge = await this.challengesRepo.findOne({ where: { id } });
 
@@ -91,6 +120,19 @@ export class ChallengesService {
 
     // 챌린지를 삭제합니다.
     await this.challengesRepo.delete(id);
+  }
+
+  async deleteSubChallenge(id: string): Promise<void> {
+    // 챌린지 id로 챌린지를 찾습니다.
+    const challenge = await this.subChallengesRepo.findOne({ where: { id } });
+
+    // 챌린지가 없으면 예외를 던집니다.
+    if (!challenge) {
+      throw new NotFoundException(`해당 ID(${id})의 챌린지를 찾을 수 없습니다.`);
+    }
+
+    // 챌린지를 삭제합니다.
+    await this.subChallengesRepo.delete(id);
   }
 
   // challenge 하나 입력 구현
@@ -141,12 +183,5 @@ export class ChallengesService {
     return { challengeList, totalCount, perPage };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} challenge`;
-  }
-
-  update(id: number, updateChallengeDto: UpdateChallengeDto) {
-    return `This action updates a #${id} challenge`;
-  }
 
 }

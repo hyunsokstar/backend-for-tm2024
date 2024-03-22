@@ -44,7 +44,8 @@ export class ChallengesController {
   @Put(':id')
   async updateChallenge(
     @Param('id') id: string,
-    @Body() updateChallengeDto: UpdateChallengeDto,
+    @Body('isMainOrSub') isMainOrSub: string,
+    @Body('updateChallengeDto') updateChallengeDto: UpdateChallengeDto,
     @Req() req,
     @Res() response,
   ) {
@@ -59,11 +60,22 @@ export class ChallengesController {
     }
 
     try {
-      const updatedChallenge = await this.challengesService.updateChallenge(
-        id,
-        updateChallengeDto,
-      );
-      return response.status(HttpStatus.OK).json(updatedChallenge);
+
+      if (isMainOrSub === "main") {
+
+        const updatedChallenge = await this.challengesService.updateMainChallenge(
+          id,
+          updateChallengeDto,
+        );
+        return response.status(HttpStatus.OK).json(updatedChallenge);
+      } else {
+        const updatedChallenge = await this.challengesService.updateSubChallenge(
+          id,
+          updateChallengeDto,
+        );
+        return response.status(HttpStatus.OK).json(updatedChallenge);
+      }
+
 
     } catch (error) {
       console.log("error : ", error);
@@ -77,9 +89,10 @@ export class ChallengesController {
   }
 
 
-  @Delete(':id')
+  @Delete(':isMainOrSub/:id')
   async deleteChallenge(
     @Param('id') id: string,
+    @Param('isMainOrSub') isMainOrSub: string,
     @Req() req,
     @Res() response,
   ) {
@@ -96,8 +109,16 @@ export class ChallengesController {
         );
       }
 
-      await this.challengesService.deleteChallenge(id);
+      if (isMainOrSub === "main") {
+        await this.challengesService.deleteMainChallenge(id);
+
+      } else {
+        await this.challengesService.deleteSubChallenge(id);
+
+      }
+
       return response.status(HttpStatus.NO_CONTENT).send();
+
     } catch (error) {
       // 예외가 발생하면 해당 예외를 처리하여 적절한 HTTP 응답을 반환합니다.
       if (error instanceof HttpException) {

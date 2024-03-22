@@ -3,7 +3,7 @@ import { IsNotEmpty, IsString, IsNumber, IsDate, Min } from 'class-validator';
 export class CreateSubChallengeDto {
     @IsNotEmpty()
     @IsString()
-    subChallengeName: string;
+    challengeName: string;
 
     @IsNotEmpty()
     @IsString()
