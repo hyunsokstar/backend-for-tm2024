@@ -8,7 +8,6 @@ import { UsersModel } from 'src/users/entities/users.entity';
 import { SubChallengesModel } from './entities/sub_challenge.entity';
 import { CreateSubChallengeDto } from './dto/create-sub-challenge.dto';
 import { ParticipantsForSubChallengeModel } from './entities/participants-for-sub-challenge.entity';
-import { AddParticipantDto } from './dto/add-participant.dto';
 
 @Injectable()
 export class ChallengesService {
@@ -86,7 +85,7 @@ export class ChallengesService {
     }
   }
 
-  async addParticipantForSubChallenge(loginUser: UsersModel, subChallengeId: number, addParticipantDto: AddParticipantDto): Promise<ParticipantsForSubChallengeModel> {
+  async addParticipantForSubChallenge(loginUser: UsersModel, subChallengeId: number, noteUrl: string): Promise<ParticipantsForSubChallengeModel> {
     // userId와 subChallengeId에 해당하는 사용자 및 서브 챌린지가 존재하는지 확인
     const subChallenge = await this.subChallengesRepo.findOne({ where: { id: subChallengeId } });
 
@@ -106,7 +105,7 @@ export class ChallengesService {
     const participant = new ParticipantsForSubChallengeModel();
     participant.user = loginUser;
     participant.subChallenge = subChallenge;
-    participant.noteUrl = addParticipantDto.noteUrl;
+    participant.noteUrl = noteUrl;
 
     return this.participantsForSubChallengeRepo.save(participant);
   }

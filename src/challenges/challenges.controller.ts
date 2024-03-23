@@ -22,12 +22,13 @@ export class ChallengesController {
   }
 
   // subChallenge 에 대한 사용자 추가
-  // subChallenge 에 대한 사용자 추가
   @Post('sub-challenges/:subChallengeId/participants')
+  @UseGuards(new AuthGuard()) // 인증이 필요한 경우 사용
   async addParticipantForSubChallenge(
     @Param('subChallengeId') subChallengeId: number,
-    @Body() addParticipantDto: AddParticipantDto,
+    @Body('noteUrl') noteUrl: string,
     @Req() req,
+
     @Res() res,
   ) {
     const loginUser = req.user;
@@ -43,7 +44,7 @@ export class ChallengesController {
     let message: string;
 
     // 참가자를 추가하거나 삭제합니다.
-    const participant = await this.challengesService.addParticipantForSubChallenge(loginUser, subChallengeId, addParticipantDto);
+    const participant = await this.challengesService.addParticipantForSubChallenge(loginUser, subChallengeId, noteUrl);
 
     if (participant) {
       message = `${loginUser.email} 님이 ${subChallenge.challengeName}에 참가했습니다.`;
@@ -72,8 +73,13 @@ export class ChallengesController {
 
       const participantsForSubChallenge = await this.challengesService.findAllParticipantsForSubChallenges(subChallengeId);
 
+      let participantsEmailList = participantsForSubChallenge.map((row) => {
+        return row.user.email
+      })
+
       return response.status(HttpStatus.ACCEPTED).json({
         success: true,
+        participantsEmailList: participantsEmailList,
         participantsForSubChallenge: participantsForSubChallenge, // 에러 메시지 포함
       });
 
