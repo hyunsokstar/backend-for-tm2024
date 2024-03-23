@@ -18,8 +18,10 @@ export class SkilnotesService {
     constructor(
         @InjectRepository(TechNotesModel)
         private techNotesRepo: Repository<TechNotesModel>,
+
         @InjectRepository(SkilNotesModel)
         private skilNotesRepo: Repository<SkilNotesModel>,
+
         @InjectRepository(SkilNoteContentsModel)
         private skilNoteContentsRepo: Repository<SkilNoteContentsModel>,
         @InjectRepository(UsersModel)
@@ -32,6 +34,28 @@ export class SkilnotesService {
         private ParticipantsForSkilNoteRepo: Repository<ParticipantsForSkilNoteModel>
 
     ) { }
+
+    // getAllMySkilNoteList
+    async getAllMySkilNoteList(pageNum: number, perPage: number, loginUser: any) {
+        const userId = loginUser.id; // 가정: 로그인한 사용자의 ID를 가져올 수 있는 방법이라고 가정합니다.
+
+        console.log("pageNum : ", pageNum);
+        console.log("perPage : ", perPage);
+        console.log("loginUser : ", loginUser);
+
+
+        // 사용자의 스킬 노트를 페이지네이션하여 가져오기
+        const skilNotes = await this.skilNotesRepo.find({
+            where: { writer: { id: userId } }, // 사용자의 ID로 필터링
+            skip: (pageNum - 1) * perPage,
+            take: perPage,
+        });
+
+        console.log("skilNotes ??? ", skilNotes);
+
+
+        return skilNotes;
+    }
 
     async changePagesOrderForSkilNoteContent({ skilNoteId, targetOrder, destinationOrder }: DtoForChangePagesOrderForSkilNoteContent) {
 
@@ -285,7 +309,6 @@ export class SkilnotesService {
         return responseObj;
     }
 
-    // fix 0217
     async getAllSkilNoteList(
         pageNum: number = 1,
         perPage: number = 10,
@@ -298,17 +321,7 @@ export class SkilnotesService {
         totalCount: number,
         perPage: number,
     }> {
-        // return this.techNotesRepo.find();
         console.log("pageNum at all skilnote list: ", pageNum);
-
-        // const [skilNoteList, totalCount] = await this.skilNotesRepo.findAndCount({
-        //     skip: (pageNum - 1) * perPage,
-        //     take: perPage,
-        //     relations: ['writer'], // 이 부분이 추가된 부분입니다. User 정보를 가져오도록 설정합니다.
-        //     order: {
-        //         id: 'DESC'
-        //     }
-        // });
 
         let query = this.skilNotesRepo.createQueryBuilder('skilnotes')
             .skip((pageNum - 1) * perPage)

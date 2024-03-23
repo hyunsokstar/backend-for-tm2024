@@ -11,6 +11,31 @@ import { DtoForChangePagesOrderForSkilNoteContent } from '../dtos/dtoForChangePa
 export class SkilnotesController {
     constructor(private readonly skilnoteService: SkilnotesService) { }
 
+    @UseGuards(AuthGuard)
+    @Get("my-notes")
+    async getAllMySkilNoteList(
+        @Query('pageNum') pageNum = 1,
+        @Query('perPage') perPage = 10,
+        @Req() req
+    ) {
+        console.log("getAllMySkilNoteList : ", pageNum);
+        const loginUser = req.user;
+
+        const result = await this.skilnoteService.getAllMySkilNoteList(
+            pageNum,
+            perPage,
+            loginUser
+        );
+
+        const response = {
+            perPage: perPage,
+            totalCount: result.length,
+            allMySkilNoteList: result
+        };
+
+        return response;
+    }
+
     // fix 02027
     @Get()
     async getAllSkilNoteList(
