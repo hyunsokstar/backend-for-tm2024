@@ -1,16 +1,83 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req, Res, HttpException, HttpStatus, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req, Res, HttpException, HttpStatus, Put, UseGuards } from '@nestjs/common';
 import { ChallengesService } from './challenges.service';
 import { CreateChallengeDto } from './dto/create-challenge.dto';
 import { UpdateChallengeDto } from './dto/update-challenge.dto';
 import { CreateSubChallengeDto } from './dto/create-sub-challenge.dto';
+import { AddParticipantDto } from './dto/add-participant.dto';
+import { AuthGuard } from 'src/guards/auth.guard';
 
 @Controller('challenges')
 export class ChallengesController {
   constructor(private readonly challengesService: ChallengesService) { }
 
+  // subChallenge 에 대한 사용자 추가
+  // subChallenge 에 대한 사용자 추가
+  @Post('sub-challenges/:subChallengeId/participants')
+  async addParticipantForSubChallenge(
+    @Param('subChallengeId') subChallengeId: number,
+    @Body() addParticipantDto: AddParticipantDto,
+    @Req() req,
+    @Res() res,
+  ) {
+    const loginUser = req.user;
+
+    // subChallenge를 가져옵니다.
+    const subChallenge = await this.challengesService.findSubchallengeById(subChallengeId);
+
+    if (!subChallenge) {
+      return res.status(HttpStatus.NOT_FOUND).json({ message: '해당하는 서브 챌린지를 찾을 수 없습니다.' });
+    }
+
+    // 참가 또는 탈퇴 메시지를 생성합니다.
+    let message: string;
+
+    // 참가자를 추가하거나 삭제합니다.
+    const participant = await this.challengesService.addParticipantForSubChallenge(loginUser, subChallengeId, addParticipantDto);
+
+    if (participant) {
+      message = `${loginUser.email} 님이 ${subChallenge.challengeName}에 참가했습니다.`;
+    } else {
+      message = `${loginUser.email} 님이 ${subChallenge.challengeName}에서 탈퇴했습니다.`;
+    }
+
+    // 적절한 응답을 반환합니다.
+    if (participant) {
+      res.status(HttpStatus.CREATED).json({ message });
+    } else {
+      res.status(HttpStatus.OK).json({ message });
+    }
+  }
+
+  @Get('sub-challenges/:subChallengeId/participants')
+  async allParticipantsListForSubchallenges(
+    @Param('subChallengeId') subChallengeId: number,
+    @Res() response,
+  ) {
+
+    console.log("subChallengeId ??? ", subChallengeId);
+
+
+    try {
+
+      const participantsForSubChallenge = await this.challengesService.findAllParticipantsForSubChallenges(subChallengeId);
+
+      return response.status(HttpStatus.ACCEPTED).json({
+        success: true,
+        participantsForSubChallenge: participantsForSubChallenge, // 에러 메시지 포함
+      });
+
+    } catch (error) {
+      if (error instanceof HttpException) {
+        return response.status(error.getStatus()).send(error.message);
+      }
+      return response.status(HttpStatus.INTERNAL_SERVER_ERROR).send('서버 오류가 발생했습니다.');
+    }
+
+  }
+
   @Post(':id/subChallenges')
   async createSubChallenge(
-    @Param('id') challengeId: string,
+    @Param('id') challengeId: number,
     @Body() createSubChallengeDto: CreateSubChallengeDto,
     @Res() response,
   ) {
@@ -27,7 +94,7 @@ export class ChallengesController {
 
   @Get(':id/subChallenges')
   async findAllSubChallenges(
-    @Param('id') challengeId: string,
+    @Param('id') challengeId: number,
     @Res() response,
   ) {
     try {
@@ -43,7 +110,7 @@ export class ChallengesController {
 
   @Put(':id')
   async updateChallenge(
-    @Param('id') id: string,
+    @Param('id') id: number,
     @Body('isMainOrSub') isMainOrSub: string,
     @Body('updateChallengeDto') updateChallengeDto: UpdateChallengeDto,
     @Req() req,
@@ -60,9 +127,7 @@ export class ChallengesController {
     }
 
     try {
-
       if (isMainOrSub === "main") {
-
         const updatedChallenge = await this.challengesService.updateMainChallenge(
           id,
           updateChallengeDto,
@@ -91,7 +156,7 @@ export class ChallengesController {
 
   @Delete(':isMainOrSub/:id')
   async deleteChallenge(
-    @Param('id') id: string,
+    @Param('id') id: number,
     @Param('isMainOrSub') isMainOrSub: string,
     @Req() req,
     @Res() response,
@@ -165,6 +230,5 @@ export class ChallengesController {
   async findAllChallenges(@Query('pageNum') pageNum: number) {
     return this.challengesService.findAllChallenges(pageNum);
   }
-
 
 }

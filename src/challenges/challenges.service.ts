@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreateChallengeDto } from './dto/create-challenge.dto';
 import { UpdateChallengeDto } from './dto/update-challenge.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -7,6 +7,8 @@ import { Repository } from 'typeorm';
 import { UsersModel } from 'src/users/entities/users.entity';
 import { SubChallengesModel } from './entities/sub_challenge.entity';
 import { CreateSubChallengeDto } from './dto/create-sub-challenge.dto';
+import { ParticipantsForSubChallengeModel } from './entities/participants-for-sub-challenge.entity';
+import { AddParticipantDto } from './dto/add-participant.dto';
 
 @Injectable()
 export class ChallengesService {
@@ -18,9 +20,66 @@ export class ChallengesService {
     private subChallengesRepo: Repository<SubChallengesModel>,
     @InjectRepository(UsersModel)
     private readonly usersRepository: Repository<UsersModel>,
+    @InjectRepository(ParticipantsForSubChallengeModel)
+    private readonly participantsForSubChallengeRepo: Repository<ParticipantsForSubChallengeModel>
   ) { }
 
-  async createSubChallenge(challengeId: string, createSubChallengeDto: CreateSubChallengeDto): Promise<SubChallengesModel> {
+
+  async findSubchallengeById(subChallengeId: number): Promise<SubChallengesModel> {
+    return await this.subChallengesRepo.findOne({ where: { id: subChallengeId } });
+  }
+
+  async findAllParticipantsForSubChallenges(subChallengeId: number): Promise<ParticipantsForSubChallengeModel[]> {
+
+    console.log("subChallengeId : ", subChallengeId);
+
+    try {
+      // subChallengeId에 해당하는 subChallenge를 찾습니다.
+      const subChallenge = await this.subChallengesRepo.findOne({ where: { id: subChallengeId } });
+      console.log("subChallenge : ", subChallenge);
+
+
+      if (!subChallenge) {
+        throw new NotFoundException('Sub Challenge not found');
+      }
+
+      // subChallenge에 대한 모든 참가자 목록을 가져옵니다.
+      const participantsForSubChallenge = await this.participantsForSubChallengeRepo.find({ where: { subChallenge: { id: subChallengeId } }, relations: ['user'] });
+      console.log("participantsForSubChallenge : ", participantsForSubChallenge);
+
+      return participantsForSubChallenge;
+    } catch (error) {
+      throw new InternalServerErrorException('서버 오류가 발생했습니다.');
+    }
+  }
+
+  async addParticipantForSubChallenge(loginUser: UsersModel, subChallengeId: number, addParticipantDto: AddParticipantDto): Promise<ParticipantsForSubChallengeModel> {
+    // userId와 subChallengeId에 해당하는 사용자 및 서브 챌린지가 존재하는지 확인
+    const subChallenge = await this.subChallengesRepo.findOne({ where: { id: subChallengeId } });
+
+    if (!loginUser || !subChallenge) {
+      throw new NotFoundException('User or sub challenge not found');
+    }
+
+    // participantsForSubChallengeRepo에서 loginUser에 해당하는 데이터가 존재할 경우, 이미 참여중이므로 삭제 후 탈퇴 메시지 응답
+    const existingParticipant = await this.participantsForSubChallengeRepo.findOne({ where: { user: { id: loginUser.id }, subChallenge: { id: subChallengeId } } });
+
+    if (existingParticipant) {
+      await this.participantsForSubChallengeRepo.remove(existingParticipant);
+      return null; // 참여를 취소했으므로, 응답값을 반환하지 않음
+    }
+
+    // ParticipantsForSubChallengeModel 엔티티 생성 및 저장
+    const participant = new ParticipantsForSubChallengeModel();
+    participant.user = loginUser;
+    participant.subChallenge = subChallenge;
+    participant.noteUrl = addParticipantDto.noteUrl;
+
+    return this.participantsForSubChallengeRepo.save(participant);
+  }
+
+
+  async createSubChallenge(challengeId: number, createSubChallengeDto: CreateSubChallengeDto): Promise<SubChallengesModel> {
     const challenge = await this.challengesRepo.findOne({ where: { id: challengeId } });
 
     if (!challenge) {
@@ -39,7 +98,7 @@ export class ChallengesService {
     return savedSubChallenge;
   }
 
-  async findAllSubChallenges(challengeId: string): Promise<SubChallengesModel[]> {
+  async findAllSubChallenges(challengeId: number): Promise<SubChallengesModel[]> {
     const challenge = await this.challengesRepo.findOne({ where: { id: challengeId }, relations: ['subChallenges'] });
 
     if (!challenge) {
@@ -49,7 +108,7 @@ export class ChallengesService {
     return challenge.subChallenges;
   }
 
-  async updateMainChallenge(id: string, updateChallengeDto: UpdateChallengeDto): Promise<ChallengesModel> {
+  async updateMainChallenge(id: number, updateChallengeDto: UpdateChallengeDto): Promise<ChallengesModel> {
     console.log("check for update challenge id : ", id);
 
     const challenge = await this.challengesRepo.findOne({ where: { id } });
@@ -78,7 +137,7 @@ export class ChallengesService {
 
     return updatedChallenge;
   }
-  async updateSubChallenge(id: string, updateChallengeDto: UpdateChallengeDto): Promise<SubChallengesModel> {
+  async updateSubChallenge(id: number, updateChallengeDto: UpdateChallengeDto): Promise<SubChallengesModel> {
     console.log("check for update challenge id : ", id);
 
     const challenge = await this.subChallengesRepo.findOne({ where: { id } });
@@ -109,7 +168,7 @@ export class ChallengesService {
   }
 
 
-  async deleteMainChallenge(id: string): Promise<void> {
+  async deleteMainChallenge(id: number): Promise<void> {
     // 챌린지 id로 챌린지를 찾습니다.
     const challenge = await this.challengesRepo.findOne({ where: { id } });
 
@@ -122,7 +181,7 @@ export class ChallengesService {
     await this.challengesRepo.delete(id);
   }
 
-  async deleteSubChallenge(id: string): Promise<void> {
+  async deleteSubChallenge(id: number): Promise<void> {
     // 챌린지 id로 챌린지를 찾습니다.
     const challenge = await this.subChallengesRepo.findOne({ where: { id } });
 

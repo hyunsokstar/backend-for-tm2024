@@ -5,13 +5,15 @@ import { ChallengesModel } from './entities/challenge.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModel } from 'src/users/entities/users.entity';
 import { SubChallengesModel } from './entities/sub_challenge.entity';
+import { ParticipantsForSubChallengeModel } from './entities/participants-for-sub-challenge.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       UsersModel,
       ChallengesModel,
-      SubChallengesModel
+      SubChallengesModel,
+      ParticipantsForSubChallengeModel
     ])
   ],
   controllers: [ChallengesController],

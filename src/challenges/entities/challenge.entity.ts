@@ -13,7 +13,7 @@ import { SubChallengesModel } from './sub_challenge.entity';
 @Entity('challenges')
 export class ChallengesModel {
     @PrimaryGeneratedColumn()
-    id: string;
+    id: number;
 
     @Column()
     challengeName: string;

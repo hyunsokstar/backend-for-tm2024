@@ -39,6 +39,7 @@ import { PaymentsModelForCashPoints } from "./users/entities/payment.entity";
 import { ChallengesModule } from './challenges/challenges.module';
 import { ChallengesModel } from "./challenges/entities/challenge.entity";
 import { SubChallengesModel } from "./challenges/entities/sub_challenge.entity";
+import { ParticipantsForSubChallengeModel } from "./challenges/entities/participants-for-sub-challenge.entity";
 
 @Module({
   imports: [
@@ -73,7 +74,8 @@ import { SubChallengesModel } from "./challenges/entities/sub_challenge.entity";
         ParticipantsForTechNoteModel,
         PaymentsModelForCashPoints,
         ChallengesModel,
-        SubChallengesModel
+        SubChallengesModel,
+        ParticipantsForSubChallengeModel
       ],
       synchronize: true,
     }),
