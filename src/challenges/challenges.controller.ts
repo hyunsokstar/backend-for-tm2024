@@ -10,6 +10,17 @@ import { AuthGuard } from 'src/guards/auth.guard';
 export class ChallengesController {
   constructor(private readonly challengesService: ChallengesService) { }
 
+  // 다른 컨트롤러 메서드들 위에 추가할 것
+  @Put('sub-challenges/:subChallengeId/participants/:participantId/is-passed')
+  @UseGuards(new AuthGuard()) // 인증이 필요한 경우 사용
+  async updateIsPassedForParticipantForSubChallenge(
+    @Param('subChallengeId') subChallengeId: number,
+    @Param('participantId') participantId: number,
+    @Body('isPassed') isPassed: boolean,
+  ) {
+    return this.challengesService.updateIsPassedForParticipantForSubChallenge(subChallengeId, participantId, isPassed);
+  }
+
   // subChallenge 에 대한 사용자 추가
   // subChallenge 에 대한 사용자 추가
   @Post('sub-challenges/:subChallengeId/participants')

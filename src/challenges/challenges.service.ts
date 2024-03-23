@@ -24,6 +24,39 @@ export class ChallengesService {
     private readonly participantsForSubChallengeRepo: Repository<ParticipantsForSubChallengeModel>
   ) { }
 
+  async updateIsPassedForParticipantForSubChallenge(subChallengeId: number, participantId: number, isPassed: boolean) {
+    try {
+      console.log("요청 확인 isPassedUpdate");
+      console.log("요청 확인 subChallengeId : ", subChallengeId);
+      console.log("요청 확인 participantId : ", participantId);
+
+      // 해당하는 subChallenge와 participant를 찾습니다.
+      const subChallenge = await this.subChallengesRepo.findOne({ where: { id: subChallengeId } });
+      const participant = await this.participantsForSubChallengeRepo.findOne({ where: { user: { id: participantId }, subChallenge: { id: subChallengeId } } });
+
+      console.log('subChallenge : ', subChallenge);
+      console.log('participant : ', participant);
+
+
+      if (!subChallenge || !participant) {
+        throw new NotFoundException('SubChallenge or Participant not found');
+      }
+
+      // isPassed 값을 업데이트하고 저장합니다.
+      const previousIsPassed = participant.isPassed;
+      participant.isPassed = !previousIsPassed;
+
+      await this.participantsForSubChallengeRepo.save(participant);
+
+      return {
+        message: `isPassed updated from ${previousIsPassed} to ${!previousIsPassed} successfully`
+      };
+    } catch (error) {
+      console.log("error : ", error);
+
+      throw new InternalServerErrorException('Failed to update isPassed');
+    }
+  }
 
   async findSubchallengeById(subChallengeId: number): Promise<SubChallengesModel> {
     return await this.subChallengesRepo.findOne({ where: { id: subChallengeId } });

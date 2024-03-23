@@ -22,4 +22,8 @@ export class ParticipantsForSubChallengeModel {
 
     @Column()
     noteUrl: string;
+
+    @Column({ default: false }) // 기본값은 false로 설정
+    isPassed: boolean;
+
 }
