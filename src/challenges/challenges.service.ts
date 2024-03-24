@@ -23,6 +23,28 @@ export class ChallengesService {
     private readonly participantsForSubChallengeRepo: Repository<ParticipantsForSubChallengeModel>
   ) { }
 
+  async updateParticipantNoteUrl(participantId: number, noteUrlForUpdate: string) {
+    try {
+      // 참가자를 찾음
+      const participant = await this.participantsForSubChallengeRepo.findOne({ where: { id: participantId } });
+      if (!participant) {
+        throw new Error('Participant not found');
+      }
+
+      // 노트 URL 업데이트
+      participant.noteUrl = noteUrlForUpdate;
+
+      // 업데이트된 참가자 저장
+      await this.participantsForSubChallengeRepo.save(participant);
+
+      // 성공 응답 반환
+      return { success: true, message: `noteUrl을 ${noteUrlForUpdate}로 업데이트 했습니다` };
+    } catch (error) {
+      // 오류 발생 시 오류 응답 반환
+      return { success: false, message: `오류: ${error.message}` };
+    }
+  }
+
   async updateIsPassedForParticipantForSubChallenge(subChallengeId: number, participantId: number, isPassed: boolean) {
     try {
       console.log("요청 확인 isPassedUpdate");
