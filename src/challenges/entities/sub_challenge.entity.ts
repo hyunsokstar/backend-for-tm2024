@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany } from 'typeorm';
 import { ChallengesModel } from './challenge.entity';
 import { ParticipantsForSubChallengeModel } from './participants-for-sub-challenge.entity';
+import { SubChallengeBriefingsModel } from './sub-challenge-briefings.entity';
 
 
 @Entity('sub_challenges')
@@ -36,5 +37,10 @@ export class SubChallengesModel {
         nullable: true,
     })
     participants: ParticipantsForSubChallengeModel[];
+
+    @OneToMany(() => SubChallengeBriefingsModel, subChallengeBriefing => subChallengeBriefing.subChallenge, {
+        nullable: true,
+    })
+    briefings: SubChallengeBriefingsModel[];
 
 }

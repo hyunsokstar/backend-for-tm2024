@@ -5,10 +5,30 @@ import { UpdateChallengeDto } from './dto/update-challenge.dto';
 import { CreateSubChallengeDto } from './dto/create-sub-challenge.dto';
 import { AddParticipantDto } from './dto/add-participant.dto';
 import { AuthGuard } from 'src/guards/auth.guard';
+import { CreateBriefingForSubChallengeDto } from './dto/create-briefing-for-sub-challenge.dto';
 
 @Controller('challenges')
 export class ChallengesController {
   constructor(private readonly challengesService: ChallengesService) { }
+
+  @Post('/sub-challenges/:subChallengeId/briefing-for-sub-challenge')
+  @UseGuards(new AuthGuard())
+  async createBriefingForSubChallenge(
+    @Param('subChallengeId') subChallengeId: number,
+    @Body() createBriefingForSubChallengeDto: CreateBriefingForSubChallengeDto,
+    @Req() req,
+    @Res() res,
+  ) {
+    const loginUser = req.user;
+    // const subChallenge = await this.challengesService.createBriefingForSubChallenge(subChallengeId, loginUser, createBriefingForSubChallengeDto);
+    try {
+      const subChallenge = await this.challengesService.createBriefingForSubChallenge(subChallengeId, loginUser.id, createBriefingForSubChallengeDto);
+      return res.status(201).json(subChallenge);
+    } catch (error) {
+      // 에러 처리
+      return res.status(500).json({ message: 'Failed to create briefing', error: error.message });
+    }
+  }
 
   @Put("participant/:participantId")
   @UseGuards(new AuthGuard)

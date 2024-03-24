@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModel } from 'src/users/entities/users.entity';
 import { SubChallengesModel } from './entities/sub_challenge.entity';
 import { ParticipantsForSubChallengeModel } from './entities/participants-for-sub-challenge.entity';
+import { SubChallengeBriefingsModel } from './entities/sub-challenge-briefings.entity';
 
 @Module({
   imports: [
@@ -13,7 +14,8 @@ import { ParticipantsForSubChallengeModel } from './entities/participants-for-su
       UsersModel,
       ChallengesModel,
       SubChallengesModel,
-      ParticipantsForSubChallengeModel
+      ParticipantsForSubChallengeModel,
+      SubChallengeBriefingsModel
     ])
   ],
   controllers: [ChallengesController],

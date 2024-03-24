@@ -8,6 +8,8 @@ import { UsersModel } from 'src/users/entities/users.entity';
 import { SubChallengesModel } from './entities/sub_challenge.entity';
 import { CreateSubChallengeDto } from './dto/create-sub-challenge.dto';
 import { ParticipantsForSubChallengeModel } from './entities/participants-for-sub-challenge.entity';
+import { SubChallengeBriefingsModel } from './entities/sub-challenge-briefings.entity';
+import { CreateBriefingForSubChallengeDto } from './dto/create-briefing-for-sub-challenge.dto';
 
 @Injectable()
 export class ChallengesService {
@@ -20,8 +22,29 @@ export class ChallengesService {
     @InjectRepository(UsersModel)
     private readonly usersRepository: Repository<UsersModel>,
     @InjectRepository(ParticipantsForSubChallengeModel)
-    private readonly participantsForSubChallengeRepo: Repository<ParticipantsForSubChallengeModel>
+    private readonly participantsForSubChallengeRepo: Repository<ParticipantsForSubChallengeModel>,
+    @InjectRepository(SubChallengeBriefingsModel)
+    private readonly subChallengeBriefingsRepo: Repository<SubChallengeBriefingsModel>
   ) { }
+
+  async createBriefingForSubChallenge(subChallengeId: number, loginUser, createBriefingDto: CreateBriefingForSubChallengeDto): Promise<SubChallengeBriefingsModel> {
+    // SubChallenge 확인
+    const subChallenge = await this.subChallengesRepo.findOne({ where: { id: subChallengeId } });
+    if (!subChallenge) {
+      throw new NotFoundException(`SubChallenge with ID ${subChallengeId} not found`);
+    }
+
+
+    // 새로운 브리핑 생성
+    const newBriefing = this.subChallengeBriefingsRepo.create({
+      ...createBriefingDto,
+      subChallenge,
+      writer: loginUser,
+    });
+
+    // 생성된 브리핑 저장
+    return await this.subChallengeBriefingsRepo.save(newBriefing);
+  }
 
   async updateParticipantNoteUrl(participantId: number, noteUrlForUpdate: string) {
     try {
@@ -289,6 +312,7 @@ export class ChallengesService {
       .createQueryBuilder('challenge')
       .leftJoinAndSelect('challenge.writer', 'writer')
       .leftJoinAndSelect('challenge.subChallenges', 'subChallenges')
+      .leftJoinAndSelect('subChallenges.briefings', 'briefings')
       .skip(skip)
       .take(perPage)
       .getManyAndCount();
