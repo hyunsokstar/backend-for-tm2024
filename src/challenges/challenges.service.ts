@@ -156,7 +156,7 @@ export class ChallengesService {
   }
 
 
-  async createSubChallenge(challengeId: number, createSubChallengeDto: CreateSubChallengeDto): Promise<SubChallengesModel> {
+  async createSubChallenge(loginUser: UsersModel, challengeId: number, createSubChallengeDto: CreateSubChallengeDto): Promise<SubChallengesModel> {
     const challenge = await this.challengesRepo.findOne({ where: { id: challengeId } });
 
     if (!challenge) {
@@ -169,6 +169,7 @@ export class ChallengesService {
     subChallenge.prize = createSubChallengeDto.prize;
     subChallenge.deadline = new Date(createSubChallengeDto.deadline);
     subChallenge.challenge = challenge;
+    subChallenge.writer = loginUser;
 
     const savedSubChallenge = await this.subChallengesRepo.save(subChallenge);
 
@@ -299,7 +300,6 @@ export class ChallengesService {
     return savedChallenge;
   }
 
-
   async findAllChallenges(pageNum: number = 1):
     Promise<{ challengeList: ChallengesModel[], totalCount: number, perPage: number }> {
     const perPage = 20;
@@ -313,6 +313,7 @@ export class ChallengesService {
       .leftJoinAndSelect('challenge.writer', 'writer')
       .leftJoinAndSelect('challenge.subChallenges', 'subChallenges')
       .leftJoinAndSelect('subChallenges.briefings', 'briefings')
+      .leftJoinAndSelect('subChallenges.writer', 'subChallengeWriter')
       .skip(skip)
       .take(perPage)
       .getManyAndCount();

@@ -56,7 +56,6 @@ export class ChallengesController {
     @Param('subChallengeId') subChallengeId: number,
     @Body('noteUrl') noteUrl: string,
     @Req() req,
-
     @Res() res,
   ) {
     const loginUser = req.user;
@@ -125,9 +124,13 @@ export class ChallengesController {
     @Param('id') challengeId: number,
     @Body() createSubChallengeDto: CreateSubChallengeDto,
     @Res() response,
+    @Req() req,
+
   ) {
     try {
-      const createdSubChallenge = await this.challengesService.createSubChallenge(challengeId, createSubChallengeDto);
+      const loginUser = req.user;
+
+      const createdSubChallenge = await this.challengesService.createSubChallenge(loginUser, challengeId, createSubChallengeDto);
       return response.status(HttpStatus.CREATED).json(createdSubChallenge);
     } catch (error) {
       if (error instanceof HttpException) {

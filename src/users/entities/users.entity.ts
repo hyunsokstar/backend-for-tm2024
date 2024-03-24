@@ -9,6 +9,7 @@ import { SupplementaryTodosModel } from "src/todos/entities/supplementary_todos.
 import { ParticipantsForSkilNoteModel } from "src/technotes/entities/participantsForSkilNote.entity";
 import { PaymentsModelForCashPoints } from "./payment.entity";
 import { ChallengesModel } from "src/challenges/entities/challenge.entity";
+import { SubChallengesModel } from "src/challenges/entities/sub_challenge.entity";
 
 @Entity()
 @Unique(["email", "nickname"])
@@ -95,6 +96,9 @@ export class UsersModel {
 
     @OneToMany(() => ChallengesModel, challenge => challenge.writer, { cascade: true })
     challenges: TodosModel[];
+
+    @OneToMany(() => SubChallengesModel, subChallenge => subChallenge.writer, { cascade: true })
+    subChallenges: SubChallengesModel[];
 
     @OneToMany(() => SupplementaryTodosModel, supplemnetaryTodo => supplemnetaryTodo.manager, { cascade: true })
     supplementaryTodosForManager: TodosModel[];

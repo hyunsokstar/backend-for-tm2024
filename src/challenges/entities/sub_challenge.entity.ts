@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 import { ChallengesModel } from './challenge.entity';
 import { ParticipantsForSubChallengeModel } from './participants-for-sub-challenge.entity';
 import { SubChallengeBriefingsModel } from './sub-challenge-briefings.entity';
+import { UsersModel } from 'src/users/entities/users.entity';
 
 
 @Entity('sub_challenges')
@@ -23,6 +24,12 @@ export class SubChallengesModel {
         nullable: false,
     })
     challenge: ChallengesModel;
+
+    @ManyToOne(() => UsersModel, (user) => user.subChallenges, {
+        onDelete: 'CASCADE',
+        nullable: true,
+    })
+    writer: UsersModel;
 
     @Column({ type: 'timestamp', nullable: true })
     deadline: Date;
