@@ -15,7 +15,7 @@ export class SkilnotesController {
     @Get("my-notes")
     async getAllMySkilNoteList(
         @Query('pageNum') pageNum = 1,
-        @Query('perPage') perPage = 10,
+        @Query('perPage') perPage = 100,
         @Req() req
     ) {
         console.log("getAllMySkilNoteList : ", pageNum);
