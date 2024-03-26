@@ -21,6 +21,9 @@ export class SkilnotesController {
         console.log("getAllMySkilNoteList : ", pageNum);
         const loginUser = req.user;
 
+        console.log("loginUser for create skil note : ", loginUser);
+
+
         const result = await this.skilnoteService.getAllMySkilNoteList(
             pageNum,
             perPage,

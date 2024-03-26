@@ -197,6 +197,9 @@ export class SkilnotesService {
         // const writerObj = await this.usersRepository.findOne({ where: { id: writerId } });
         const skilNoteObj = await this.skilNotesRepo.findOne({ where: { id: parseInt(skilNoteId) } })
 
+        console.log("skilNoteObj : ", skilNoteObj);
+
+
         if (!loginUser || !skilNoteObj) {
             throw new Error('loginUser or skilNoteId가 필요합니다.');
         }
