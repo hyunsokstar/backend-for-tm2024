@@ -313,6 +313,7 @@ export class ChallengesService {
       .leftJoinAndSelect('challenge.writer', 'writer')
       .leftJoinAndSelect('challenge.subChallenges', 'subChallenges')
       .leftJoinAndSelect('subChallenges.briefings', 'briefings')
+      .leftJoinAndSelect('briefings.writer', 'briefingWriter')
       .leftJoinAndSelect('subChallenges.writer', 'subChallengeWriter')
       .skip(skip)
       .take(perPage)
