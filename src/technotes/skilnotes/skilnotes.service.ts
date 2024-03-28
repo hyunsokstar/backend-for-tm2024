@@ -35,24 +35,44 @@ export class SkilnotesService {
 
     ) { }
 
+    async createNextPageForSkilnoteContent({ loginUser, skilNoteId }: { loginUser: UsersModel, skilNoteId: number }) {
+        const maxPageNumber = await this.skilNoteContentsRepo
+            .createQueryBuilder('skilNoteContent')
+            .where('skilNoteContent.skilNote = :skilNoteId', { skilNoteId })
+            .select('MAX(skilNoteContent.page)', 'maxPageNumber')
+            .getRawOne();
+
+        const newPageNumber = maxPageNumber ? maxPageNumber.maxPageNumber + 1 : 1;
+
+        const newSkilNoteContent = this.skilNoteContentsRepo.create({
+            title: `ch ${newPageNumber}`,
+            file: '.todo',
+            content: 'test',
+            page: newPageNumber,
+            order: 1,
+            skilNote: { id: skilNoteId },
+            writer: loginUser,
+        });
+
+        const savedSkilNoteContent = await this.skilNoteContentsRepo.save(newSkilNoteContent);
+
+        if (!savedSkilNoteContent) {
+            throw new NotFoundException('Failed to create new skil note content');
+        }
+
+        return savedSkilNoteContent;
+    }
+
     // getAllMySkilNoteList
     async getAllMySkilNoteList(pageNum: number, perPage: number, loginUser: any) {
         const userId = loginUser.id; // 가정: 로그인한 사용자의 ID를 가져올 수 있는 방법이라고 가정합니다.
-
-        console.log("pageNum : ", pageNum);
-        console.log("perPage : ", perPage);
-        console.log("loginUser : ", loginUser);
-
-
         // 사용자의 스킬 노트를 페이지네이션하여 가져오기
         const skilNotes = await this.skilNotesRepo.find({
             where: { writer: { id: userId } }, // 사용자의 ID로 필터링
             skip: (pageNum - 1) * perPage,
             take: perPage,
         });
-
         console.log("skilNotes ??? ", skilNotes);
-
 
         return skilNotes;
     }
@@ -294,9 +314,6 @@ export class SkilnotesService {
         } else {
             myBookMarks = []
         }
-
-        // const skilnote_contents
-        // console.log("skilnotePagesCount ?? ", skilnotePagesCount);
 
         const responseObj = {
             title: skilNoteInfo.title,

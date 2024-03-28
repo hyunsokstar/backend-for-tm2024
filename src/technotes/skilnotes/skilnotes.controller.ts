@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, InternalServerErrorException, Param, Post, Put, Query, Req, Res, UseGuards } from '@nestjs/common';
 import { SkilnotesService } from './skilnotes.service';
 import { dtoForCreateSkilNote } from '../dtos/dtoForCreateSkilNote.dto';
 import { dtoForCreateSkilNoteContent } from '../dtos/dtoForCreateSkilNoteContents';
@@ -11,6 +11,20 @@ import { DtoForChangePagesOrderForSkilNoteContent } from '../dtos/dtoForChangePa
 export class SkilnotesController {
     constructor(private readonly skilnoteService: SkilnotesService) { }
 
+    @Post('create-next-page-for-skilnotecontent/:skilNoteId')
+    async createNextPageForSkilnoteContent(
+        @Param('skilNoteId') skilNoteId: number,
+        @Req() req
+    ) {
+        try {
+            const loginUser = req.user;
+            const createdSkilNoteContent = await this.skilnoteService.createNextPageForSkilnoteContent({ loginUser, skilNoteId });
+            return { success: true, data: createdSkilNoteContent };
+        } catch (error) {
+            throw new InternalServerErrorException(error.message);
+        }
+    }
+
     @UseGuards(AuthGuard)
     @Get("my-notes")
     async getAllMySkilNoteList(
@@ -20,9 +34,7 @@ export class SkilnotesController {
     ) {
         console.log("getAllMySkilNoteList : ", pageNum);
         const loginUser = req.user;
-
         console.log("loginUser for create skil note : ", loginUser);
-
 
         const result = await this.skilnoteService.getAllMySkilNoteList(
             pageNum,
