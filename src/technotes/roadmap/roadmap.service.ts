@@ -99,18 +99,9 @@ export class RoadmapService {
             .leftJoinAndSelect('techNotes.participants', 'participantsForTechNote')
             .leftJoinAndSelect('participantsForTechNote.user', 'participantsUserForTechNote')
             .leftJoinAndSelect('techNotes.skilnotes', 'techNote.skilnotes')
+            .addOrderBy('techNotes.createdAt', 'DESC')
             .getManyAndCount();
 
-        // console.log("roadMapList ??? ", roadMapList);
-        // const techNoteListWithCounts = roadMapList.map(roadMap => {
-        //     let techNotes = roadMap.techNotes.map(techNote => {
-        //         techNote.countForSkilNotes = techNote.skilnotes.length; // 수정 필요
-        //     })
-        //     return {
-        //         ...roadMap,
-        //         techNotes
-        //     }
-        // });
 
         return {
             perPage: perPage,

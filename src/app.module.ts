@@ -35,6 +35,12 @@ import { StarterKitsModel } from "./starter-projects/entities/starter-project.en
 import { ParticipantsForRoadMapModel } from "./technotes/entities/participantsForRoadMap.entity";
 import { ParticipantsForSkilNoteModel } from "./technotes/entities/participantsForSkilNote.entity";
 import { ParticipantsForTechNoteModel } from "./technotes/entities/participantsForTechNote.entity";
+import { PaymentsModelForCashPoints } from "./users/entities/payment.entity";
+import { ChallengesModule } from './challenges/challenges.module';
+import { ChallengesModel } from "./challenges/entities/challenge.entity";
+import { SubChallengesModel } from "./challenges/entities/sub_challenge.entity";
+import { ParticipantsForSubChallengeModel } from "./challenges/entities/participants-for-sub-challenge.entity";
+import { SubChallengeBriefingsModel } from "./challenges/entities/sub-challenge-briefings.entity";
 
 @Module({
   imports: [
@@ -66,7 +72,12 @@ import { ParticipantsForTechNoteModel } from "./technotes/entities/participantsF
         StarterKitsModel,
         ParticipantsForRoadMapModel,
         ParticipantsForSkilNoteModel,
-        ParticipantsForTechNoteModel
+        ParticipantsForTechNoteModel,
+        PaymentsModelForCashPoints,
+        ChallengesModel,
+        SubChallengesModel,
+        ParticipantsForSubChallengeModel,
+        SubChallengeBriefingsModel
       ],
       synchronize: true,
     }),
@@ -81,6 +92,8 @@ import { ParticipantsForTechNoteModel } from "./technotes/entities/participantsF
     TechnotesModule,
     GuardsModule,
     StarterProjectsModule,
+    ChallengesModule,
+    SubChallengesModel
   ],
   controllers: [AppController],
   providers: [AppService,

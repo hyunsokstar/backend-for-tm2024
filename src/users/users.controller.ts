@@ -58,7 +58,7 @@ export class UsersController {
 
     // 이메일로 사용자 찾기
     const user = await this.usersService.getUserByEmailWithEmailRelations(email);
-    console.log("user : ", user);
+    // console.log("user : ", user);
     // 사용자가 존재하지 않으면 에러 처리
     if (!user) {
       return response.status(HttpStatus.UNAUTHORIZED).json({
@@ -114,7 +114,6 @@ export class UsersController {
       const userOrError = await this.usersService.loginCheck(accessToken);
 
       // console.log("userOrError.user : ", userOrError.user);
-
 
       if (!userOrError.success) {
         return response.status(HttpStatus.UNAUTHORIZED).json({
@@ -292,7 +291,58 @@ export class UsersController {
     const userEmails = await this.usersService.getUserEmails()
     console.log("userEmails : ", userEmails);
 
-    // return userEmails;
     return res.status(HttpStatus.OK).json(userEmails);
   }
+
+  @Put('/buyPoints')
+  async updateUserCashPoints(
+    @Body('cashPointsToBuy') cashPointsToBuy: number,
+    @Body('merchantUid') merchantUid: number,
+    @Req() req, @Res() response
+  ) {
+    console.log("cashPointsToBuy:", cashPointsToBuy);
+    const loginUser = req.user
+
+    try {
+      // 로그인하지 않은 경우 에러 처리
+      if (!loginUser) {
+        throw new Error("로그인된 사용자만 캐시를 구입할 수 있습니다.");
+      }
+
+      // cashPoints를 업데이트하고 업데이트된 값을 가져옵니다.
+      const cashPointsAfterUpdate = await this.usersService.updateUserCashPoints({ loginUser, cashPointsToBuy, merchantUid });
+
+      // 적절한 응답을 보냅니다.
+      return response.status(200).json({
+        success: true,
+        message: `${req.user.email} 님은 cashPoint ${cashPointsToBuy} 원을 구입 했습니다. 총 잔액: ${cashPointsAfterUpdate} `
+      });
+    } catch (error) {
+      // 에러 메시지를 콘솔에 기록합니다.
+      console.error("updateUserCashPoints 오류:", error.message);
+
+      // 적절한 에러 응답을 보냅니다.
+      return response.status(400).json({
+        success: false,
+        message: error.message
+      });
+    }
+  }
+
+  @Get('payment-history')
+  async getUsersPaymentHistory(@Req() req, @Res() response) {
+    const userId = req.user.id;
+
+    if (!userId) {
+      return response.status(HttpStatus.UNAUTHORIZED).json({ success: false, message: '로그인이 필요합니다.' });
+    }
+
+    try {
+      const paymentHistory = await this.usersService.getUsersPaymentHistory(userId);
+      return response.status(HttpStatus.OK).json({ success: true, paymentHistory });
+    } catch (error) {
+      return response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ success: false, message: error.message });
+    }
+  }
+
 }

@@ -18,8 +18,10 @@ export class SkilnotesService {
     constructor(
         @InjectRepository(TechNotesModel)
         private techNotesRepo: Repository<TechNotesModel>,
+
         @InjectRepository(SkilNotesModel)
         private skilNotesRepo: Repository<SkilNotesModel>,
+
         @InjectRepository(SkilNoteContentsModel)
         private skilNoteContentsRepo: Repository<SkilNoteContentsModel>,
         @InjectRepository(UsersModel)
@@ -32,6 +34,48 @@ export class SkilnotesService {
         private ParticipantsForSkilNoteRepo: Repository<ParticipantsForSkilNoteModel>
 
     ) { }
+
+    async createNextPageForSkilnoteContent({ loginUser, skilNoteId }: { loginUser: UsersModel, skilNoteId: number }) {
+        const maxPageNumber = await this.skilNoteContentsRepo
+            .createQueryBuilder('skilNoteContent')
+            .where('skilNoteContent.skilNote = :skilNoteId', { skilNoteId })
+            .select('MAX(skilNoteContent.page)', 'maxPageNumber')
+            .getRawOne();
+
+        const newPageNumber = maxPageNumber ? maxPageNumber.maxPageNumber + 1 : 1;
+
+        const newSkilNoteContent = this.skilNoteContentsRepo.create({
+            title: `ch ${newPageNumber}`,
+            file: '.todo',
+            content: 'test',
+            page: newPageNumber,
+            order: 1,
+            skilNote: { id: skilNoteId },
+            writer: loginUser,
+        });
+
+        const savedSkilNoteContent = await this.skilNoteContentsRepo.save(newSkilNoteContent);
+
+        if (!savedSkilNoteContent) {
+            throw new NotFoundException('Failed to create new skil note content');
+        }
+
+        return savedSkilNoteContent;
+    }
+
+    // getAllMySkilNoteList
+    async getAllMySkilNoteList(pageNum: number, perPage: number, loginUser: any) {
+        const userId = loginUser.id; // 가정: 로그인한 사용자의 ID를 가져올 수 있는 방법이라고 가정합니다.
+        // 사용자의 스킬 노트를 페이지네이션하여 가져오기
+        const skilNotes = await this.skilNotesRepo.find({
+            where: { writer: { id: userId } }, // 사용자의 ID로 필터링
+            skip: (pageNum - 1) * perPage,
+            take: perPage,
+        });
+        console.log("skilNotes ??? ", skilNotes);
+
+        return skilNotes;
+    }
 
     async changePagesOrderForSkilNoteContent({ skilNoteId, targetOrder, destinationOrder }: DtoForChangePagesOrderForSkilNoteContent) {
 
@@ -173,6 +217,9 @@ export class SkilnotesService {
         // const writerObj = await this.usersRepository.findOne({ where: { id: writerId } });
         const skilNoteObj = await this.skilNotesRepo.findOne({ where: { id: parseInt(skilNoteId) } })
 
+        console.log("skilNoteObj : ", skilNoteObj);
+
+
         if (!loginUser || !skilNoteObj) {
             throw new Error('loginUser or skilNoteId가 필요합니다.');
         }
@@ -200,9 +247,8 @@ export class SkilnotesService {
         return saveResult;
     }
 
-    async getSkilNoteContentsBySkilNoteId(skilNoteId: any, pageNum: any) {
+    async getSkilNoteContentsBySkilNoteId(skilNoteId: any, pageNum: any, loginUser) {
         // 
-
         // SkilNoteId로 SkilNote 가져오기
         // const skilNote = await this.skilNotesRepo.findOne({ where: { id: skilNoteId } });
         const skilNote = await this.skilNotesRepo.findOne({
@@ -218,13 +264,21 @@ export class SkilnotesService {
         const techNoteId = skilNote.techNote.id
         console.log("techNoteId : ", techNoteId);
 
-        const relatedSkilnoteList = await this.skilNotesRepo.find({ where: { techNote: { id: techNoteId } } })
-        console.log("relatedSkilnoteList : ", relatedSkilnoteList);
+        // createdAt
+        // createdAt을 기준으로 정렬하여 techNoteId와 관련된 스킬 노트 목록을 가져옵니다.
+        const relatedSkilnoteList = await this.skilNotesRepo.find({
+            where: { techNote: { id: techNoteId } },
+            order: { createdAt: 'ASC' }, // createdAt을 기준으로 내림차순으로 정렬합니다. 오름차순으로 정렬하려면 'ASC'를 사용합니다.
+        });
 
         const options: FindManyOptions<SkilNoteContentsModel> = {
             where: { skilNote: { id: parseInt(skilNoteId) }, page: pageNum },
             order: { order: 'ASC' },
-            relations: ['bookMarks', 'bookMarks.user', 'bookMarks.skilNoteContent'] // Include the user information
+            relations: [
+                'bookMarks',
+                'bookMarks.user',
+                'bookMarks.skilNoteContent'
+            ]
         };
 
         const skilnoteContents = await this.skilNoteContentsRepo.find(options);
@@ -251,10 +305,19 @@ export class SkilnotesService {
             where: { skilNote: { id: skilNoteId }, file: ".todo" }
         })
 
-        // const skilnote_contents
-
-
-        // console.log("skilnotePagesCount ?? ", skilnotePagesCount);
+        console.log("loginUser for skilnote contents: ", loginUser);
+        let myBookMarks;
+        if (loginUser) {
+            myBookMarks = await this.skilNoteContentBookmarkRepo.find({
+                where: { user: { email: loginUser.email } },
+                relations: [
+                    'skilNoteContent',
+                    'skilNoteContent.skilNote'
+                ]
+            });
+        } else {
+            myBookMarks = []
+        }
 
         const responseObj = {
             title: skilNoteInfo.title,
@@ -263,13 +326,13 @@ export class SkilnotesService {
             skilnoteContents: skilnoteContents,
             skilnoteContentsPagesInfo: skilnoteContentsPagesInfo,
             skilnotePagesCount: skilnotePagesCount,
-            relatedSkilnoteList: relatedSkilnoteList
+            relatedSkilnoteList: relatedSkilnoteList,
+            myBookMarks: myBookMarks
         };
 
         return responseObj;
     }
 
-    // fix 0217
     async getAllSkilNoteList(
         pageNum: number = 1,
         perPage: number = 10,
@@ -282,17 +345,7 @@ export class SkilnotesService {
         totalCount: number,
         perPage: number,
     }> {
-        // return this.techNotesRepo.find();
         console.log("pageNum at all skilnote list: ", pageNum);
-
-        // const [skilNoteList, totalCount] = await this.skilNotesRepo.findAndCount({
-        //     skip: (pageNum - 1) * perPage,
-        //     take: perPage,
-        //     relations: ['writer'], // 이 부분이 추가된 부분입니다. User 정보를 가져오도록 설정합니다.
-        //     order: {
-        //         id: 'DESC'
-        //     }
-        // });
 
         let query = this.skilNotesRepo.createQueryBuilder('skilnotes')
             .skip((pageNum - 1) * perPage)
@@ -383,7 +436,7 @@ export class SkilnotesService {
     async getSkilnotesForTechNote(
         techNoteId: number,
         pageNum: number = 1,
-        perPage: number = 10,
+        perPage: number = 30,
         searchOption: string,
         searchText: string,
         isBestByLikes: any,

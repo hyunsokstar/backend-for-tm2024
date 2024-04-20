@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, InternalServerErrorException, Param, Post, Put, Query, Req, Res, UseGuards } from '@nestjs/common';
 import { SkilnotesService } from './skilnotes.service';
 import { dtoForCreateSkilNote } from '../dtos/dtoForCreateSkilNote.dto';
 import { dtoForCreateSkilNoteContent } from '../dtos/dtoForCreateSkilNoteContents';
@@ -10,6 +10,46 @@ import { DtoForChangePagesOrderForSkilNoteContent } from '../dtos/dtoForChangePa
 @Controller('skilnotes')
 export class SkilnotesController {
     constructor(private readonly skilnoteService: SkilnotesService) { }
+
+    @Post('create-next-page-for-skilnotecontent/:skilNoteId')
+    async createNextPageForSkilnoteContent(
+        @Param('skilNoteId') skilNoteId: number,
+        @Req() req
+    ) {
+        try {
+            const loginUser = req.user;
+            const createdSkilNoteContent = await this.skilnoteService.createNextPageForSkilnoteContent({ loginUser, skilNoteId });
+            return { success: true, data: createdSkilNoteContent };
+        } catch (error) {
+            throw new InternalServerErrorException(error.message);
+        }
+    }
+
+    @UseGuards(AuthGuard)
+    @Get("my-notes")
+    async getAllMySkilNoteList(
+        @Query('pageNum') pageNum = 1,
+        @Query('perPage') perPage = 100,
+        @Req() req
+    ) {
+        console.log("getAllMySkilNoteList : ", pageNum);
+        const loginUser = req.user;
+        console.log("loginUser for create skil note : ", loginUser);
+
+        const result = await this.skilnoteService.getAllMySkilNoteList(
+            pageNum,
+            perPage,
+            loginUser
+        );
+
+        const response = {
+            perPage: perPage,
+            totalCount: result.length,
+            allMySkilNoteList: result
+        };
+
+        return response;
+    }
 
     // fix 02027
     @Get()
@@ -43,7 +83,7 @@ export class SkilnotesController {
     async getSkilnotesForTechNote(
         @Param('techNoteId') techNoteId: number,
         @Query('pageNum') pageNum = 1,
-        @Query('perPage') perPage = 10,
+        @Query('perPage') perPage = 30,
         @Query('searchOption') searchOption = "",
         @Query('searchText') searchText = "",
         @Query('isBestByLikes') isBestByLikes = false,
@@ -67,10 +107,17 @@ export class SkilnotesController {
     @Get(':skilnoteId/contents/:pageNum')
     async getSkilNoteContents(
         @Param('skilnoteId') skilnoteId: string,
-        @Param('pageNum') pageNum: string
+        @Param('pageNum') pageNum: string,
+        @Req() req
     ) {
-        // console.log("hi");
-        return this.skilnoteService.getSkilNoteContentsBySkilNoteId(skilnoteId, pageNum);
+
+        const loginUser = req.user
+
+        return this.skilnoteService.getSkilNoteContentsBySkilNoteId(
+            skilnoteId,
+            pageNum,
+            loginUser
+        );
     }
 
     @Post('saveRows')

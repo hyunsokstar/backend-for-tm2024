@@ -9,7 +9,7 @@ export class AuthGuard implements CanActivate {
         const user = request.user;
 
         if (!user) {
-            throw new ForbiddenException('로그인 사용자만 skilnote content를 입력할 수 있습니다.');
+            throw new ForbiddenException('로그인 해주세요 !');
         }
 
         return true;

@@ -7,6 +7,9 @@ import { TodosModel } from "src/todos/entities/todos.entity";
 import { BookMarksForSkilNoteContentsModel } from "src/technotes/entities/bookMarksForSkilNoteContent.entity";
 import { SupplementaryTodosModel } from "src/todos/entities/supplementary_todos.entity";
 import { ParticipantsForSkilNoteModel } from "src/technotes/entities/participantsForSkilNote.entity";
+import { PaymentsModelForCashPoints } from "./payment.entity";
+import { ChallengesModel } from "src/challenges/entities/challenge.entity";
+import { SubChallengesModel } from "src/challenges/entities/sub_challenge.entity";
 
 @Entity()
 @Unique(["email", "nickname"])
@@ -23,6 +26,9 @@ export class UsersModel {
     @Column({ default: "noname" })
     @Column()
     nickname: string;
+
+    @Column({ default: 0 })
+    cashPoints: number;
 
     @Column({
         type: "enum",
@@ -88,6 +94,12 @@ export class UsersModel {
     @OneToMany(() => TodosModel, todo => todo.manager, { cascade: true })
     todosForManager: TodosModel[];
 
+    @OneToMany(() => ChallengesModel, challenge => challenge.writer, { cascade: true })
+    challenges: TodosModel[];
+
+    @OneToMany(() => SubChallengesModel, subChallenge => subChallenge.writer, { cascade: true })
+    subChallenges: SubChallengesModel[];
+
     @OneToMany(() => SupplementaryTodosModel, supplemnetaryTodo => supplemnetaryTodo.manager, { cascade: true })
     supplementaryTodosForManager: TodosModel[];
 
@@ -99,4 +111,8 @@ export class UsersModel {
 
     @OneToMany(() => ParticipantsForSkilNoteModel, particiPateForSkilNote => particiPateForSkilNote.user)
     takenCoursesForSkilNote: ParticipantsForSkilNoteModel
+
+    @OneToMany(() => PaymentsModelForCashPoints, paymentsModelForCashPoints => paymentsModelForCashPoints.user)
+    paymentsForCashPoints: PaymentsModelForCashPoints
+
 }
