@@ -268,7 +268,7 @@ export class SkilnotesService {
         // createdAt을 기준으로 정렬하여 techNoteId와 관련된 스킬 노트 목록을 가져옵니다.
         const relatedSkilnoteList = await this.skilNotesRepo.find({
             where: { techNote: { id: techNoteId } },
-            order: { createdAt: 'ASC' }, // createdAt을 기준으로 내림차순으로 정렬합니다. 오름차순으로 정렬하려면 'ASC'를 사용합니다.
+            order: { order: 'ASC' }, // createdAt을 기준으로 내림차순으로 정렬합니다. 오름차순으로 정렬하려면 'ASC'를 사용합니다.
         });
 
         const options: FindManyOptions<SkilNoteContentsModel> = {
