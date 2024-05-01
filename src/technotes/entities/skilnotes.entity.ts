@@ -49,6 +49,9 @@ export class SkilNotesModel {
     @OneToMany(() => ParticipantsForSkilNoteModel, participants => participants.skilNote)
     participants: ParticipantsForSkilNoteModel[]
 
+    @Column({ type: 'int', nullable: true, default: 0 }) // 추가된 viewCount 필드
+    viewCount: number;
+
     countForLikes: any;
     countForBookMarks: number;
     countForSkilNoteContents: number;
