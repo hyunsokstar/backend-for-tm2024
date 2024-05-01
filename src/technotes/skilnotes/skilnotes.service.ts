@@ -319,6 +319,8 @@ export class SkilnotesService {
             myBookMarks = []
         }
 
+        await this.skilNotesRepo.increment({ id: skilNoteId }, 'viewCount', 1);
+
         const responseObj = {
             title: skilNoteInfo.title,
             writer: skilNoteInfo.writer,
