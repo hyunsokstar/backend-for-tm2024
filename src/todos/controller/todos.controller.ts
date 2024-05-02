@@ -37,6 +37,17 @@ export class TodosController {
         return this.todosService.getTodoListForUserId(pageNum, perPage, userId, todoStatusOption);
     }
 
+    @Get('uncompleted')
+    async getUncompletedTodoList(
+        @Query('pageNum') pageNum = 1,
+        @Query('perPage') perPage = 200,
+        @Query('todoStatusOption') todoStatusOption,
+        @Req() req
+    ): Promise<{ usersEmailInfo: string[], todoList: TodosModel[], totalCount: number, perPage: number }> {
+        // console.log("req.user : ", req.user);
+        return this.todosService.getUncompletedTodoList(pageNum, perPage, todoStatusOption);
+    }
+
 
     @Post('saveTodos') // API 엔드포인트 추가
     async saveTodos(@Body() todoRowsForSave: any) {

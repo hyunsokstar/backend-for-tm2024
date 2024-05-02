@@ -741,6 +741,144 @@ export class TodosService {
         };
     }
 
+    async getUncompletedTodoList(
+        pageNum: number = 1,
+        perPage: number = 20,
+        todoStatusOption: "all_uncompleted" | "all_completed" | "idea" | "uncompleted" | "complete" | "entry"
+    ): Promise<{
+        todoList: TodosModel[],
+        totalCount: number,
+        perPage: number,
+        usersEmailInfo: string[]
+    }> {
+        const userEmailList = await this.usersRepository
+            .createQueryBuilder('user')
+            .select('user.email AS user_email')
+            .getRawMany();
+
+        const usersEmailInfo = userEmailList.map(item => item.user_email);
+
+        let todoStatus: TodoStatus[] = [TodoStatus.IDEA, TodoStatus.COMPLETED]; // 기본적으로 IDEA와 COMPLETED를 제외하도록 설정
+
+        if (todoStatusOption === "all_uncompleted") {
+            todoStatus = [TodoStatus.IDEA, TodoStatus.READY, TodoStatus.PROGRESS, TodoStatus.TESTING]; // IDEA와 COMPLETED를 제외한 나머지 상태를 가져옴
+        }
+
+        if (todoStatusOption === "entry") {
+            todoStatus = [TodoStatus.ENTRY]; // IDEA와 COMPLETED를 제외한 나머지 상태를 가져옴
+        }
+
+        if (todoStatusOption === "all_completed") {
+            todoStatus = [TodoStatus.COMPLETED]; // IDEA와 COMPLETED를 제외한 나머지 상태를 가져옴
+        }
+        else if (todoStatusOption === 'uncompleted') {
+            todoStatus = [TodoStatus.READY, TodoStatus.PROGRESS, TodoStatus.TESTING]; // IDEA와 COMPLETED를 제외한 나머지 상태를 가져옴
+        } else if (todoStatusOption === 'complete') {
+            todoStatus = [TodoStatus.COMPLETED]
+        } else if (todoStatusOption === 'idea') {
+            todoStatus = [TodoStatus.IDEA]
+        }
+
+        // 메인 쿼리 설정
+        let mainQuery = this.todosRepository
+            .createQueryBuilder('todo')
+            .leftJoinAndSelect('todo.manager', 'manager')
+            .leftJoinAndSelect('todo.supervisor', 'supervisor')
+            .leftJoinAndSelect('todo.briefings', 'briefings')
+            .leftJoinAndSelect('todo.supplementaryTodos', 'supplementaryTodos')
+            .leftJoinAndSelect('supplementaryTodos.manager', 'supplementaryTodosManager')
+            .leftJoinAndSelect('supplementaryTodos.briefings', 'supplementaryTodosBriefings')
+            .leftJoinAndSelect('supplementaryTodosBriefings.writer', 'supplementaryTodosBriefingsWriter')
+            .leftJoinAndSelect('briefings.writer', 'writer')
+
+        if (todoStatusOption === "all_completed") {
+            console.log("complete list 왜 안가져오지?");
+            mainQuery = mainQuery.andWhere('todo.status IN (:...status)', { status: todoStatus })
+            mainQuery = mainQuery.addOrderBy('todo.completedAt', 'ASC')
+            mainQuery = mainQuery.addOrderBy('todo.id', 'DESC');
+        } else if (todoStatusOption === "all_uncompleted") {
+            mainQuery = mainQuery.andWhere('todo.status IN (:...status)', { status: todoStatus })
+            mainQuery = mainQuery.orderBy('manager.email')
+            mainQuery = mainQuery.addOrderBy(
+                `CASE 
+                WHEN todo.status = 'idea' THEN 1 
+                WHEN todo.status = 'ready' THEN 2
+                WHEN todo.status = 'progress' THEN 3
+                WHEN todo.status = 'testing' THEN 4
+                ELSE 4
+                END`,
+                'ASC'
+            );
+            mainQuery = mainQuery.addOrderBy('todo.id', 'DESC');
+            mainQuery = mainQuery.addOrderBy(
+                `CASE 
+                    WHEN supplementaryTodos.status = 'idea' THEN 1
+                    WHEN supplementaryTodos.status = 'ready' THEN 2
+                    WHEN supplementaryTodos.status = 'progress' THEN 3
+                    WHEN supplementaryTodos.status = 'testing' THEN 4
+                    WHEN supplementaryTodos.status = 'complete' THEN 5
+                    ELSE 6
+                    END`,
+                'ASC'
+            );
+            mainQuery = mainQuery.addOrderBy('supplementaryTodos.id', 'DESC');
+
+        } else if (todoStatusOption === "entry") {
+            // console.log("이게 실행 됐나?");
+            mainQuery = mainQuery.andWhere('todo.status IN (:...status)', { status: todoStatus })
+            mainQuery = mainQuery.addOrderBy('todo.completedAt', 'ASC')
+            mainQuery = mainQuery.addOrderBy('todo.id', 'DESC');
+        } else if (todoStatusOption === "uncompleted") {
+            // console.log("이게 실행 됐나?");
+            mainQuery = mainQuery.andWhere('todo.status IN (:...status)', { status: todoStatus })
+            mainQuery = mainQuery.addOrderBy('todo.completedAt', 'ASC')
+            mainQuery = mainQuery.addOrderBy('todo.id', 'DESC');
+        } else if (todoStatusOption === "complete") {
+            // console.log("이게 실행 됐나?");
+            mainQuery = mainQuery.andWhere('todo.status IN (:...status)', { status: todoStatus })
+            mainQuery = mainQuery.addOrderBy('todo.completedAt', 'ASC')
+            mainQuery = mainQuery.addOrderBy('todo.id', 'DESC');
+        } else if (todoStatusOption === "idea") {
+            // console.log("이게 실행 됐나?");
+            mainQuery = mainQuery.andWhere('todo.status IN (:...status)', { status: todoStatus })
+            mainQuery = mainQuery.addOrderBy('todo.completedAt', 'ASC')
+            mainQuery = mainQuery.addOrderBy('todo.id', 'DESC');
+        }
+
+        else {
+            console.log("여기가 맞지 ??? : ", todoStatus);
+            mainQuery = mainQuery.andWhere('todo.status IN (:...status)', { status: todoStatus })
+            // mainQuery = mainQuery.andWhere('manager.id = :userId', { userId })
+            mainQuery = mainQuery.addOrderBy(
+                `CASE 
+                WHEN todo.status = 'idea' THEN 1 
+                WHEN todo.status = 'ready' THEN 2
+                WHEN todo.status = 'progress' THEN 3
+                WHEN todo.status = 'testing' THEN 4
+                ELSE 4
+                END`,
+                'ASC'
+            );
+            mainQuery = mainQuery.addOrderBy('todo.id', 'DESC');
+            mainQuery = mainQuery.addOrderBy('supplementaryTodos.id', 'ASC');
+
+        }
+
+        const todoList = await mainQuery.getMany();
+
+        console.log("todoList ?? ", todoList);
+
+
+        const totalCount = todoList.length;
+
+        return {
+            usersEmailInfo,
+            todoList,
+            totalCount,
+            perPage
+        };
+    }
+
 
 
     async loadMoreTodosForScroll(
