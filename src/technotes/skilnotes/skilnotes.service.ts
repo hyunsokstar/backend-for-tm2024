@@ -293,7 +293,6 @@ export class SkilnotesService {
                     page: 'ASC'
                 }
             });
-        // console.log("skilnoteContentsPagesInfo : ", skilnoteContentsPagesInfo);
 
         const skilNoteInfo = await this.skilNotesRepo
             .findOne({
