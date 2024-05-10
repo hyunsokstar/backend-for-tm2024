@@ -5,16 +5,20 @@ import { DevSpecController } from './dev-spec.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DevSpec } from './entities/dev-spec.entity';
 import { LikeDevSpec } from './entities/like-dev-spec';
+import { FavoriteDevSpec } from './entities/favorite-dev-spec.entity';
+import { FavoriteDevSpecController } from './favorite-dev-spec.controller';
+import { FavoriteDevSpecService } from './favorite-dev-spec.service';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       DevSpec,
       LikeDevSpec,
-      DislikeDevSpec
+      DislikeDevSpec,
+      FavoriteDevSpec
     ])
   ],
-  controllers: [DevSpecController],
-  providers: [DevSpecService],
+  controllers: [DevSpecController, FavoriteDevSpecController],
+  providers: [DevSpecService, FavoriteDevSpecService],
 })
 export class DevSpecModule { }

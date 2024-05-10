@@ -45,6 +45,7 @@ import { DevSpecModule } from './dev-spec/dev-spec.module';
 import { DevSpec } from "./dev-spec/entities/dev-spec.entity";
 import { DislikeDevSpec } from "./dev-spec/entities/dislike-dev-spec";
 import { LikeDevSpec } from "./dev-spec/entities/like-dev-spec";
+import { FavoriteDevSpec } from "./dev-spec/entities/favorite-dev-spec.entity";
 
 @Module({
   imports: [
@@ -84,7 +85,8 @@ import { LikeDevSpec } from "./dev-spec/entities/like-dev-spec";
         SubChallengeBriefingsModel,
         DevSpec,
         LikeDevSpec,
-        DislikeDevSpec
+        DislikeDevSpec,
+        FavoriteDevSpec
       ],
       synchronize: true,
     }),
