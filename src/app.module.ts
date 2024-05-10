@@ -41,6 +41,10 @@ import { ChallengesModel } from "./challenges/entities/challenge.entity";
 import { SubChallengesModel } from "./challenges/entities/sub_challenge.entity";
 import { ParticipantsForSubChallengeModel } from "./challenges/entities/participants-for-sub-challenge.entity";
 import { SubChallengeBriefingsModel } from "./challenges/entities/sub-challenge-briefings.entity";
+import { DevSpecModule } from './dev-spec/dev-spec.module';
+import { DevSpec } from "./dev-spec/entities/dev-spec.entity";
+import { DislikeDevSpec } from "./dev-spec/entities/dislike-dev-spec";
+import { LikeDevSpec } from "./dev-spec/entities/like-dev-spec";
 
 @Module({
   imports: [
@@ -77,7 +81,10 @@ import { SubChallengeBriefingsModel } from "./challenges/entities/sub-challenge-
         ChallengesModel,
         SubChallengesModel,
         ParticipantsForSubChallengeModel,
-        SubChallengeBriefingsModel
+        SubChallengeBriefingsModel,
+        DevSpec,
+        LikeDevSpec,
+        DislikeDevSpec
       ],
       synchronize: true,
     }),
@@ -93,7 +100,8 @@ import { SubChallengeBriefingsModel } from "./challenges/entities/sub-challenge-
     GuardsModule,
     StarterProjectsModule,
     ChallengesModule,
-    SubChallengesModel
+    SubChallengesModel,
+    DevSpecModule
   ],
   controllers: [AppController],
   providers: [AppService,

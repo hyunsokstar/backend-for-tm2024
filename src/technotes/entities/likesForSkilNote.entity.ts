@@ -17,6 +17,9 @@ export class LikesModelForSkilNote {
     @UpdateDateColumn()
     updatedAt: Date;
 
-    @ManyToOne(() => SkilNotesModel, { onDelete: 'CASCADE', nullable: false })
+    // @OneToMany(() => LikesModelForSkilNote, likes => likes.skilNote)
+    // likes: LikesModelForSkilNote[]
+
+    @ManyToOne(() => SkilNotesModel, skilnote => skilnote.likes, { onDelete: 'CASCADE', nullable: false })
     skilNote: SkilNotesModel;
 }
