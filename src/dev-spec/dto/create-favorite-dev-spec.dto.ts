@@ -21,4 +21,9 @@ export class CreateFavoriteDevSpecDto {
     @IsNotEmpty()
     @IsString()
     css: string;
+
+    @IsNotEmpty()
+    @IsString()
+    app: string;
+
 }

@@ -8,6 +8,7 @@ export enum Category {
   FRONTEND = 'frontend',
   ORM = 'orm',
   CSS = 'css',
+  APP = 'app'
 }
 
 @Entity()

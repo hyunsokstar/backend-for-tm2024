@@ -6,4 +6,5 @@ export interface GroupedDevSpecs {
     frontend: DevSpec[];
     orm: DevSpec[];
     css: DevSpec[];
+    app: DevSpec[];
 }

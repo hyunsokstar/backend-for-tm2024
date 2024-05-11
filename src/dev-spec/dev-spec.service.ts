@@ -63,6 +63,10 @@ export class DevSpecService {
         spec: skillSet.css,
         category: Category.CSS,
       },
+      {
+        spec: skillSet.app,
+        category: Category.APP,
+      },
     ]);
 
     const devSpecs = this.devSpecRepo.create(devSpecEntities);
@@ -83,6 +87,7 @@ export class DevSpecService {
       frontend: [],
       orm: [],
       css: [],
+      app: []
     };
 
     devSpecs.forEach((devSpec) => {
@@ -101,6 +106,9 @@ export class DevSpecService {
           break;
         case Category.CSS:
           groupedDevSpecs.css.push(devSpec);
+          break;
+        case Category.APP:
+          groupedDevSpecs.app.push(devSpec);
           break;
       }
     });

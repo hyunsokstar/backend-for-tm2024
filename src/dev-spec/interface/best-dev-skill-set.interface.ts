@@ -4,5 +4,6 @@ export interface BestDevSkillSet {
     frontend: string;
     orm: string;
     css: string;
+    app: string;
 }
 

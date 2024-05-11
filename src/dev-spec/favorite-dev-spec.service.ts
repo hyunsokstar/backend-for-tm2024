@@ -39,6 +39,7 @@ export class FavoriteDevSpecService {
     favoriteDevSpec.frontend = createFavoriteDevSpecDto.frontend;
     favoriteDevSpec.orm = createFavoriteDevSpecDto.orm;
     favoriteDevSpec.css = createFavoriteDevSpecDto.css;
+    favoriteDevSpec.app = createFavoriteDevSpecDto.app;
 
     return await this.favoriteDevSpecRepo.save(favoriteDevSpec);
   }
