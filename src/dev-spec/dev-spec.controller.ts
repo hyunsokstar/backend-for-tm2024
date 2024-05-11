@@ -21,10 +21,6 @@ export class DevSpecController {
     return this.devSpecService.findAll();
   }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.devSpecService.findOne(+id);
-  // }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateDevSpecDto: UpdateDevSpecDto) {

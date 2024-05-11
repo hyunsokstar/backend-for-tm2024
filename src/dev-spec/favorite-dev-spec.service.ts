@@ -18,6 +18,20 @@ export class FavoriteDevSpecService {
     private favoriteDevSpecRepo: Repository<FavoriteDevSpec>,
   ) { }
 
+  async like(id: number) {
+    const devSpec = await this.favoriteDevSpecRepo.findOne({ where: { id: id } });
+    devSpec.likeCount++;
+    await this.favoriteDevSpecRepo.save(devSpec);
+    return devSpec;
+  }
+
+  async dislike(id: number) {
+    const devSpec = await this.favoriteDevSpecRepo.findOne({ where: { id: id } });
+    devSpec.dislikeCount++;
+    await this.favoriteDevSpecRepo.save(devSpec);
+    return devSpec;
+  }
+
   async create(createFavoriteDevSpecDto: CreateFavoriteDevSpecDto): Promise<FavoriteDevSpec> {
     const favoriteDevSpec = new FavoriteDevSpec();
     favoriteDevSpec.language = createFavoriteDevSpecDto.language;
@@ -32,7 +46,11 @@ export class FavoriteDevSpecService {
   async findAll(): Promise<FavoriteDevSpec[]> {
     console.log("find All Dev Spec List");
 
-    return await this.favoriteDevSpecRepo.find();
+    return await this.favoriteDevSpecRepo.find({
+      order: {
+        likeCount: "DESC" // likeCount를 오름차순으로 정렬
+      }
+    });
   }
 
   // update(id: number, updateDevSpecDto: UpdateDevSpecDto) {

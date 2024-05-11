@@ -19,4 +19,11 @@ export class FavoriteDevSpec {
 
     @Column()
     css: string;
+
+    @Column({ default: 0 }) // 기본값을 0으로 설정하여 시작할 수 있습니다.
+    likeCount: number;
+
+    @Column({ default: 0 }) // 기본값을 0으로 설정하여 시작할 수 있습니다.
+    dislikeCount: number;
+
 }
