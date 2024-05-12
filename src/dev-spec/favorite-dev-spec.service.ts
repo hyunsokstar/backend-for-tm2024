@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 // import { Category, DevSpec } from './entities/dev-spec.entity';
 import { FavoriteDevSpec } from './entities/favorite-dev-spec.entity';
-import { CreateFavoriteDevSpecDto, UpdateFavoriteDevSpecDto } from './dto/create-favorite-dev-spec.dto';
+import { CreateFavoriteDevSpecDto } from './dto/create-favorite-dev-spec.dto';
 
 
 @Injectable()
