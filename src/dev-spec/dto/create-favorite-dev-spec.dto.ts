@@ -27,8 +27,6 @@ export class CreateFavoriteDevSpecDto {
 
 }
 
-
-// update-favorite-dev-spec.dto.ts
 export class UpdateFavoriteDevSpecBoilerPlateInfoDto {
     @IsNotEmpty()
     @IsString()
