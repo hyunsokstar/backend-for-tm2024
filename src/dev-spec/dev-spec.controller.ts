@@ -2,7 +2,6 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { DevSpecService } from './dev-spec.service';
 import { CreateDevSpecDto } from './dto/create-dev-spec.dto';
 import { UpdateDevSpecDto } from './dto/update-dev-spec.dto';
-import { DevSpec } from './entities/dev-spec.entity';
 import { BestDevSkillSet } from './interface/best-dev-skill-set.interface';
 import { GroupedDevSpecs } from './types/grouped-dev-specs.type';
 
@@ -20,7 +19,6 @@ export class DevSpecController {
   findAll() {
     return this.devSpecService.findAll();
   }
-
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateDevSpecDto: UpdateDevSpecDto) {
