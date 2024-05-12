@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Put } from '@nestjs/common';
-import { CreateFavoriteDevSpecDto, UpdateFavoriteDevSpecDto } from './dto/create-favorite-dev-spec.dto';
+import { CreateFavoriteDevSpecDto } from './dto/create-favorite-dev-spec.dto';
 import { FavoriteDevSpecService } from './favorite-dev-spec.service';
 import { ParseIntPipe } from '@nestjs/common';
 
@@ -9,7 +9,7 @@ export class FavoriteDevSpecController {
   constructor(private readonly favoriteDevSpecService: FavoriteDevSpecService) { }
 
   @Put(':id/boiler-plate')
-  async updateVoilerPlateInfo(@Param('id') id: number, @Body() updateFavoriteDevSpecDto: UpdateFavoriteDevSpecDto) {
+  async updateVoilerPlateInfo(@Param('id') id: number, @Body() updateFavoriteDevSpecDto: CreateFavoriteDevSpecDto) {
     console.log("update boiler plate info check");
     // return "hello world"
     return this.favoriteDevSpecService.updateFavoriteDevSpec(id, updateFavoriteDevSpecDto);
