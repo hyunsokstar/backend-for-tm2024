@@ -1,13 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { CreateDevSpecDto } from './dto/create-dev-spec.dto';
-import { UpdateDevSpecDto } from './dto/update-dev-spec.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 // import { Category, DevSpec } from './entities/dev-spec.entity';
-import { BestDevSkillSet } from './interface/best-dev-skill-set.interface';
-import { GroupedDevSpecs } from './types/grouped-dev-specs.type';
 import { FavoriteDevSpec } from './entities/favorite-dev-spec.entity';
-import { CreateFavoriteDevSpecDto } from './dto/create-favorite-dev-spec.dto';
+import { CreateFavoriteDevSpecDto, UpdateFavoriteDevSpecDto } from './dto/create-favorite-dev-spec.dto';
 
 
 @Injectable()
@@ -26,6 +22,7 @@ export class FavoriteDevSpecService {
   }
 
   async dislike(id: number) {
+
     const devSpec = await this.favoriteDevSpecRepo.findOne({ where: { id: id } });
     devSpec.dislikeCount++;
     await this.favoriteDevSpecRepo.save(devSpec);
@@ -54,13 +51,14 @@ export class FavoriteDevSpecService {
     });
   }
 
-  // update(id: number, updateDevSpecDto: UpdateDevSpecDto) {
-  //   return `This action updates a #${id} devSpec`;
-  // }
+  async updateFavoriteDevSpec(id: number, updateFavoriteDevSpecDto: any): Promise<FavoriteDevSpec> {
+    const favoriteDevSpec = await this.favoriteDevSpecRepo.findOne({ where: { id: id } });
+    if (!favoriteDevSpec) {
+      throw new Error('FavoriteDevSpec not found');
+    }
 
-  // remove(id: number) {
-  //   return `This action removes a #${id} devSpec`;
-  // }
-
+    this.favoriteDevSpecRepo.merge(favoriteDevSpec, updateFavoriteDevSpecDto);
+    return this.favoriteDevSpecRepo.save(favoriteDevSpec);
+  }
 
 }

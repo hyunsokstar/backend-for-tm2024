@@ -23,10 +23,40 @@ export class FavoriteDevSpec {
     @Column()
     app: string;
 
-    @Column({ default: 0 }) // 기본값을 0으로 설정하여 시작할 수 있습니다.
+    @Column({ default: 0 })
     likeCount: number;
 
-    @Column({ default: 0 }) // 기본값을 0으로 설정하여 시작할 수 있습니다.
+    @Column({ default: 0 })
     dislikeCount: number;
 
+    // 새로운 필드들 추가
+    @Column({ nullable: true, default: "" })
+    authGithub: string;
+
+    @Column({ nullable: true, default: "" })
+    authNote: string;
+
+    @Column({ nullable: true, default: "" })
+    boardGithub: string;
+
+    @Column({ nullable: true, default: "" })
+    boardNote: string;
+
+    @Column({ nullable: true, default: "" })
+    chatGithub: string;
+
+    @Column({ nullable: true, default: "" })
+    chatNote: string;
+
+    @Column({ nullable: true, default: "" })
+    paymentGithub: string;
+
+    @Column({ nullable: true, default: "" })
+    paymentNote: string;
+
+    @Column({ nullable: true, default: "" })
+    devOpsGithub: string;
+
+    @Column({ nullable: true, default: "" })
+    devOpsNote: string;
 }
