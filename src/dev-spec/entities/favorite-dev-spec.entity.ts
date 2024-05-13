@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { LibraryForFavoriteDevSpec } from './library-for-favorite-dev-spec';
 
 
 @Entity()
@@ -66,5 +67,11 @@ export class FavoriteDevSpec {
 
     @Column({ nullable: true, default: "" })
     figma: string;
+
+    @OneToMany(
+        () => LibraryForFavoriteDevSpec,
+        (library) => library.favoriteDevSpec
+    )
+    libraries: LibraryForFavoriteDevSpec[];
 
 }
