@@ -9,7 +9,7 @@ export class LibraryForFavoriteDevSpec {
     @Column()
     library: string;
 
-    @Column()
+    @Column({ nullable: true, default: '' })
     siteUrl: string;
 
     // One-to-Many relationship with FavoriteDevSpec entity

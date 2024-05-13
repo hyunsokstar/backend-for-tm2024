@@ -8,6 +8,7 @@ import { LikeDevSpec } from './entities/like-dev-spec';
 import { FavoriteDevSpec } from './entities/favorite-dev-spec.entity';
 import { FavoriteDevSpecController } from './favorite-dev-spec.controller';
 import { FavoriteDevSpecService } from './favorite-dev-spec.service';
+import { LibraryForFavoriteDevSpec } from './entities/library-for-favorite-dev-spec';
 
 @Module({
   imports: [
@@ -15,7 +16,8 @@ import { FavoriteDevSpecService } from './favorite-dev-spec.service';
       DevSpec,
       LikeDevSpec,
       DislikeDevSpec,
-      FavoriteDevSpec
+      FavoriteDevSpec,
+      LibraryForFavoriteDevSpec
     ])
   ],
   controllers: [DevSpecController, FavoriteDevSpecController],

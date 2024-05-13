@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 // import { Category, DevSpec } from './entities/dev-spec.entity';
 import { FavoriteDevSpec } from './entities/favorite-dev-spec.entity';
 import { CreateFavoriteDevSpecDto } from './dto/create-favorite-dev-spec.dto';
+import { LibraryForFavoriteDevSpec } from './entities/library-for-favorite-dev-spec';
+import { CreateLibraryForFavoriteDevSpecDto } from './dto/library-for-favorite-dev-spec-dto';
 
 
 @Injectable()
@@ -12,7 +14,35 @@ export class FavoriteDevSpecService {
   constructor(
     @InjectRepository(FavoriteDevSpec)
     private favoriteDevSpecRepo: Repository<FavoriteDevSpec>,
+    @InjectRepository(LibraryForFavoriteDevSpec)
+    private libraryForFavoriteDevSpecRepo: Repository<LibraryForFavoriteDevSpec>,
   ) { }
+
+
+  // async addLibraryToFavoriteDevSpec(favoriteDevSpecId: number, createLibraryDto: CreateLibraryForFavoriteDevSpecDto): Promise<FavoriteDevSpec> {
+  //   const favoriteDevSpec = await this.favoriteDevSpecRepo.findOneOrFail({ where: { id: favoriteDevSpecId }, relations: ['libraries'] });
+
+  //   const newLibrary = new LibraryForFavoriteDevSpec();
+  //   newLibrary.library = createLibraryDto.library;
+  //   newLibrary.siteUrl = createLibraryDto.siteUrl;
+  //   newLibrary.favoriteDevSpec = favoriteDevSpec; // Set the relationship
+
+  //   await this.libraryForFavoriteDevSpecRepo.save(newLibrary);
+  //   favoriteDevSpec.libraries.push(newLibrary);
+
+  //   return favoriteDevSpec;
+  // }
+
+  async addLibraryToFavoriteDevSpec(favoriteDevSpecId: number, createLibraryDto: CreateLibraryForFavoriteDevSpecDto): Promise<LibraryForFavoriteDevSpec> {
+    const favoriteDevSpec = await this.favoriteDevSpecRepo.findOneOrFail({ where: { id: favoriteDevSpecId } });
+
+    const newLibrary = new LibraryForFavoriteDevSpec();
+    newLibrary.library = createLibraryDto.library;
+    newLibrary.siteUrl = createLibraryDto.siteUrl;
+    newLibrary.favoriteDevSpec = favoriteDevSpec; // LibraryForFavoriteDevSpec 쪽에만 관계 설정
+
+    return this.libraryForFavoriteDevSpecRepo.save(newLibrary);
+  }
 
   async updateCompany(id: number, company: string) {
     const favoriteDevSpec = await this.favoriteDevSpecRepo.findOneBy({ id });

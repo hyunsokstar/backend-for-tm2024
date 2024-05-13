@@ -46,6 +46,7 @@ import { DevSpec } from "./dev-spec/entities/dev-spec.entity";
 import { DislikeDevSpec } from "./dev-spec/entities/dislike-dev-spec";
 import { LikeDevSpec } from "./dev-spec/entities/like-dev-spec";
 import { FavoriteDevSpec } from "./dev-spec/entities/favorite-dev-spec.entity";
+import { LibraryForFavoriteDevSpec } from "./dev-spec/entities/library-for-favorite-dev-spec";
 
 @Module({
   imports: [
@@ -86,7 +87,8 @@ import { FavoriteDevSpec } from "./dev-spec/entities/favorite-dev-spec.entity";
         DevSpec,
         LikeDevSpec,
         DislikeDevSpec,
-        FavoriteDevSpec
+        FavoriteDevSpec,
+        LibraryForFavoriteDevSpec
       ],
       synchronize: true,
     }),
@@ -103,7 +105,7 @@ import { FavoriteDevSpec } from "./dev-spec/entities/favorite-dev-spec.entity";
     StarterProjectsModule,
     ChallengesModule,
     SubChallengesModel,
-    DevSpecModule
+    DevSpecModule,
   ],
   controllers: [AppController],
   providers: [AppService,
