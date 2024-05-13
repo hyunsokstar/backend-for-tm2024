@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateFavoriteDevSpecDto {
     @IsNotEmpty()
@@ -28,44 +28,49 @@ export class CreateFavoriteDevSpecDto {
 }
 
 export class UpdateFavoriteDevSpecBoilerPlateInfoDto {
-    @IsNotEmpty()
     @IsString()
-    authGithub: string;
+    @IsOptional()
+    authGithub: string | null;
 
-    @IsNotEmpty()
     @IsString()
-    authNote: string;
+    @IsOptional()
+    authNote: string | null;
 
-    @IsNotEmpty()
     @IsString()
-    boardGithub: string;
+    @IsOptional()
+    boardGithub: string | null;
 
-    @IsNotEmpty()
     @IsString()
-    boardNote: string;
+    @IsOptional()
+    boardNote: string | null;
 
-    @IsNotEmpty()
     @IsString()
-    chatGithub: string;
+    @IsOptional()
+    chatGithub: string | null;
 
-    @IsNotEmpty()
     @IsString()
-    chatNote: string;
+    @IsOptional()
+    chatNote: string | null;
 
-    @IsNotEmpty()
     @IsString()
-    paymentGithub: string;
+    @IsOptional()
+    paymentGithub: string | null;
 
-    @IsNotEmpty()
     @IsString()
-    paymentNote: string;
+    @IsOptional()
+    paymentNote: string | null;
 
-    @IsNotEmpty()
     @IsString()
-    devOpsGithub: string;
+    @IsOptional()
+    devOpsGithub: string | null;
 
-    @IsNotEmpty()
     @IsString()
-    devOpsNote: string;
+    @IsOptional()
+    devOpsNote: string | null;
+
+    @IsString()
+    @IsOptional()
+    figma: string | null;
 }
+
 

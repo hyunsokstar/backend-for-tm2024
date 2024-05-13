@@ -63,4 +63,8 @@ export class FavoriteDevSpec {
 
     @Column({ nullable: true, default: "" })
     devOpsNote: string;
+
+    @Column({ nullable: true, default: "" })
+    figma: string;
+
 }
