@@ -14,6 +14,15 @@ export class FavoriteDevSpecService {
     private favoriteDevSpecRepo: Repository<FavoriteDevSpec>,
   ) { }
 
+  async updateCompany(id: number, company: string) {
+    const favoriteDevSpec = await this.favoriteDevSpecRepo.findOneBy({ id });
+    if (!favoriteDevSpec) {
+      throw new Error(`FavoriteDevSpec with ID ${id} not found`);
+    }
+    favoriteDevSpec.company = company;
+    await this.favoriteDevSpecRepo.save(favoriteDevSpec);
+  }
+
   async like(id: number) {
     const devSpec = await this.favoriteDevSpecRepo.findOne({ where: { id: id } });
     devSpec.likeCount++;

@@ -1,9 +1,13 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
+
 @Entity()
 export class FavoriteDevSpec {
     @PrimaryGeneratedColumn()
     id: number;
+
+    @Column({ nullable: true, default: "" })
+    company: string;
 
     @Column()
     language: string;

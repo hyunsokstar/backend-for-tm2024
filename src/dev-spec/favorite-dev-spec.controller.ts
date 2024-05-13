@@ -8,6 +8,14 @@ import { ParseIntPipe } from '@nestjs/common';
 export class FavoriteDevSpecController {
   constructor(private readonly favoriteDevSpecService: FavoriteDevSpecService) { }
 
+  @Put(':id/company')
+  async updateCompany(
+    @Param('id', ParseIntPipe) id: number,
+    @Body('company') company: string,
+  ) {
+    await this.favoriteDevSpecService.updateCompany(id, company);
+  }
+
   @Put(':id/boiler-plate')
   async updateVoilerPlateInfo(@Param('id') id: number, @Body() updateFavoriteDevSpecDto: CreateFavoriteDevSpecDto) {
     console.log("update boiler plate info check");
