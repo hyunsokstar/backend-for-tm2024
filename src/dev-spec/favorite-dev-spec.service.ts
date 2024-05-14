@@ -19,19 +19,7 @@ export class FavoriteDevSpecService {
   ) { }
 
 
-  // async addLibraryToFavoriteDevSpec(favoriteDevSpecId: number, createLibraryDto: CreateLibraryForFavoriteDevSpecDto): Promise<FavoriteDevSpec> {
-  //   const favoriteDevSpec = await this.favoriteDevSpecRepo.findOneOrFail({ where: { id: favoriteDevSpecId }, relations: ['libraries'] });
 
-  //   const newLibrary = new LibraryForFavoriteDevSpec();
-  //   newLibrary.library = createLibraryDto.library;
-  //   newLibrary.siteUrl = createLibraryDto.siteUrl;
-  //   newLibrary.favoriteDevSpec = favoriteDevSpec; // Set the relationship
-
-  //   await this.libraryForFavoriteDevSpecRepo.save(newLibrary);
-  //   favoriteDevSpec.libraries.push(newLibrary);
-
-  //   return favoriteDevSpec;
-  // }
 
   async addLibraryToFavoriteDevSpec(favoriteDevSpecId: number, createLibraryDto: CreateLibraryForFavoriteDevSpecDto): Promise<LibraryForFavoriteDevSpec> {
     const favoriteDevSpec = await this.favoriteDevSpecRepo.findOneOrFail({ where: { id: favoriteDevSpecId } });
@@ -81,15 +69,6 @@ export class FavoriteDevSpecService {
     return await this.favoriteDevSpecRepo.save(favoriteDevSpec);
   }
 
-  // async findAll(): Promise<FavoriteDevSpec[]> {
-  //   console.log("find All Dev Spec List");
-
-  //   return await this.favoriteDevSpecRepo.find({
-  //     order: {
-  //       likeCount: "DESC" // likeCount를 오름차순으로 정렬
-  //     }
-  //   });
-  // }
 
   async findAllWithLibraries(): Promise<FavoriteDevSpec[]> {
     console.log("find All Dev Spec List");

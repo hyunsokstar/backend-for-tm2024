@@ -12,13 +12,6 @@ import { LibraryForFavoriteDevSpec } from './entities/library-for-favorite-dev-s
 export class FavoriteDevSpecController {
   constructor(private readonly favoriteDevSpecService: FavoriteDevSpecService) { }
 
-  // @Post(':id/libraries')
-  // async addLibraryToFavoriteDevSpec(
-  //   @Param('id', ParseIntPipe) favoriteDevSpecId: number,
-  //   @Body() createLibraryDto: CreateLibraryForFavoriteDevSpecDto,
-  // ): Promise<FavoriteDevSpec> {
-  //   return await this.favoriteDevSpecService.addLibraryToFavoriteDevSpec(favoriteDevSpecId, createLibraryDto);
-  // }
 
   @Post(':id/libraries')
   async addLibraryToFavoriteDevSpec(
