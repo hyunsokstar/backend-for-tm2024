@@ -38,8 +38,9 @@ export class FavoriteDevSpecService {
 
     const newLibrary = new LibraryForFavoriteDevSpec();
     newLibrary.library = createLibraryDto.library;
+    newLibrary.description = createLibraryDto.description;
     newLibrary.siteUrl = createLibraryDto.siteUrl;
-    newLibrary.favoriteDevSpec = favoriteDevSpec; // LibraryForFavoriteDevSpec 쪽에만 관계 설정
+    newLibrary.favoriteDevSpec = favoriteDevSpec;
 
     return this.libraryForFavoriteDevSpecRepo.save(newLibrary);
   }
@@ -80,13 +81,24 @@ export class FavoriteDevSpecService {
     return await this.favoriteDevSpecRepo.save(favoriteDevSpec);
   }
 
-  async findAll(): Promise<FavoriteDevSpec[]> {
+  // async findAll(): Promise<FavoriteDevSpec[]> {
+  //   console.log("find All Dev Spec List");
+
+  //   return await this.favoriteDevSpecRepo.find({
+  //     order: {
+  //       likeCount: "DESC" // likeCount를 오름차순으로 정렬
+  //     }
+  //   });
+  // }
+
+  async findAllWithLibraries(): Promise<FavoriteDevSpec[]> {
     console.log("find All Dev Spec List");
 
     return await this.favoriteDevSpecRepo.find({
       order: {
-        likeCount: "DESC" // likeCount를 오름차순으로 정렬
-      }
+        likeCount: "DESC" // likeCount를 내림차순으로 정렬
+      },
+      relations: ['libraries'] // libraries 관계를 로드
     });
   }
 

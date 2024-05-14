@@ -19,6 +19,7 @@ export class FavoriteDevSpecController {
   // ): Promise<FavoriteDevSpec> {
   //   return await this.favoriteDevSpecService.addLibraryToFavoriteDevSpec(favoriteDevSpecId, createLibraryDto);
   // }
+
   @Post(':id/libraries')
   async addLibraryToFavoriteDevSpec(
     @Param('id', ParseIntPipe) favoriteDevSpecId: number,
@@ -49,7 +50,7 @@ export class FavoriteDevSpecController {
 
   @Get()
   findAll() {
-    return this.favoriteDevSpecService.findAll();
+    return this.favoriteDevSpecService.findAllWithLibraries();
   }
 
   @Patch(':id/like')

@@ -10,6 +10,9 @@ export class LibraryForFavoriteDevSpec {
     library: string;
 
     @Column({ nullable: true, default: '' })
+    description: string;
+
+    @Column({ nullable: true, default: '' })
     siteUrl: string;
 
     // One-to-Many relationship with FavoriteDevSpec entity
