@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-// import { Category, DevSpec } from './entities/dev-spec.entity';
 import { FavoriteDevSpec } from './entities/favorite-dev-spec.entity';
 import { CreateFavoriteDevSpecDto } from './dto/create-favorite-dev-spec.dto';
 import { LibraryForFavoriteDevSpec } from './entities/library-for-favorite-dev-spec';
 import { CreateLibraryForFavoriteDevSpecDto } from './dto/library-for-favorite-dev-spec-dto';
+import { ToolForFavoriteDevSpec } from './entities/tool-for-favorite-dev-spec.entity';
+import { CreateToolForFavoriteDevSpecDto } from './dto/tool-for-favorite-dev-spec.dto';
 
 
 @Injectable()
@@ -16,9 +17,11 @@ export class FavoriteDevSpecService {
     private favoriteDevSpecRepo: Repository<FavoriteDevSpec>,
     @InjectRepository(LibraryForFavoriteDevSpec)
     private libraryForFavoriteDevSpecRepo: Repository<LibraryForFavoriteDevSpec>,
+
+    @InjectRepository(ToolForFavoriteDevSpec)
+    private toolForFavoriteDevSpecRepo: Repository<ToolForFavoriteDevSpec>,
+
   ) { }
-
-
 
 
   async addLibraryToFavoriteDevSpec(favoriteDevSpecId: number, createLibraryDto: CreateLibraryForFavoriteDevSpecDto): Promise<LibraryForFavoriteDevSpec> {
@@ -77,7 +80,7 @@ export class FavoriteDevSpecService {
       order: {
         likeCount: "DESC" // likeCount를 내림차순으로 정렬
       },
-      relations: ['libraries'] // libraries 관계를 로드
+      relations: ['libraries', 'tools'] // libraries와 tools 관계를 로드
     });
   }
 
@@ -89,6 +92,19 @@ export class FavoriteDevSpecService {
 
     this.favoriteDevSpecRepo.merge(favoriteDevSpec, updateFavoriteDevSpecDto);
     return this.favoriteDevSpecRepo.save(favoriteDevSpec);
+  }
+
+  async addToolToFavoriteDevSpec(favoriteDevSpecId: number, createToolDto: CreateToolForFavoriteDevSpecDto): Promise<ToolForFavoriteDevSpec> {
+    const favoriteDevSpec = await this.favoriteDevSpecRepo.findOneOrFail({ where: { id: favoriteDevSpecId } });
+
+    const newTool = new ToolForFavoriteDevSpec();
+    newTool.tool = createToolDto.tool;
+    newTool.description = createToolDto.description;
+    newTool.siteUrl = createToolDto.siteUrl;
+    newTool.favoriteDevSpec = favoriteDevSpec;
+    newTool.category = createToolDto.category;
+
+    return this.toolForFavoriteDevSpecRepo.save(newTool);
   }
 
 }

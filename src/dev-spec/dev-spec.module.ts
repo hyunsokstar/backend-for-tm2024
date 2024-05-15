@@ -9,6 +9,7 @@ import { FavoriteDevSpec } from './entities/favorite-dev-spec.entity';
 import { FavoriteDevSpecController } from './favorite-dev-spec.controller';
 import { FavoriteDevSpecService } from './favorite-dev-spec.service';
 import { LibraryForFavoriteDevSpec } from './entities/library-for-favorite-dev-spec';
+import { ToolForFavoriteDevSpec } from './entities/tool-for-favorite-dev-spec.entity';
 
 @Module({
   imports: [
@@ -17,7 +18,8 @@ import { LibraryForFavoriteDevSpec } from './entities/library-for-favorite-dev-s
       LikeDevSpec,
       DislikeDevSpec,
       FavoriteDevSpec,
-      LibraryForFavoriteDevSpec
+      LibraryForFavoriteDevSpec,
+      ToolForFavoriteDevSpec
     ])
   ],
   controllers: [DevSpecController, FavoriteDevSpecController],

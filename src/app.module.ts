@@ -47,6 +47,7 @@ import { DislikeDevSpec } from "./dev-spec/entities/dislike-dev-spec";
 import { LikeDevSpec } from "./dev-spec/entities/like-dev-spec";
 import { FavoriteDevSpec } from "./dev-spec/entities/favorite-dev-spec.entity";
 import { LibraryForFavoriteDevSpec } from "./dev-spec/entities/library-for-favorite-dev-spec";
+import { ToolForFavoriteDevSpec } from "./dev-spec/entities/tool-for-favorite-dev-spec.entity";
 
 @Module({
   imports: [
@@ -88,7 +89,8 @@ import { LibraryForFavoriteDevSpec } from "./dev-spec/entities/library-for-favor
         LikeDevSpec,
         DislikeDevSpec,
         FavoriteDevSpec,
-        LibraryForFavoriteDevSpec
+        LibraryForFavoriteDevSpec,
+        ToolForFavoriteDevSpec
       ],
       synchronize: true,
     }),

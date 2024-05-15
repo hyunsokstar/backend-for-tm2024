@@ -28,4 +28,6 @@ export class DevSpec {
 
   @OneToMany(() => LikeDevSpec, disLikeDevSpec => disLikeDevSpec.devSpec)
   disLikeDevSpecs: LikeDevSpec[];
+
+
 }

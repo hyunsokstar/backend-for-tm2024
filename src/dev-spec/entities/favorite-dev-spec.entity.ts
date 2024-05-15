@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { LibraryForFavoriteDevSpec } from './library-for-favorite-dev-spec';
+import { ToolForFavoriteDevSpec } from './tool-for-favorite-dev-spec.entity';
 
 
 @Entity()
@@ -73,5 +74,11 @@ export class FavoriteDevSpec {
         (library) => library.favoriteDevSpec
     )
     libraries: LibraryForFavoriteDevSpec[];
+
+    @OneToMany(
+        () => ToolForFavoriteDevSpec,
+        (tool) => tool.favoriteDevSpec
+    )
+    tools: ToolForFavoriteDevSpec[];
 
 }

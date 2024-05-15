@@ -5,6 +5,8 @@ import { ParseIntPipe } from '@nestjs/common';
 import { CreateLibraryForFavoriteDevSpecDto } from './dto/library-for-favorite-dev-spec-dto';
 import { FavoriteDevSpec } from './entities/favorite-dev-spec.entity';
 import { LibraryForFavoriteDevSpec } from './entities/library-for-favorite-dev-spec';
+import { CreateToolForFavoriteDevSpecDto } from './dto/tool-for-favorite-dev-spec.dto';
+import { ToolForFavoriteDevSpec } from './entities/tool-for-favorite-dev-spec.entity';
 
 
 
@@ -54,6 +56,14 @@ export class FavoriteDevSpecController {
   @Patch(':id/dislike')
   dislike(@Param('id', ParseIntPipe) id: number) {
     return this.favoriteDevSpecService.dislike(id);
+  }
+
+  @Post(':id/tools')
+  async addToolToFavoriteDevSpec(
+    @Param('id', ParseIntPipe) favoriteDevSpecId: number,
+    @Body() createToolDto: CreateToolForFavoriteDevSpecDto,
+  ): Promise<ToolForFavoriteDevSpec> {
+    return await this.favoriteDevSpecService.addToolToFavoriteDevSpec(favoriteDevSpecId, createToolDto);
   }
 
 }
