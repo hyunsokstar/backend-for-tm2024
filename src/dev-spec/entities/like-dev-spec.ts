@@ -13,4 +13,5 @@ export class LikeDevSpec {
     @ManyToOne(() => DevSpec, devSpec => devSpec.likeDevSpecs)
     devSpec: DevSpec;
 
+
 }

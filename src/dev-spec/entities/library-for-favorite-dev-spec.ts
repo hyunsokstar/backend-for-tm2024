@@ -15,8 +15,16 @@ export class LibraryForFavoriteDevSpec {
     @Column({ nullable: true, default: '' })
     siteUrl: string;
 
+    @Column({
+        type: 'enum',
+        enum: ['backend', 'state_management', 'ui'],
+        default: 'backend', // Set a default category for convenience
+    })
+    category: string;
+
     // One-to-Many relationship with FavoriteDevSpec entity
     @ManyToOne(() => FavoriteDevSpec, (favoriteDevSpec) => favoriteDevSpec.libraries)
     favoriteDevSpec: FavoriteDevSpec;
+
 
 }
