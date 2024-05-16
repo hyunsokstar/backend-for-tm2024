@@ -48,6 +48,9 @@ import { LikeDevSpec } from "./dev-spec/entities/like-dev-spec";
 import { FavoriteDevSpec } from "./dev-spec/entities/favorite-dev-spec.entity";
 import { LibraryForFavoriteDevSpec } from "./dev-spec/entities/library-for-favorite-dev-spec";
 import { ToolForFavoriteDevSpec } from "./dev-spec/entities/tool-for-favorite-dev-spec.entity";
+import { DevRelayModule } from './dev-relay/dev-relay.module';
+import { DevRelay } from "./dev-relay/entities/dev-relay.entity";
+import { DevAssignment } from "./dev-relay/entities/dev-assignment.entity";
 
 @Module({
   imports: [
@@ -90,7 +93,9 @@ import { ToolForFavoriteDevSpec } from "./dev-spec/entities/tool-for-favorite-de
         DislikeDevSpec,
         FavoriteDevSpec,
         LibraryForFavoriteDevSpec,
-        ToolForFavoriteDevSpec
+        ToolForFavoriteDevSpec,
+        DevRelay,
+        DevAssignment
       ],
       synchronize: true,
     }),
@@ -108,6 +113,7 @@ import { ToolForFavoriteDevSpec } from "./dev-spec/entities/tool-for-favorite-de
     ChallengesModule,
     SubChallengesModel,
     DevSpecModule,
+    DevRelayModule,
   ],
   controllers: [AppController],
   providers: [AppService,
