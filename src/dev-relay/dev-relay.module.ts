@@ -4,12 +4,14 @@ import { DevRelayController } from './dev-relay.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DevRelay } from './entities/dev-relay.entity';
 import { DevAssignment } from './entities/dev-assignment.entity';
+import { DevAssignmentSubmission } from './entities/dev-assignment-submission.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       DevRelay,
-      DevAssignment
+      DevAssignment,
+      DevAssignmentSubmission
     ])
   ],
   controllers: [DevRelayController],

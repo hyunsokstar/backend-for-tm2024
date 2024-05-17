@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateDevRelayDto } from './dto/create-dev-relay.dto';
 import { UpdateDevRelayDto } from './dto/update-dev-relay.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -6,6 +6,8 @@ import { DevRelay } from './entities/dev-relay.entity';
 import { Repository } from 'typeorm';
 import { DevAssignment } from './entities/dev-assignment.entity';
 import { CreateDevAssignmentDto } from './dto/create-dev-assignment.dto';
+import { DevAssignmentSubmission } from './entities/dev-assignment-submission.entity';
+import { CreateDevAssignmentSubmissionDto } from './dto/create-dev-assignment-submission.dto';
 
 @Injectable()
 export class DevRelayService {
@@ -15,7 +17,37 @@ export class DevRelayService {
     private devRelayRepo: Repository<DevRelay>,
     @InjectRepository(DevAssignment)
     private devAssignmentRepo: Repository<DevAssignment>,
+    @InjectRepository(DevAssignmentSubmission)
+    private devAssignmentSubmissionRepo: Repository<DevAssignmentSubmission>,
   ) { }
+
+  async findAllDevAssignments(): Promise<DevAssignment[]> {
+    return await this.devAssignmentRepo.find({ relations: ['submissions'] });
+  }
+
+  async createDevAssignmentSubmission(devAssignmentId: number, createDevAssignmentSubmissionDto: CreateDevAssignmentSubmissionDto): Promise<DevAssignmentSubmission> {
+    const { title, noteUrl, figmaUrl, youtubeUrl } = createDevAssignmentSubmissionDto;
+
+    // DevAssignment 조회
+    const devAssignment = await this.devAssignmentRepo.findOne({
+      where: { id: devAssignmentId },
+    });
+
+    if (!devAssignment) {
+      throw new NotFoundException(`Dev Assignment with ID ${devAssignmentId} not found`);
+    }
+
+    // DevAssignmentSubmission 생성
+    const devAssignmentSubmission = this.devAssignmentSubmissionRepo.create({
+      title,
+      noteUrl,
+      figmaUrl,
+      youtubeUrl,
+      devAssignment, // 이 부분이 수정된 부분입니다.
+    });
+
+    return await this.devAssignmentSubmissionRepo.save(devAssignmentSubmission);
+  }
 
   async createDevAssignments(createDevAssignmentsDto: CreateDevAssignmentDto[]): Promise<DevAssignment[]> {
     const createdAssignments: DevAssignment[] = [];
@@ -30,10 +62,6 @@ export class DevRelayService {
     const { day, title, category } = createDevAssignmentDto;
     const newAssignment = this.devAssignmentRepo.create({ day, title, category });
     return this.devAssignmentRepo.save(newAssignment);
-  }
-
-  async findAllDevAssignments(): Promise<DevAssignment[]> {
-    return await this.devAssignmentRepo.find();
   }
 
   async findAllDevRelays(): Promise<DevRelay[]> {

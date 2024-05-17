@@ -51,6 +51,7 @@ import { ToolForFavoriteDevSpec } from "./dev-spec/entities/tool-for-favorite-de
 import { DevRelayModule } from './dev-relay/dev-relay.module';
 import { DevRelay } from "./dev-relay/entities/dev-relay.entity";
 import { DevAssignment } from "./dev-relay/entities/dev-assignment.entity";
+import { DevAssignmentSubmission } from "./dev-relay/entities/dev-assignment-submission.entity";
 
 @Module({
   imports: [
@@ -95,7 +96,8 @@ import { DevAssignment } from "./dev-relay/entities/dev-assignment.entity";
         LibraryForFavoriteDevSpec,
         ToolForFavoriteDevSpec,
         DevRelay,
-        DevAssignment
+        DevAssignment,
+        DevAssignmentSubmission
       ],
       synchronize: true,
     }),

@@ -1,6 +1,7 @@
 // src\dev-relay\entities\dev-assignment.entity.ts
 
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { DevAssignmentSubmission } from './dev-assignment-submission.entity';
 
 export enum WeekDay {
     MONDAY = 'monday',
@@ -32,4 +33,8 @@ export class DevAssignment {
 
     @Column({ type: 'enum', enum: AssignmentCategory, default: AssignmentCategory.BASIC })
     category: AssignmentCategory;
+
+    @OneToMany(() => DevAssignmentSubmission, submission => submission.devAssignment)
+    submissions: DevAssignmentSubmission[];
+
 }

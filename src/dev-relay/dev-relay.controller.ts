@@ -3,10 +3,21 @@ import { DevRelayService } from './dev-relay.service';
 import { CreateDevRelayDto } from './dto/create-dev-relay.dto';
 import { UpdateDevRelayDto } from './dto/update-dev-relay.dto';
 import { CreateDevAssignmentDto } from './dto/create-dev-assignment.dto';
+import { CreateDevAssignmentSubmissionDto } from './dto/create-dev-assignment-submission.dto';
 
 @Controller('dev-relay')
 export class DevRelayController {
   constructor(private readonly devRelayService: DevRelayService) { }
+
+  // DevAssignmentSubmission 생성 라우트
+  @Post(':id/dev-assignment-submission')
+  async createDevAssignmentSubmission(
+    @Param('id') devAssignmentId: number,
+    @Body() createDevAssignmentSubmissionDto: CreateDevAssignmentSubmissionDto,
+  ) {
+    console.log("devAssignmentId : ", devAssignmentId);
+    return this.devRelayService.createDevAssignmentSubmission(devAssignmentId, createDevAssignmentSubmissionDto);
+  }
 
   @Get('')
   findAllDevRelays() {
