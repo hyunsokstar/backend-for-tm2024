@@ -3,7 +3,6 @@ import { CreateFavoriteDevSpecDto, UpdateFavoriteDevSpecBoilerPlateInfoDto } fro
 import { FavoriteDevSpecService } from './favorite-dev-spec.service';
 import { ParseIntPipe } from '@nestjs/common';
 import { CreateLibraryForFavoriteDevSpecDto } from './dto/library-for-favorite-dev-spec-dto';
-import { FavoriteDevSpec } from './entities/favorite-dev-spec.entity';
 import { LibraryForFavoriteDevSpec } from './entities/library-for-favorite-dev-spec';
 import { CreateToolForFavoriteDevSpecDto } from './dto/tool-for-favorite-dev-spec.dto';
 import { ToolForFavoriteDevSpec } from './entities/tool-for-favorite-dev-spec.entity';
