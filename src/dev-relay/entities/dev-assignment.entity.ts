@@ -15,9 +15,11 @@ export enum WeekDay {
 
 export enum AssignmentCategory {
     BASIC = 'basic',
-    CHALLENGE = 'challenge',
-    UI_UX = 'ui/ux',
-    RESEARCH = 'research',
+    FRAMEWORK = 'framework',
+    LIBRARY = 'library',
+    UI = 'ui',
+    DEVOPS = 'devops',
+    LANGUAGE = 'language',
 }
 
 @Entity()

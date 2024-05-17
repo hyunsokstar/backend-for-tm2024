@@ -4,7 +4,7 @@ import { UpdateDevRelayDto } from './dto/update-dev-relay.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DevRelay } from './entities/dev-relay.entity';
 import { Repository } from 'typeorm';
-import { DevAssignment } from './entities/dev-assignment.entity';
+import { AssignmentCategory, DevAssignment } from './entities/dev-assignment.entity';
 import { CreateDevAssignmentDto } from './dto/create-dev-assignment.dto';
 import { DevAssignmentSubmission } from './entities/dev-assignment-submission.entity';
 import { CreateDevAssignmentSubmissionDto } from './dto/create-dev-assignment-submission.dto';
@@ -21,8 +21,15 @@ export class DevRelayService {
     private devAssignmentSubmissionRepo: Repository<DevAssignmentSubmission>,
   ) { }
 
-  async findAllDevAssignments(): Promise<DevAssignment[]> {
-    return await this.devAssignmentRepo.find({ relations: ['submissions'] });
+  async findAllDevAssignments(category: AssignmentCategory): Promise<DevAssignment[]> {
+    if (category) {
+      return await this.devAssignmentRepo.find({
+        where: { category },
+        relations: ['submissions'],
+      });
+    } else {
+      return await this.devAssignmentRepo.find({ relations: ['submissions'] });
+    }
   }
 
   async createDevAssignmentSubmission(devAssignmentId: number, createDevAssignmentSubmissionDto: CreateDevAssignmentSubmissionDto): Promise<DevAssignmentSubmission> {

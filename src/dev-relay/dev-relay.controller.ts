@@ -1,13 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { DevRelayService } from './dev-relay.service';
 import { CreateDevRelayDto } from './dto/create-dev-relay.dto';
 import { UpdateDevRelayDto } from './dto/update-dev-relay.dto';
 import { CreateDevAssignmentDto } from './dto/create-dev-assignment.dto';
 import { CreateDevAssignmentSubmissionDto } from './dto/create-dev-assignment-submission.dto';
+import { AssignmentCategory } from './entities/dev-assignment.entity';
 
 @Controller('dev-relay')
 export class DevRelayController {
   constructor(private readonly devRelayService: DevRelayService) { }
+
+  @Get('dev-assignments')
+  findAllDevAssignments(@Query('category') category: AssignmentCategory) {
+    return this.devRelayService.findAllDevAssignments(category);
+  }
 
   // DevAssignmentSubmission 생성 라우트
   @Post(':id/dev-assignment-submission')
@@ -32,11 +38,6 @@ export class DevRelayController {
   @Post('create-dev-assignment')
   createDevAssignment(@Body() createDevAssignmentDto: CreateDevAssignmentDto) {
     return this.devRelayService.createDevAssignment(createDevAssignmentDto);
-  }
-
-  @Get('dev-assignments')
-  findAllDevAssignments() {
-    return this.devRelayService.findAllDevAssignments();
   }
 
   @Post()
