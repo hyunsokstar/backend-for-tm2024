@@ -5,13 +5,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DevRelay } from './entities/dev-relay.entity';
 import { DevAssignment } from './entities/dev-assignment.entity';
 import { DevAssignmentSubmission } from './entities/dev-assignment-submission.entity';
+import { CategoryForDevAssignment } from './entities/category-for-dev-assignment.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       DevRelay,
       DevAssignment,
-      DevAssignmentSubmission
+      DevAssignmentSubmission,
+      CategoryForDevAssignment
     ])
   ],
   controllers: [DevRelayController],

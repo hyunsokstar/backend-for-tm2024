@@ -4,15 +4,47 @@ import { CreateDevRelayDto } from './dto/create-dev-relay.dto';
 import { UpdateDevRelayDto } from './dto/update-dev-relay.dto';
 import { CreateDevAssignmentDto } from './dto/create-dev-assignment.dto';
 import { CreateDevAssignmentSubmissionDto } from './dto/create-dev-assignment-submission.dto';
-import { AssignmentCategory } from './entities/dev-assignment.entity';
+import { CategoryForDevAssignmentDto } from './dto/category-for-dev-assignment.dto';
+import { CategoryForDevAssignment } from './entities/category-for-dev-assignment.entity';
+import { DevAssignment } from './entities/dev-assignment.entity';
 
 @Controller('dev-relay')
 export class DevRelayController {
   constructor(private readonly devRelayService: DevRelayService) { }
 
+  @Get(':categoryId/dev-assignments')
+  async findDevAssignmentsByCategory(@Param('categoryId') categoryId: number): Promise<DevAssignment[]> {
+    return this.devRelayService.findDevAssignmentsByCategory(categoryId);
+  }
+
   @Get('dev-assignments')
-  findAllDevAssignments(@Query('category') category: AssignmentCategory) {
-    return this.devRelayService.findAllDevAssignments(category);
+  async findAllDevAssignments(@Query() query): Promise<DevAssignment[]> {
+    return this.devRelayService.findAllDevAssignments();
+  }
+
+  @Post(':categoryId/create-dev-assignment')
+  createDevAssignment(@Param('categoryId') categoryId: number, @Body() createDevAssignmentDto: CreateDevAssignmentDto) {
+    return this.devRelayService.createDevAssignment(categoryId, createDevAssignmentDto);
+  }
+
+  @Post(':categoryId/create-dev-assignments')
+  createDevAssignments(@Param('categoryId') categoryId: number, @Body() createDevAssignmentsDto: CreateDevAssignmentDto[]) {
+    return this.devRelayService.createDevAssignments(categoryId, createDevAssignmentsDto);
+  }
+
+  @Get('categories')
+  async getAllCategories(): Promise<CategoryForDevAssignment[]> {
+    return this.devRelayService.getAllCategories();
+  }
+
+  @Post('categories')
+  async createCategories(@Body() categoriesDto: CategoryForDevAssignmentDto[]) {
+    return this.devRelayService.createCategories(categoriesDto);
+  }
+
+  @Post('category')
+  async createCategory(@Body() categoryDto: CategoryForDevAssignmentDto) {
+    return this.devRelayService.createCategory(categoryDto);
   }
 
   // DevAssignmentSubmission 생성 라우트
@@ -28,16 +60,6 @@ export class DevRelayController {
   @Get('')
   findAllDevRelays() {
     return this.devRelayService.findAllDevRelays();
-  }
-
-  @Post('create-dev-assignments')
-  createDevAssignments(@Body() createDevAssignmentsDto: CreateDevAssignmentDto[]) {
-    return this.devRelayService.createDevAssignments(createDevAssignmentsDto);
-  }
-
-  @Post('create-dev-assignment')
-  createDevAssignment(@Body() createDevAssignmentDto: CreateDevAssignmentDto) {
-    return this.devRelayService.createDevAssignment(createDevAssignmentDto);
   }
 
   @Post()

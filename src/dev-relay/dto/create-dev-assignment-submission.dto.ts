@@ -1,6 +1,6 @@
 // src\dev-relay\dto\create-dev-assignment-submission.dto.ts 추가 필요
 import { IsString, IsOptional, IsUrl } from 'class-validator';
-import { AssignmentCategory, WeekDay } from '../entities/dev-assignment.entity';
+import { WeekDay } from '../entities/dev-assignment.entity';
 
 export class CreateDevAssignmentSubmissionDto {
     @IsString()

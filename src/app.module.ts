@@ -52,6 +52,7 @@ import { DevRelayModule } from './dev-relay/dev-relay.module';
 import { DevRelay } from "./dev-relay/entities/dev-relay.entity";
 import { DevAssignment } from "./dev-relay/entities/dev-assignment.entity";
 import { DevAssignmentSubmission } from "./dev-relay/entities/dev-assignment-submission.entity";
+import { CategoryForDevAssignment } from "./dev-relay/entities/category-for-dev-assignment.entity";
 
 @Module({
   imports: [
@@ -97,7 +98,8 @@ import { DevAssignmentSubmission } from "./dev-relay/entities/dev-assignment-sub
         ToolForFavoriteDevSpec,
         DevRelay,
         DevAssignment,
-        DevAssignmentSubmission
+        DevAssignmentSubmission,
+        CategoryForDevAssignment
       ],
       synchronize: true,
     }),

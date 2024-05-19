@@ -4,10 +4,12 @@ import { UpdateDevRelayDto } from './dto/update-dev-relay.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DevRelay } from './entities/dev-relay.entity';
 import { Repository } from 'typeorm';
-import { AssignmentCategory, DevAssignment } from './entities/dev-assignment.entity';
+import { DevAssignment } from './entities/dev-assignment.entity';
 import { CreateDevAssignmentDto } from './dto/create-dev-assignment.dto';
 import { DevAssignmentSubmission } from './entities/dev-assignment-submission.entity';
 import { CreateDevAssignmentSubmissionDto } from './dto/create-dev-assignment-submission.dto';
+import { CategoryForDevAssignment } from './entities/category-for-dev-assignment.entity';
+import { CategoryForDevAssignmentDto } from './dto/category-for-dev-assignment.dto';
 
 @Injectable()
 export class DevRelayService {
@@ -15,21 +17,96 @@ export class DevRelayService {
   constructor(
     @InjectRepository(DevRelay)
     private devRelayRepo: Repository<DevRelay>,
+    @InjectRepository(CategoryForDevAssignment)
+    private categoryForDevAssignmentRepo: Repository<CategoryForDevAssignment>,
     @InjectRepository(DevAssignment)
     private devAssignmentRepo: Repository<DevAssignment>,
     @InjectRepository(DevAssignmentSubmission)
     private devAssignmentSubmissionRepo: Repository<DevAssignmentSubmission>,
   ) { }
 
-  async findAllDevAssignments(category: AssignmentCategory): Promise<DevAssignment[]> {
-    if (category) {
-      return await this.devAssignmentRepo.find({
-        where: { category },
-        relations: ['submissions'],
-      });
-    } else {
-      return await this.devAssignmentRepo.find({ relations: ['submissions'] });
+  async findDevAssignmentsByCategory(categoryId: number): Promise<DevAssignment[]> {
+    // 특정 카테고리 ID에 해당하는 DevAssignment 리스트를 조회합니다.
+    return this.devAssignmentRepo
+      .createQueryBuilder('devAssignment')
+      .leftJoinAndSelect('devAssignment.category', 'category')
+      .leftJoinAndSelect('devAssignment.submissions', 'submission') // DevAssignment과 DevAssignmentSubmission의 관계를 설정합니다.
+      .where('category.id = :categoryId', { categoryId })
+      .getMany();
+  }
+
+
+  async findAllDevAssignments(): Promise<DevAssignment[]> {
+    return this.devAssignmentRepo.find({
+      relations: ['category']
+    });
+  }
+
+  async createDevAssignment(categoryId: number, createDevAssignmentDto: CreateDevAssignmentDto): Promise<DevAssignment> {
+    // 해당 categoryId에 대한 카테고리가 존재하는지 확인
+    const category = await this.categoryForDevAssignmentRepo.findOne({
+      where: {
+        id: categoryId
+      }
+    });
+
+    if (!category) {
+      throw new NotFoundException('해당 카테고리를 찾을 수 없습니다.');
     }
+
+    // DevAssignment 생성
+    const { day, title } = createDevAssignmentDto;
+    const newAssignment = this.devAssignmentRepo.create({ day, title, category });
+    return this.devAssignmentRepo.save(newAssignment);
+  }
+
+
+  async createDevAssignments(categoryId: number, createDevAssignmentsDto: CreateDevAssignmentDto[]): Promise<DevAssignment[]> {
+    // 해당 categoryId에 대한 카테고리가 존재하는지 확인
+    const category = await this.categoryForDevAssignmentRepo.findOne({ where: { id: categoryId } });
+    if (!category) {
+      throw new NotFoundException('해당 카테고리를 찾을 수 없습니다.');
+    }
+
+    // createDevAssignmentsDto 배열을 순회하면서 DevAssignment 생성
+    const devAssignments: DevAssignment[] = [];
+    for (const assignmentDto of createDevAssignmentsDto) {
+      const { title, day } = assignmentDto;
+
+      // DevAssignment 생성
+      const devAssignment = this.devAssignmentRepo.create({
+        title,
+        day,
+        category: category,
+      });
+
+      // 생성된 DevAssignment을 저장
+      const savedDevAssignment = await this.devAssignmentRepo.save(devAssignment);
+
+      // 생성된 DevAssignment을 결과 배열에 추가
+      devAssignments.push(savedDevAssignment);
+    }
+
+    // 생성된 DevAssignment들을 반환
+    return devAssignments;
+  }
+
+  async getAllCategories(): Promise<CategoryForDevAssignment[]> {
+    return this.categoryForDevAssignmentRepo.find();
+  }
+
+  async createCategories(categoriesDto: CategoryForDevAssignmentDto[]) {
+    const categories = categoriesDto.map(categoryDto => {
+      const { name } = categoryDto;
+      return this.categoryForDevAssignmentRepo.create({ name });
+    });
+    return this.categoryForDevAssignmentRepo.save(categories);
+  }
+
+  async createCategory(categoryDto: CategoryForDevAssignmentDto) {
+    const { name } = categoryDto;
+    const category = this.categoryForDevAssignmentRepo.create({ name });
+    return this.categoryForDevAssignmentRepo.save(category);
   }
 
   async createDevAssignmentSubmission(devAssignmentId: number, createDevAssignmentSubmissionDto: CreateDevAssignmentSubmissionDto): Promise<DevAssignmentSubmission> {
@@ -56,20 +133,20 @@ export class DevRelayService {
     return await this.devAssignmentSubmissionRepo.save(devAssignmentSubmission);
   }
 
-  async createDevAssignments(createDevAssignmentsDto: CreateDevAssignmentDto[]): Promise<DevAssignment[]> {
-    const createdAssignments: DevAssignment[] = [];
-    for (const assignmentDto of createDevAssignmentsDto) {
-      const createdAssignment = await this.createDevAssignment(assignmentDto);
-      createdAssignments.push(createdAssignment);
-    }
-    return createdAssignments;
-  }
+  // async createDevAssignments(createDevAssignmentsDto: CreateDevAssignmentDto[]): Promise<DevAssignment[]> {
+  //   const createdAssignments: DevAssignment[] = [];
+  //   for (const assignmentDto of createDevAssignmentsDto) {
+  //     const createdAssignment = await this.createDevAssignment(assignmentDto);
+  //     createdAssignments.push(createdAssignment);
+  //   }
+  //   return createdAssignments;
+  // }
 
-  async createDevAssignment(createDevAssignmentDto: CreateDevAssignmentDto): Promise<DevAssignment> {
-    const { day, title, category } = createDevAssignmentDto;
-    const newAssignment = this.devAssignmentRepo.create({ day, title, category });
-    return this.devAssignmentRepo.save(newAssignment);
-  }
+  // async createDevAssignment(createDevAssignmentDto: CreateDevAssignmentDto): Promise<DevAssignment> {
+  //   const { day, title } = createDevAssignmentDto;
+  //   const newAssignment = this.devAssignmentRepo.create({ day, title });
+  //   return this.devAssignmentRepo.save(newAssignment);
+  // }
 
   async findAllDevRelays(): Promise<DevRelay[]> {
     return await this.devRelayRepo.find();
