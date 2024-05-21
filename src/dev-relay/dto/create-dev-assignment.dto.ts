@@ -3,7 +3,7 @@ import { IsEnum, IsString, IsOptional } from 'class-validator';
 import { WeekDay } from '../entities/dev-assignment.entity';
 
 export class CreateDevAssignmentDto {
-    @IsEnum(WeekDay)
+    @IsString()
     day: WeekDay;
 
     @IsString()

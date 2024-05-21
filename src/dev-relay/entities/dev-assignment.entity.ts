@@ -19,7 +19,7 @@ export class DevAssignment {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ type: 'enum', enum: WeekDay, default: WeekDay.MONDAY })
+    @Column({ type: 'varchar', default: WeekDay.MONDAY })
     day: WeekDay;
 
     @Column({ type: 'varchar', length: 255 })

@@ -8,9 +8,15 @@ import { CategoryForDevAssignmentDto } from './dto/category-for-dev-assignment.d
 import { CategoryForDevAssignment } from './entities/category-for-dev-assignment.entity';
 import { DevAssignment } from './entities/dev-assignment.entity';
 
+
 @Controller('dev-relay')
 export class DevRelayController {
   constructor(private readonly devRelayService: DevRelayService) { }
+
+  @Post(':categoryId/create-dev-assignment')
+  createDevAssignment(@Param('categoryId') categoryId: number, @Body() createDevAssignmentDto: CreateDevAssignmentDto) {
+    return this.devRelayService.createDevAssignment(categoryId, createDevAssignmentDto);
+  }
 
   @Get(':categoryId/dev-assignments')
   async findDevAssignmentsByCategory(@Param('categoryId') categoryId: number): Promise<DevAssignment[]> {
@@ -20,11 +26,6 @@ export class DevRelayController {
   @Get('dev-assignments')
   async findAllDevAssignments(@Query() query): Promise<DevAssignment[]> {
     return this.devRelayService.findAllDevAssignments();
-  }
-
-  @Post(':categoryId/create-dev-assignment')
-  createDevAssignment(@Param('categoryId') categoryId: number, @Body() createDevAssignmentDto: CreateDevAssignmentDto) {
-    return this.devRelayService.createDevAssignment(categoryId, createDevAssignmentDto);
   }
 
   @Post(':categoryId/create-dev-assignments')
