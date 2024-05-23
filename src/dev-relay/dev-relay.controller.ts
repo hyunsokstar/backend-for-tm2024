@@ -59,7 +59,6 @@ export class DevRelayController {
     return this.devRelayService.createCategory(categoryDto);
   }
 
-  // DevAssignmentSubmission 생성 라우트
   @Post(':id/dev-assignment-submission')
   async createDevAssignmentSubmission(
     @Param('id') devAssignmentId: number,
