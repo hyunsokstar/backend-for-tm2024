@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Put } from '@nestjs/common';
 import { DevRelayService } from './dev-relay.service';
 import { CreateDevRelayDto } from './dto/create-dev-relay.dto';
 import { UpdateDevRelayDto } from './dto/update-dev-relay.dto';
@@ -12,6 +12,17 @@ import { DevAssignment } from './entities/dev-assignment.entity';
 @Controller('dev-relay')
 export class DevRelayController {
   constructor(private readonly devRelayService: DevRelayService) { }
+
+  @Put('category-for-dev-assignment/:id')
+  updateCategoryForDevAssginment(
+    @Param('id') id: number,
+    @Body() updateCategoryDto: CategoryForDevAssignmentDto,
+  ): Promise<CategoryForDevAssignmentDto> {
+    console.log("category-for-dev-assignment 2 : ", id);
+
+    return this.devRelayService.updateCategoryForDevAssginment(id, updateCategoryDto);
+  }
+
 
   @Post(':categoryId/create-dev-assignment')
   createDevAssignment(@Param('categoryId') categoryId: number, @Body() createDevAssignmentDto: CreateDevAssignmentDto) {

@@ -25,6 +25,20 @@ export class DevRelayService {
     private devAssignmentSubmissionRepo: Repository<DevAssignmentSubmission>,
   ) { }
 
+  async updateCategoryForDevAssginment(id: number, updateCategoryDto: CategoryForDevAssignmentDto): Promise<CategoryForDevAssignmentDto> {
+    const category = await this.categoryForDevAssignmentRepo.findOne({ where: { id: id } });
+    if (!category) {
+      throw new NotFoundException(`Category with id ${id} not found`);
+    }
+
+    // 이름 필드만 업데이트
+    if (updateCategoryDto.name) {
+      category.name = updateCategoryDto.name;
+    }
+
+    return this.categoryForDevAssignmentRepo.save(category);
+  }
+
   async findDevAssignmentsByCategory(categoryId: number): Promise<DevAssignment[]> {
     // 특정 카테고리 ID에 해당하는 DevAssignment 리스트를 조회합니다.
     return this.devAssignmentRepo
