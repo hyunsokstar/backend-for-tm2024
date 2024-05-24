@@ -33,10 +33,12 @@ export class DevRelayService {
       .addSelect("COUNT(devAssignment.id)", "dev_assignments_count")
       .leftJoin("category.devAssignments", "devAssignment")
       .groupBy("category.id")
+      .orderBy("category.id", "ASC") // ID 순으로 정렬 (오름차순)
       .getRawMany();
 
     return categories;
   }
+
 
 
   async updateCategoryForDevAssginment(id: number, updateCategoryDto: CategoryForDevAssignmentDto): Promise<CategoryForDevAssignmentDto> {
