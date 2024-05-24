@@ -13,6 +13,11 @@ import { DevAssignment } from './entities/dev-assignment.entity';
 export class DevRelayController {
   constructor(private readonly devRelayService: DevRelayService) { }
 
+  @Get('categories')
+  async getAllCategories(): Promise<CategoryForDevAssignment[]> {
+    return this.devRelayService.getAllCategories();
+  }
+
   @Put('category-for-dev-assignment/:id')
   updateCategoryForDevAssginment(
     @Param('id') id: number,
@@ -42,11 +47,6 @@ export class DevRelayController {
   @Post(':categoryId/create-dev-assignments')
   createDevAssignments(@Param('categoryId') categoryId: number, @Body() createDevAssignmentsDto: CreateDevAssignmentDto[]) {
     return this.devRelayService.createDevAssignments(categoryId, createDevAssignmentsDto);
-  }
-
-  @Get('categories')
-  async getAllCategories(): Promise<CategoryForDevAssignment[]> {
-    return this.devRelayService.getAllCategories();
   }
 
   @Post('categories')

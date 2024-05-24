@@ -25,6 +25,20 @@ export class DevRelayService {
     private devAssignmentSubmissionRepo: Repository<DevAssignmentSubmission>,
   ) { }
 
+  async getAllCategories(): Promise<CategoryForDevAssignment[]> {
+    const categories = await this.categoryForDevAssignmentRepo
+      .createQueryBuilder("category")
+      .select("category.id", "id")
+      .addSelect("category.name", "name")
+      .addSelect("COUNT(devAssignment.id)", "dev_assignments_count")
+      .leftJoin("category.devAssignments", "devAssignment")
+      .groupBy("category.id")
+      .getRawMany();
+
+    return categories;
+  }
+
+
   async updateCategoryForDevAssginment(id: number, updateCategoryDto: CategoryForDevAssignmentDto): Promise<CategoryForDevAssignmentDto> {
     const category = await this.categoryForDevAssignmentRepo.findOne({ where: { id: id } });
     if (!category) {
@@ -103,10 +117,6 @@ export class DevRelayService {
 
     // 생성된 DevAssignment들을 반환
     return devAssignments;
-  }
-
-  async getAllCategories(): Promise<CategoryForDevAssignment[]> {
-    return this.categoryForDevAssignmentRepo.find();
   }
 
   async createCategories(categoriesDto: CategoryForDevAssignmentDto[]) {
