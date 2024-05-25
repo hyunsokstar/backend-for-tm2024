@@ -15,6 +15,11 @@ import { UpdateSubjectForCategoryDto } from './dto/update-subject-for-category.d
 export class DevRelayController {
   constructor(private readonly devRelayService: DevRelayService) { }
 
+  @Post('subjects')
+  async createSubjectForCategory(@Body() createSubjectForCategoryDto: CreateSubjectDto): Promise<SubjectForCategory> {
+    return this.devRelayService.createSubject(createSubjectForCategoryDto);
+  }
+
   @Get('categories-by-subject/:subjectId')
   async getAllCategoriesBySubject(@Param('subjectId') subjectId: number): Promise<CategoryForDevAssignment[]> {
     return this.devRelayService.getAllCategoriesBySubject(subjectId);
@@ -32,11 +37,6 @@ export class DevRelayController {
   ): Promise<{ updatedCategoryCount: number }> {
     const updatedCategoryCount = await this.devRelayService.updateSubjectForCategory(subjectId);
     return { updatedCategoryCount };
-  }
-
-  @Post('subjects')
-  async createSubjectForCategory(@Body() createSubjectForCategoryDto: CreateSubjectDto): Promise<SubjectForCategory> {
-    return this.devRelayService.createSubject(createSubjectForCategoryDto);
   }
 
   @Get('subjects')
