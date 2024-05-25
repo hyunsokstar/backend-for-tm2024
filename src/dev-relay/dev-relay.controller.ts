@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Put, HttpCode } from '@nestjs/common';
 import { DevRelayService } from './dev-relay.service';
 import { CreateDevRelayDto } from './dto/create-dev-relay.dto';
 import { UpdateDevRelayDto } from './dto/update-dev-relay.dto';
@@ -7,14 +7,41 @@ import { CreateDevAssignmentSubmissionDto } from './dto/create-dev-assignment-su
 import { CategoryForDevAssignmentDto } from './dto/category-for-dev-assignment.dto';
 import { CategoryForDevAssignment } from './entities/category-for-dev-assignment.entity';
 import { DevAssignment } from './entities/dev-assignment.entity';
+import { SubjectForCategory } from './entities/subject-for-category.entity';
+import { CreateSubjectDto } from './dto/subject-for-category.dto';
+import { UpdateSubjectForCategoryDto } from './dto/update-subject-for-category.dto';
 
 @Controller('dev-relay')
 export class DevRelayController {
   constructor(private readonly devRelayService: DevRelayService) { }
 
+  @Get('categories-by-subject/:subjectId')
+  async getAllCategoriesBySubject(@Param('subjectId') subjectId: number): Promise<CategoryForDevAssignment[]> {
+    return this.devRelayService.getAllCategoriesBySubject(subjectId);
+  }
+
   @Get('categories')
   async getAllCategories(): Promise<CategoryForDevAssignment[]> {
     return this.devRelayService.getAllCategories();
+  }
+
+  @Put('updateAllCategoriesToSpecificSubject/:subjectId')
+  @HttpCode(200)
+  async updateSubject(
+    @Param('subjectId') subjectId: number,
+  ): Promise<{ updatedCategoryCount: number }> {
+    const updatedCategoryCount = await this.devRelayService.updateSubjectForCategory(subjectId);
+    return { updatedCategoryCount };
+  }
+
+  @Post('subjects')
+  async createSubjectForCategory(@Body() createSubjectForCategoryDto: CreateSubjectDto): Promise<SubjectForCategory> {
+    return this.devRelayService.createSubject(createSubjectForCategoryDto);
+  }
+
+  @Get('subjects')
+  async getAllSubjects(): Promise<SubjectForCategory[]> {
+    return this.devRelayService.getAllSubjects();
   }
 
   @Put('category-for-dev-assignment/:id')

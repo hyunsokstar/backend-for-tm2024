@@ -6,6 +6,7 @@ import { DevRelay } from './entities/dev-relay.entity';
 import { DevAssignment } from './entities/dev-assignment.entity';
 import { DevAssignmentSubmission } from './entities/dev-assignment-submission.entity';
 import { CategoryForDevAssignment } from './entities/category-for-dev-assignment.entity';
+import { SubjectForCategory } from './entities/subject-for-category.entity';
 
 @Module({
   imports: [
@@ -13,7 +14,8 @@ import { CategoryForDevAssignment } from './entities/category-for-dev-assignment
       DevRelay,
       DevAssignment,
       DevAssignmentSubmission,
-      CategoryForDevAssignment
+      CategoryForDevAssignment,
+      SubjectForCategory
     ])
   ],
   controllers: [DevRelayController],

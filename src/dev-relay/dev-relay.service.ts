@@ -10,6 +10,9 @@ import { DevAssignmentSubmission } from './entities/dev-assignment-submission.en
 import { CreateDevAssignmentSubmissionDto } from './dto/create-dev-assignment-submission.dto';
 import { CategoryForDevAssignment } from './entities/category-for-dev-assignment.entity';
 import { CategoryForDevAssignmentDto } from './dto/category-for-dev-assignment.dto';
+import { SubjectForCategory } from './entities/subject-for-category.entity';
+import { CreateSubjectDto } from './dto/subject-for-category.dto';
+import { UpdateSubjectForCategoryDto } from './dto/update-subject-for-category.dto';
 
 @Injectable()
 export class DevRelayService {
@@ -21,10 +24,31 @@ export class DevRelayService {
     private categoryForDevAssignmentRepo: Repository<CategoryForDevAssignment>,
     @InjectRepository(DevAssignment)
     private devAssignmentRepo: Repository<DevAssignment>,
+
     @InjectRepository(DevAssignmentSubmission)
     private devAssignmentSubmissionRepo: Repository<DevAssignmentSubmission>,
+
+    @InjectRepository(SubjectForCategory)
+    private subjectForCategoryRepo: Repository<SubjectForCategory>,
+
   ) { }
 
+  async getAllCategoriesBySubject(subjectId: number): Promise<CategoryForDevAssignment[]> {
+    const categories = await this.categoryForDevAssignmentRepo
+      .createQueryBuilder("category")
+      .select("category.id", "id")
+      .addSelect("category.name", "name")
+      .addSelect("COUNT(devAssignment.id)", "dev_assignments_count")
+      .leftJoin("category.devAssignments", "devAssignment")
+      .where("category.subjectId = :subjectId", { subjectId })
+      .groupBy("category.id")
+      .orderBy("category.id", "ASC") // ID 순으로 정렬 (오름차순)
+      .getRawMany();
+
+    return categories;
+  }
+
+  // src/dev-relay/dev-relay.service.ts
   async getAllCategories(): Promise<CategoryForDevAssignment[]> {
     const categories = await this.categoryForDevAssignmentRepo
       .createQueryBuilder("category")
@@ -39,6 +63,41 @@ export class DevRelayService {
     return categories;
   }
 
+  async updateSubjectForCategory(id: number): Promise<number> {
+    const newSubject = await this.subjectForCategoryRepo.findOneBy({ id });
+
+    if (!newSubject) {
+      throw new NotFoundException(`SubjectForCategory with ID ${id} not found`);
+    }
+
+    const categories = await this.categoryForDevAssignmentRepo.find();
+
+    // 각 카테고리의 subject를 업데이트합니다.
+    for (const category of categories) {
+      category.subject = newSubject;
+      await this.categoryForDevAssignmentRepo.save(category);
+    }
+
+    return categories.length;
+  }
+
+
+  async createSubject(createSubjectDto: CreateSubjectDto): Promise<SubjectForCategory> {
+    const subject = new SubjectForCategory();
+    subject.name = createSubjectDto.name;
+
+    // Subject 저장
+    const savedSubject = await this.subjectForCategoryRepo.save(subject);
+
+    // 만약 카테고리 생성 로직을 따로 분리하고 싶다면, 여기서 카테고리 생성 함수를 호출할 수 있습니다.
+
+    return savedSubject;
+  }
+
+
+  async getAllSubjects(): Promise<SubjectForCategory[]> {
+    return this.subjectForCategoryRepo.find();
+  }
 
 
   async updateCategoryForDevAssginment(id: number, updateCategoryDto: CategoryForDevAssignmentDto): Promise<CategoryForDevAssignmentDto> {
