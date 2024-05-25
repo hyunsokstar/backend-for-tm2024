@@ -8,7 +8,6 @@ import { CategoryForDevAssignmentDto } from './dto/category-for-dev-assignment.d
 import { CategoryForDevAssignment } from './entities/category-for-dev-assignment.entity';
 import { DevAssignment } from './entities/dev-assignment.entity';
 
-
 @Controller('dev-relay')
 export class DevRelayController {
   constructor(private readonly devRelayService: DevRelayService) { }
