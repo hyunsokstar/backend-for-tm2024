@@ -14,7 +14,6 @@ export class CategoryForDevAssignment {
     @OneToMany(() => DevAssignment, devAssignment => devAssignment.category) // 반대 방향의 참조 설정
     devAssignments: DevAssignment[];
 
-    @ManyToOne(() => SubjectForCategory, subject => subject.categories) // 반대 방향의 참조 설정
+    @ManyToOne(() => SubjectForCategory, subject => subject.categories, { cascade: true }) // cascade 옵션 설정
     subject: SubjectForCategory;
-
 }

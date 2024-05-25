@@ -15,6 +15,12 @@ import { UpdateSubjectForCategoryDto } from './dto/update-subject-for-category.d
 export class DevRelayController {
   constructor(private readonly devRelayService: DevRelayService) { }
 
+  @Delete('subjects/:id')
+  async deleteSubject(@Param('id') id: number): Promise<{ id: number; name: string }> {
+    const subject = await this.devRelayService.deleteSubject(id);
+    return { id: subject.id, name: subject.name };
+  }
+
   @Post('subjects')
   async createSubjectForCategory(@Body() createSubjectForCategoryDto: CreateSubjectDto): Promise<SubjectForCategory> {
     return this.devRelayService.createSubject(createSubjectForCategoryDto);

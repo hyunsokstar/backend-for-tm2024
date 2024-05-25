@@ -33,6 +33,15 @@ export class DevRelayService {
 
   ) { }
 
+  async deleteSubject(id: number): Promise<SubjectForCategory> {
+    const subject = await this.subjectForCategoryRepo.findOneBy({ id });
+    if (!subject) {
+      throw new NotFoundException(`Subject with ID ${id} not found`);
+    }
+    await this.subjectForCategoryRepo.remove(subject);
+    return subject;
+  }
+
   async getAllCategoriesBySubject(subjectId: number): Promise<CategoryForDevAssignment[]> {
     const categories = await this.categoryForDevAssignmentRepo
       .createQueryBuilder("category")
