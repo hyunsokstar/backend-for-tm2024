@@ -9,11 +9,19 @@ import { CategoryForDevAssignment } from './entities/category-for-dev-assignment
 import { DevAssignment } from './entities/dev-assignment.entity';
 import { SubjectForCategory } from './entities/subject-for-category.entity';
 import { CreateSubjectDto } from './dto/subject-for-category.dto';
-import { UpdateSubjectForCategoryDto } from './dto/update-subject-for-category.dto';
+import { SubjectResponse } from './interface/subject-response.interface';
 
 @Controller('dev-relay')
 export class DevRelayController {
   constructor(private readonly devRelayService: DevRelayService) { }
+
+  @Delete('categories/:id')
+  async deleteCategory(@Param('id') id: number): Promise<any> {
+    console.log("cateogory delete 요청 check !");
+    const category = await this.devRelayService.deleteCategory(id);
+    return { message: `Category with ID ${id} has been deleted.`, name: category.name };
+  }
+
 
   @Delete('subjects/:id')
   async deleteSubject(@Param('id') id: number): Promise<{ id: number; name: string }> {
@@ -46,7 +54,7 @@ export class DevRelayController {
   }
 
   @Get('subjects')
-  async getAllSubjects(): Promise<SubjectForCategory[]> {
+  async getAllSubjects(): Promise<SubjectResponse[]> {
     return this.devRelayService.getAllSubjects();
   }
 

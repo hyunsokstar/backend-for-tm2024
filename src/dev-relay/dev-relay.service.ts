@@ -13,6 +13,8 @@ import { CategoryForDevAssignmentDto } from './dto/category-for-dev-assignment.d
 import { SubjectForCategory } from './entities/subject-for-category.entity';
 import { CreateSubjectDto } from './dto/subject-for-category.dto';
 import { UpdateSubjectForCategoryDto } from './dto/update-subject-for-category.dto';
+import { SubjectResponse } from './interface/subject-response.interface';
+import { CategoryResponse } from './interface/category-response.interface';
 
 @Injectable()
 export class DevRelayService {
@@ -32,6 +34,24 @@ export class DevRelayService {
     private subjectForCategoryRepo: Repository<SubjectForCategory>,
 
   ) { }
+
+  async deleteCategory(id: number): Promise<CategoryResponse> {
+    const category = await this.categoryForDevAssignmentRepo.findOneBy({ id });
+
+    if (!category) {
+      throw new NotFoundException(`Category with ID ${id} not found`);
+    }
+
+    // 먼저 관련된 DevAssignment를 찾아서 삭제합니다.
+    const relatedAssignments = await this.devAssignmentRepo.find({ where: { category: category } });
+    for (const assignment of relatedAssignments) {
+      await this.devAssignmentRepo.remove(assignment);
+    }
+
+    await this.categoryForDevAssignmentRepo.remove(category);
+
+    return { id: category.id, name: category.name };
+  }
 
   async deleteSubject(id: number): Promise<SubjectForCategory> {
     const subject = await this.subjectForCategoryRepo.findOneBy({ id });
@@ -104,9 +124,23 @@ export class DevRelayService {
   }
 
 
-  async getAllSubjects(): Promise<SubjectForCategory[]> {
-    return this.subjectForCategoryRepo.find();
+  async getAllSubjects(): Promise<SubjectResponse[]> {
+    const subjects = await this.subjectForCategoryRepo.find({
+      relations: ['categories'],
+      order: {
+        id: 'ASC',
+      },
+    });
+
+    return subjects.map(subject => ({
+      id: subject.id,
+      name: subject.name,
+      countForCategories: subject.categories.length,
+    }));
   }
+
+
+
 
 
   async updateCategoryForDevAssginment(id: number, updateCategoryDto: CategoryForDevAssignmentDto): Promise<CategoryForDevAssignmentDto> {

@@ -1,8 +1,6 @@
-// src\dev-relay\entities\dev-assignment.entity.ts
-
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToOne } from 'typeorm';
-import { DevAssignmentSubmission } from './dev-assignment-submission.entity';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
 import { CategoryForDevAssignment } from './category-for-dev-assignment.entity';
+import { DevAssignmentSubmission } from './dev-assignment-submission.entity';
 
 export enum WeekDay {
     MONDAY = 'monday',
@@ -25,9 +23,9 @@ export class DevAssignment {
     @Column({ type: 'varchar', length: 255 })
     title: string;
 
+    @ManyToOne(() => CategoryForDevAssignment, category => category.devAssignments, { cascade: true })
+    category: CategoryForDevAssignment;
+
     @OneToMany(() => DevAssignmentSubmission, submission => submission.devAssignment)
     submissions: DevAssignmentSubmission[];
-
-    @ManyToOne(() => CategoryForDevAssignment, category => category.devAssignments) // 반대 방향의 참조 설정
-    category: CategoryForDevAssignment;
 }
