@@ -54,6 +54,9 @@ import { DevAssignment } from "./dev-relay/entities/dev-assignment.entity";
 import { DevAssignmentSubmission } from "./dev-relay/entities/dev-assignment-submission.entity";
 import { CategoryForDevAssignment } from "./dev-relay/entities/category-for-dev-assignment.entity";
 import { SubjectForCategory } from "./dev-relay/entities/subject-for-category.entity";
+import { DevBattleModule } from './dev-battle/dev-battle.module';
+import { DevBattle } from "./dev-battle/entities/dev-battle.entity";
+import { TagForDevBattle } from "./dev-battle/entities/tag.entity";
 
 @Module({
   imports: [
@@ -101,7 +104,9 @@ import { SubjectForCategory } from "./dev-relay/entities/subject-for-category.en
         DevAssignment,
         DevAssignmentSubmission,
         CategoryForDevAssignment,
-        SubjectForCategory
+        SubjectForCategory,
+        DevBattle,
+        TagForDevBattle
       ],
       synchronize: true,
     }),
@@ -120,6 +125,7 @@ import { SubjectForCategory } from "./dev-relay/entities/subject-for-category.en
     SubChallengesModel,
     DevSpecModule,
     DevRelayModule,
+    DevBattleModule,
   ],
   controllers: [AppController],
   providers: [AppService,
