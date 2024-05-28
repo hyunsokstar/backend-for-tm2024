@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { UpdateDevBattleDto } from './dto/update-dev-battle.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DevBattle } from './entities/dev-battle.entity';
@@ -7,6 +7,8 @@ import { CreateDevBattleDto } from './dto/create-dev-battle.dto';
 import { TagForDevBattle } from './entities/tag.entity';
 import { TeamForDevBattle } from './entities/team-for-dev-battle.entity';
 import { AddTeamToDevBattleDto } from './dto/add-team-to-dev-battle.dto';
+import { DevProgressForTeam } from './entities/dev-progress-for-team.entity';
+import { AddDevProgressForTeamDto } from './dto/add-dev-progress-for-team.dto';
 
 @Injectable()
 export class DevBattleService {
@@ -18,7 +20,30 @@ export class DevBattleService {
     private tagForDevBattleRepo: Repository<TagForDevBattle>,
     @InjectRepository(TeamForDevBattle)
     private teamForDevBattleRepo: Repository<TeamForDevBattle>,
+    @InjectRepository(DevProgressForTeam)
+    private devProgressForTeamRepo: Repository<DevProgressForTeam>,
   ) { }
+
+  async getAllTeams(): Promise<TeamForDevBattle[]> {
+    return await this.teamForDevBattleRepo.find();
+  }
+
+  async addDevProgressForTeam(teamId: number, addDevProgressForTeamDto: AddDevProgressForTeamDto): Promise<DevProgressForTeam> {
+    const team = await this.teamForDevBattleRepo.findOne({ where: { id: teamId } });
+    if (!team) {
+      throw new NotFoundException(`Team with ID ${teamId} not found`);
+    }
+
+    const devProgress = new DevProgressForTeam();
+    devProgress.task = addDevProgressForTeamDto.task;
+    devProgress.figmaUrl = addDevProgressForTeamDto.figmaUrl;
+    devProgress.youtubeUrl = addDevProgressForTeamDto.youtubeUrl;
+    devProgress.noteUrl = addDevProgressForTeamDto.noteUrl;
+    devProgress.status = addDevProgressForTeamDto.status;
+    devProgress.team = team;
+
+    return await this.devProgressForTeamRepo.save(devProgress);
+  }
 
   async addTeamToDevBattle(
     devBattleId: number,
@@ -57,12 +82,20 @@ export class DevBattleService {
     return devBattle;
   }
 
+  // async findAllDevBattle(): Promise<DevBattle[]> {
+  //   return await this.devBattleRepo.find({
+  //     relations: ['tags', 'teams'], // Include 'teams' in the relations array
+  //     order: { id: 'ASC' },
+  //   });
+  // }
+
   async findAllDevBattle(): Promise<DevBattle[]> {
     return await this.devBattleRepo.find({
-      relations: ['tags', 'teams'], // Include 'teams' in the relations array
+      relations: ['tags', 'teams', 'teams.devProgressForTeams'], // Include 'teams.devProgressForTeams' in the relations array
       order: { id: 'ASC' },
     });
   }
+
 
   async addTagToDevBattle(devBattleId: number, textForTag: string): Promise<DevBattle> {
     const devBattle = await this.devBattleRepo.findOne({

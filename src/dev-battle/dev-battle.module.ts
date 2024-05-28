@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DevBattle } from './entities/dev-battle.entity';
 import { TagForDevBattle } from './entities/tag.entity';
 import { TeamForDevBattle } from './entities/team-for-dev-battle.entity';
+import { DevProgressForTeam } from './entities/dev-progress-for-team.entity';
 
 
 @Module({
@@ -12,7 +13,8 @@ import { TeamForDevBattle } from './entities/team-for-dev-battle.entity';
     TypeOrmModule.forFeature([
       DevBattle,
       TagForDevBattle,
-      TeamForDevBattle
+      TeamForDevBattle,
+      DevProgressForTeam
     ])
   ],
   controllers: [DevBattleController],

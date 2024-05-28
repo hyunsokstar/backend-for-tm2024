@@ -1,13 +1,30 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, ParseIntPipe } from '@nestjs/common';
 import { DevBattleService } from './dev-battle.service';
 import { CreateDevBattleDto } from './dto/create-dev-battle.dto';
 import { UpdateDevBattleDto } from './dto/update-dev-battle.dto';
 import { AddTeamToDevBattleDto } from './dto/add-team-to-dev-battle.dto';
 import { DevBattle } from './entities/dev-battle.entity';
+import { AddDevProgressForTeamDto } from './dto/add-dev-progress-for-team.dto';
+import { DevProgressForTeam } from './entities/dev-progress-for-team.entity';
+import { TeamForDevBattle } from './entities/team-for-dev-battle.entity';
 
 @Controller('dev-battle')
 export class DevBattleController {
   constructor(private readonly devBattleService: DevBattleService) { }
+
+  @Get('/teams')
+  async getAllTeams(): Promise<TeamForDevBattle[]> {
+    return await this.devBattleService.getAllTeams();
+  }
+
+  @Post('/teams/:teamId/progress')
+  @HttpCode(201)
+  async addDevProgressForTeam(
+    @Param('teamId', ParseIntPipe) teamId: number, // ParseIntPipe를 사용하여 string을 number로 변환
+    @Body() addDevProgressForTeamDto: AddDevProgressForTeamDto,
+  ): Promise<DevProgressForTeam> {
+    return await this.devBattleService.addDevProgressForTeam(teamId, addDevProgressForTeamDto);
+  }
 
   @Post(':devBattleId/add-team')
   async addTeamToDevBattle(@Param('devBattleId') devBattleId: number, @Body() addTeamToDevBattleDto: AddTeamToDevBattleDto): Promise<DevBattle> {
