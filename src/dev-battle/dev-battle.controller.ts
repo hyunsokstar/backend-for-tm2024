@@ -2,10 +2,18 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { DevBattleService } from './dev-battle.service';
 import { CreateDevBattleDto } from './dto/create-dev-battle.dto';
 import { UpdateDevBattleDto } from './dto/update-dev-battle.dto';
+import { AddTeamToDevBattleDto } from './dto/add-team-to-dev-battle.dto';
+import { DevBattle } from './entities/dev-battle.entity';
 
 @Controller('dev-battle')
 export class DevBattleController {
   constructor(private readonly devBattleService: DevBattleService) { }
+
+  @Post(':devBattleId/add-team')
+  async addTeamToDevBattle(@Param('devBattleId') devBattleId: number, @Body() addTeamToDevBattleDto: AddTeamToDevBattleDto): Promise<DevBattle> {
+    console.log("dev battle team add ??");
+    return await this.devBattleService.addTeamToDevBattle(devBattleId, addTeamToDevBattleDto);
+  }
 
   @Patch(':id/tag')
   async addTagToDevBattle(@Param('id') devBattleId: number, @Body('textForTag') textForTag: string) {

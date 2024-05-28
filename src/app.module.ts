@@ -57,6 +57,7 @@ import { SubjectForCategory } from "./dev-relay/entities/subject-for-category.en
 import { DevBattleModule } from './dev-battle/dev-battle.module';
 import { DevBattle } from "./dev-battle/entities/dev-battle.entity";
 import { TagForDevBattle } from "./dev-battle/entities/tag.entity";
+import { TeamForDevBattle } from "./dev-battle/entities/team-for-dev-battle.entity";
 
 @Module({
   imports: [
@@ -106,7 +107,8 @@ import { TagForDevBattle } from "./dev-battle/entities/tag.entity";
         CategoryForDevAssignment,
         SubjectForCategory,
         DevBattle,
-        TagForDevBattle
+        TagForDevBattle,
+        TeamForDevBattle
       ],
       synchronize: true,
     }),

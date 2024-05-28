@@ -5,6 +5,8 @@ import { DevBattle } from './entities/dev-battle.entity';
 import { Repository } from 'typeorm';
 import { CreateDevBattleDto } from './dto/create-dev-battle.dto';
 import { TagForDevBattle } from './entities/tag.entity';
+import { TeamForDevBattle } from './entities/team-for-dev-battle.entity';
+import { AddTeamToDevBattleDto } from './dto/add-team-to-dev-battle.dto';
 
 @Injectable()
 export class DevBattleService {
@@ -14,7 +16,53 @@ export class DevBattleService {
     private devBattleRepo: Repository<DevBattle>,
     @InjectRepository(TagForDevBattle)
     private tagForDevBattleRepo: Repository<TagForDevBattle>,
+    @InjectRepository(TeamForDevBattle)
+    private teamForDevBattleRepo: Repository<TeamForDevBattle>,
   ) { }
+
+  async addTeamToDevBattle(
+    devBattleId: number,
+    addTeamDto: AddTeamToDevBattleDto,
+  ): Promise<DevBattle> {
+    const { name, description } = addTeamDto;
+
+    // 해당 DevBattle을 찾음
+    const devBattle = await this.devBattleRepo.findOne({
+      where: { id: devBattleId },
+      relations: ['teams'], // 관련된 teams도 로드
+    });
+
+    if (!devBattle) {
+      // DevBattle이 없을 경우 예외 처리
+      throw new Error(`DevBattle with id ${devBattleId} not found`);
+    }
+
+    // TeamForDevBattle 엔티티 생성
+    const team = this.teamForDevBattleRepo.create({
+      name,
+      description,
+      devBattle,
+    });
+
+    // 데이터베이스에 저장
+    const savedTeam = await this.teamForDevBattleRepo.save(team);
+
+    // DevBattle에 저장된 팀 추가
+    devBattle.teams.push(savedTeam);
+
+    // DevBattle 업데이트
+    await this.devBattleRepo.save(devBattle);
+
+    // 업데이트된 DevBattle 반환
+    return devBattle;
+  }
+
+  async findAllDevBattle(): Promise<DevBattle[]> {
+    return await this.devBattleRepo.find({
+      relations: ['tags', 'teams'], // Include 'teams' in the relations array
+      order: { id: 'ASC' },
+    });
+  }
 
   async addTagToDevBattle(devBattleId: number, textForTag: string): Promise<DevBattle> {
     const devBattle = await this.devBattleRepo.findOne({
@@ -37,12 +85,6 @@ export class DevBattleService {
 
     devBattle.tags.push(tag);
     return await this.devBattleRepo.save(devBattle);
-  }
-
-  async findAllDevBattle(): Promise<DevBattle[]> {
-    // Eager loading to fetch tags along with DevBattle entities
-    // Order by ID in ascending order
-    return await this.devBattleRepo.find({ relations: ['tags'], order: { id: 'ASC' } });
   }
 
   async bulkCreateDevBattles(subjects: string[]): Promise<DevBattle[]> {
