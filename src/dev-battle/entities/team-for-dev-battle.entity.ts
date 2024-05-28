@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, OneToMany } from 'typeorm';
 import { DevBattle } from './dev-battle.entity';
 import { DevProgressForTeam } from './dev-progress-for-team.entity';
+import { MemberForDevTeam } from './member-for-dev-team.entity';
 
 @Entity()
 export class TeamForDevBattle {
@@ -22,4 +23,6 @@ export class TeamForDevBattle {
     @OneToMany(() => DevProgressForTeam, (devProgressForTeam) => devProgressForTeam.team)
     devProgressForTeams: DevProgressForTeam[];
 
+    @OneToMany(() => MemberForDevTeam, member => member.team)
+    members: MemberForDevTeam[];
 }

@@ -7,10 +7,48 @@ import { DevBattle } from './entities/dev-battle.entity';
 import { AddDevProgressForTeamDto } from './dto/add-dev-progress-for-team.dto';
 import { DevProgressForTeam } from './entities/dev-progress-for-team.entity';
 import { TeamForDevBattle } from './entities/team-for-dev-battle.entity';
+import { AddMemberForDevTeamDto } from './dto/add-member-for-dev-team.dto';
 
 @Controller('dev-battle')
 export class DevBattleController {
   constructor(private readonly devBattleService: DevBattleService) { }
+
+  @Post('/teams/:teamId/member/:memberId')
+  @HttpCode(201)
+  async addMemberToTeam(
+    @Param('teamId', ParseIntPipe) teamId: number,
+    @Param('memberId', ParseIntPipe) memberId: number,
+    @Body() addMemberToTeamDto: AddMemberForDevTeamDto,
+  ) {
+    const result = await this.devBattleService.addMemberToTeam(teamId, memberId, addMemberToTeamDto);
+
+    if (result.statusCode === 200) {
+      // 이미 존재하는 멤버인 경우
+      return result;
+    }
+
+    // 새로운 멤버인 경우
+    const memberForDevTeam = result.data;
+    const member = memberForDevTeam.user;
+    const team = memberForDevTeam.team;
+    return {
+      statusCode: 201,
+      message: 'Member has been added to team',
+      data: {
+        member: {
+          id: member.id,
+          nickname: member.nickname,
+          position: memberForDevTeam.position,
+        },
+        team: {
+          id: team.id,
+          name: team.name,
+        },
+      },
+    };
+  }
+
+
 
   @Get('/teams')
   async getAllTeams(): Promise<TeamForDevBattle[]> {

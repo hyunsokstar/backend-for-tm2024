@@ -9,6 +9,9 @@ import { TeamForDevBattle } from './entities/team-for-dev-battle.entity';
 import { AddTeamToDevBattleDto } from './dto/add-team-to-dev-battle.dto';
 import { DevProgressForTeam } from './entities/dev-progress-for-team.entity';
 import { AddDevProgressForTeamDto } from './dto/add-dev-progress-for-team.dto';
+import { MemberForDevTeam } from './entities/member-for-dev-team.entity';
+import { AddMemberForDevTeamDto } from './dto/add-member-for-dev-team.dto';
+import { UsersModel } from 'src/users/entities/users.entity';
 
 @Injectable()
 export class DevBattleService {
@@ -22,7 +25,64 @@ export class DevBattleService {
     private teamForDevBattleRepo: Repository<TeamForDevBattle>,
     @InjectRepository(DevProgressForTeam)
     private devProgressForTeamRepo: Repository<DevProgressForTeam>,
+    @InjectRepository(MemberForDevTeam)
+    private memberForDevTeamRepo: Repository<MemberForDevTeam>,
+    @InjectRepository(UsersModel)
+    private usersRepo: Repository<UsersModel>,
   ) { }
+
+  async findAllDevBattle(): Promise<DevBattle[]> {
+    return await this.devBattleRepo.find({
+      relations: ['tags', 'teams', 'teams.devProgressForTeams', 'teams.members', 'teams.members.user'], // Include 'teams.members.user' in the relations array
+      order: { id: 'ASC' },
+    });
+  }
+
+
+  async addMemberToTeam(
+    teamId: number,
+    memberId: number,
+    addMemberToTeamDto: AddMemberForDevTeamDto,
+  ) {
+    const team = await this.teamForDevBattleRepo.findOneBy({ id: teamId });
+    if (!team) {
+      throw new NotFoundException('Team not found');
+    }
+
+    const member = await this.usersRepo.findOneBy({ id: memberId });
+    if (!member) {
+      throw new NotFoundException('Member not found');
+    }
+
+    // 이미 존재하는 멤버인지 확인합니다.
+    const existingMemberForDevTeam = await this.memberForDevTeamRepo.findOneBy({
+      user: { id: memberId },
+      team: { id: teamId },
+    });
+
+    if (existingMemberForDevTeam) {
+      // 이미 존재하는 멤버이므로 탈퇴 처리를 합니다.
+      await this.memberForDevTeamRepo.remove(existingMemberForDevTeam);
+      return {
+        statusCode: 200,
+        message: 'Member has been removed from team',
+        data: null,
+      };
+    }
+
+    const memberForDevTeam = new MemberForDevTeam();
+    memberForDevTeam.user = member;
+    memberForDevTeam.position = addMemberToTeamDto.position;
+    memberForDevTeam.team = team; // 팀 정보를 설정합니다.
+
+    const savedMemberForDevTeam = await this.memberForDevTeamRepo.save(memberForDevTeam);
+    return {
+      statusCode: 201,
+      message: 'Member has been added to team',
+      data: savedMemberForDevTeam,
+    };
+  }
+
 
   async getAllTeams(): Promise<TeamForDevBattle[]> {
     return await this.teamForDevBattleRepo.find();
@@ -88,14 +148,6 @@ export class DevBattleService {
   //     order: { id: 'ASC' },
   //   });
   // }
-
-  async findAllDevBattle(): Promise<DevBattle[]> {
-    return await this.devBattleRepo.find({
-      relations: ['tags', 'teams', 'teams.devProgressForTeams'], // Include 'teams.devProgressForTeams' in the relations array
-      order: { id: 'ASC' },
-    });
-  }
-
 
   async addTagToDevBattle(devBattleId: number, textForTag: string): Promise<DevBattle> {
     const devBattle = await this.devBattleRepo.findOne({
