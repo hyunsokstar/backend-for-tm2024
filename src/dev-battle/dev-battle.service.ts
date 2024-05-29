@@ -31,6 +31,25 @@ export class DevBattleService {
     private usersRepo: Repository<UsersModel>,
   ) { }
 
+  async deleteTeamForDevBattle(teamId: number): Promise<void> {
+    const team = await this.teamForDevBattleRepo.findOneBy({ id: teamId });
+
+    if (!team) {
+      throw new NotFoundException(`Team with ID ${teamId} not found`);
+    }
+
+    // Delete the team's dev progress records
+    const devProgressRecords = await this.devProgressForTeamRepo.findBy({ team: team });
+    await this.devProgressForTeamRepo.remove(devProgressRecords);
+
+    // Delete the team's member records
+    const memberRecords = await this.memberForDevTeamRepo.findBy({ team: team });
+    await this.memberForDevTeamRepo.remove(memberRecords);
+
+    // Delete the team record
+    await this.teamForDevBattleRepo.remove(team);
+  }
+
   async removeDevBattleById(id: number): Promise<void> {
     const devBattle = await this.devBattleRepo.findOneBy({ id });
 

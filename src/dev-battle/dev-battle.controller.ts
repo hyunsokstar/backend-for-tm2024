@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, ParseIntPipe, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, ParseIntPipe, NotFoundException, Res } from '@nestjs/common';
 import { DevBattleService } from './dev-battle.service';
 import { CreateDevBattleDto } from './dto/create-dev-battle.dto';
 import { UpdateDevBattleDto } from './dto/update-dev-battle.dto';
@@ -12,6 +12,21 @@ import { AddMemberForDevTeamDto } from './dto/add-member-for-dev-team.dto';
 @Controller('dev-battle')
 export class DevBattleController {
   constructor(private readonly devBattleService: DevBattleService) { }
+
+  @Delete('/teams/:teamId')
+  async deleteTeam(@Param('teamId', ParseIntPipe) teamId: number, @Res() res): Promise<void> {
+    await this.devBattleService.deleteTeamForDevBattle(teamId);
+
+    // Return an appropriate response object
+    const responseObject = { message: `Team with ID ${teamId} deleted successfully` };
+    res.status(200).json(responseObject);
+  }
+
+  @Post(':devBattleId/add-team')
+  async addTeamToDevBattle(@Param('devBattleId') devBattleId: number, @Body() addTeamToDevBattleDto: AddTeamToDevBattleDto): Promise<DevBattle> {
+    console.log("dev battle team add ??");
+    return await this.devBattleService.addTeamToDevBattle(devBattleId, addTeamToDevBattleDto);
+  }
 
   @Post()
   create(@Body() createDevBattleDto: CreateDevBattleDto) {
@@ -80,12 +95,6 @@ export class DevBattleController {
     @Body() addDevProgressForTeamDto: AddDevProgressForTeamDto,
   ): Promise<DevProgressForTeam> {
     return await this.devBattleService.addDevProgressForTeam(teamId, addDevProgressForTeamDto);
-  }
-
-  @Post(':devBattleId/add-team')
-  async addTeamToDevBattle(@Param('devBattleId') devBattleId: number, @Body() addTeamToDevBattleDto: AddTeamToDevBattleDto): Promise<DevBattle> {
-    console.log("dev battle team add ??");
-    return await this.devBattleService.addTeamToDevBattle(devBattleId, addTeamToDevBattleDto);
   }
 
   @Patch(':id/tag')
