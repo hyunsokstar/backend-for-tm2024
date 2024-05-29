@@ -48,6 +48,7 @@ export class DevBattleController {
     const memberForDevTeam = result.data;
     const member = memberForDevTeam.user;
     const team = memberForDevTeam.team;
+
     return {
       statusCode: 201,
       message: 'Member has been added to team',

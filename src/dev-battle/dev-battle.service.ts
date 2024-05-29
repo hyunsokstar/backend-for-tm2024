@@ -63,7 +63,6 @@ export class DevBattleService {
       throw new NotFoundException('Member not found');
     }
 
-    // 이미 존재하는 멤버인지 확인합니다.
     const existingMemberForDevTeam = await this.memberForDevTeamRepo.findOneBy({
       user: { id: memberId },
       team: { id: teamId },
