@@ -13,6 +13,11 @@ import { AddMemberForDevTeamDto } from './dto/add-member-for-dev-team.dto';
 export class DevBattleController {
   constructor(private readonly devBattleService: DevBattleService) { }
 
+  @Post()
+  create(@Body() createDevBattleDto: CreateDevBattleDto) {
+    return this.devBattleService.createDevBattle(createDevBattleDto);
+  }
+
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
     try {
@@ -96,11 +101,6 @@ export class DevBattleController {
   @Post('bulk-create')
   async bulkCreateDevBattles(@Body() subjects: string[]) {
     return this.devBattleService.bulkCreateDevBattles(subjects);
-  }
-
-  @Post()
-  create(@Body() createDevBattleDto: CreateDevBattleDto) {
-    return this.devBattleService.createDevBattle(createDevBattleDto);
   }
 
   @Get(':id')
