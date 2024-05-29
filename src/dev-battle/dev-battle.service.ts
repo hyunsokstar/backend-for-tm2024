@@ -31,13 +31,22 @@ export class DevBattleService {
     private usersRepo: Repository<UsersModel>,
   ) { }
 
+  async removeDevBattleById(id: number): Promise<void> {
+    const devBattle = await this.devBattleRepo.findOneBy({ id });
+
+    if (!devBattle) {
+      throw new NotFoundException(`DevBattle with ID ${id} not found`);
+    }
+
+    await this.devBattleRepo.remove(devBattle);
+  }
+
   async findAllDevBattle(): Promise<DevBattle[]> {
     return await this.devBattleRepo.find({
       relations: ['tags', 'teams', 'teams.devProgressForTeams', 'teams.members', 'teams.members.user'], // Include 'teams.members.user' in the relations array
       order: { id: 'ASC' },
     });
   }
-
 
   async addMemberToTeam(
     teamId: number,
@@ -198,7 +207,5 @@ export class DevBattleService {
     return `This action updates a #${id} devBattle`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} devBattle`;
-  }
+
 }

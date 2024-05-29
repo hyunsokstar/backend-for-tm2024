@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, ParseIntPipe, NotFoundException } from '@nestjs/common';
 import { DevBattleService } from './dev-battle.service';
 import { CreateDevBattleDto } from './dto/create-dev-battle.dto';
 import { UpdateDevBattleDto } from './dto/update-dev-battle.dto';
@@ -12,6 +12,19 @@ import { AddMemberForDevTeamDto } from './dto/add-member-for-dev-team.dto';
 @Controller('dev-battle')
 export class DevBattleController {
   constructor(private readonly devBattleService: DevBattleService) { }
+
+  @Delete(':id')
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    try {
+      await this.devBattleService.removeDevBattleById(id);
+      return { message: `DevBattle deleted successfully for ${id}` };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        return { message: error.message };
+      }
+      throw error;
+    }
+  }
 
   @Post('/teams/:teamId/member/:memberId')
   @HttpCode(201)
@@ -100,8 +113,4 @@ export class DevBattleController {
     return this.devBattleService.update(+id, updateDevBattleDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.devBattleService.remove(+id);
-  }
 }
