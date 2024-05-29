@@ -70,7 +70,6 @@ export class DevBattleService {
     });
 
     if (existingMemberForDevTeam) {
-      // 이미 존재하는 멤버이므로 탈퇴 처리를 합니다.
       await this.memberForDevTeamRepo.remove(existingMemberForDevTeam);
       return {
         statusCode: 200,
@@ -82,7 +81,7 @@ export class DevBattleService {
     const memberForDevTeam = new MemberForDevTeam();
     memberForDevTeam.user = member;
     memberForDevTeam.position = addMemberToTeamDto.position;
-    memberForDevTeam.team = team; // 팀 정보를 설정합니다.
+    memberForDevTeam.team = team;
 
     const savedMemberForDevTeam = await this.memberForDevTeamRepo.save(memberForDevTeam);
     return {
