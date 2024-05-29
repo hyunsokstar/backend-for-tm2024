@@ -41,7 +41,6 @@ export class DevBattleController {
     const result = await this.devBattleService.addMemberToTeam(teamId, memberId, addMemberToTeamDto);
 
     if (result.statusCode === 200) {
-      // 이미 존재하는 멤버인 경우
       return result;
     }
 
