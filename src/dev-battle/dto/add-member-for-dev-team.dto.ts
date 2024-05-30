@@ -5,5 +5,4 @@ export class AddMemberForDevTeamDto {
     @IsNotEmpty()
     @IsEnum(['leader', 'member'])
     position: 'leader' | 'member';
-
 }

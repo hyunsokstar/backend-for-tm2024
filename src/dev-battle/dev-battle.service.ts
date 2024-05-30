@@ -31,6 +31,46 @@ export class DevBattleService {
     private usersRepo: Repository<UsersModel>,
   ) { }
 
+  async addMemberToTeam(
+    teamId: number,
+    memberId: number,
+  ) {
+    const team = await this.teamForDevBattleRepo.findOneBy({ id: teamId });
+    if (!team) {
+      throw new NotFoundException('Team not found');
+    }
+
+    const member = await this.usersRepo.findOneBy({ id: memberId });
+    if (!member) {
+      throw new NotFoundException('Member not found');
+    }
+
+    const existingMemberForDevTeam = await this.memberForDevTeamRepo.findOneBy({
+      user: { id: memberId },
+      team: { id: teamId },
+    });
+
+    if (existingMemberForDevTeam) {
+      await this.memberForDevTeamRepo.remove(existingMemberForDevTeam);
+      return {
+        statusCode: 200,
+        message: 'Member has been removed from team',
+        data: null,
+      };
+    }
+
+    const memberForDevTeam = new MemberForDevTeam();
+    memberForDevTeam.user = member;
+    memberForDevTeam.team = team;
+
+    const savedMemberForDevTeam = await this.memberForDevTeamRepo.save(memberForDevTeam);
+    return {
+      statusCode: 201,
+      message: 'Member has been added to team',
+      data: savedMemberForDevTeam,
+    };
+  }
+
   async deleteTeamForDevBattle(teamId: number): Promise<void> {
     const team = await this.teamForDevBattleRepo.findOneBy({ id: teamId });
 
@@ -66,49 +106,6 @@ export class DevBattleService {
       order: { id: 'ASC' },
     });
   }
-
-  async addMemberToTeam(
-    teamId: number,
-    memberId: number,
-    addMemberToTeamDto: AddMemberForDevTeamDto,
-  ) {
-    const team = await this.teamForDevBattleRepo.findOneBy({ id: teamId });
-    if (!team) {
-      throw new NotFoundException('Team not found');
-    }
-
-    const member = await this.usersRepo.findOneBy({ id: memberId });
-    if (!member) {
-      throw new NotFoundException('Member not found');
-    }
-
-    const existingMemberForDevTeam = await this.memberForDevTeamRepo.findOneBy({
-      user: { id: memberId },
-      team: { id: teamId },
-    });
-
-    if (existingMemberForDevTeam) {
-      await this.memberForDevTeamRepo.remove(existingMemberForDevTeam);
-      return {
-        statusCode: 200,
-        message: 'Member has been removed from team',
-        data: null,
-      };
-    }
-
-    const memberForDevTeam = new MemberForDevTeam();
-    memberForDevTeam.user = member;
-    memberForDevTeam.position = addMemberToTeamDto.position;
-    memberForDevTeam.team = team;
-
-    const savedMemberForDevTeam = await this.memberForDevTeamRepo.save(memberForDevTeam);
-    return {
-      statusCode: 201,
-      message: 'Member has been added to team',
-      data: savedMemberForDevTeam,
-    };
-  }
-
 
   async getAllTeams(): Promise<TeamForDevBattle[]> {
     return await this.teamForDevBattleRepo.find();

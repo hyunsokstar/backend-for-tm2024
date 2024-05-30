@@ -13,6 +13,44 @@ import { AddMemberForDevTeamDto } from './dto/add-member-for-dev-team.dto';
 export class DevBattleController {
   constructor(private readonly devBattleService: DevBattleService) { }
 
+  @Post('/teams/:teamId/member/:memberId')
+  @HttpCode(201)
+  async addMemberToTeam(
+    @Param('teamId', ParseIntPipe) teamId: number,
+    @Param('memberId', ParseIntPipe) memberId: number,
+  ) {
+
+    console.log("멤버 추가 요청 받음 ", teamId, memberId);
+
+
+    const result = await this.devBattleService.addMemberToTeam(teamId, memberId);
+
+    if (result.statusCode === 200) {
+      return result;
+    }
+
+    // 새로운 멤버인 경우
+    const memberForDevTeam = result.data;
+    const member = memberForDevTeam.user;
+    const team = memberForDevTeam.team;
+
+    return {
+      statusCode: 201,
+      message: 'Member has been added to team',
+      data: {
+        member: {
+          id: member.id,
+          nickname: member.nickname,
+          position: memberForDevTeam.position,
+        },
+        team: {
+          id: team.id,
+          name: team.name,
+        },
+      },
+    };
+  }
+
   @Delete('/teams/:teamId')
   async deleteTeam(@Param('teamId', ParseIntPipe) teamId: number, @Res() res): Promise<void> {
     await this.devBattleService.deleteTeamForDevBattle(teamId);
@@ -45,42 +83,6 @@ export class DevBattleController {
       throw error;
     }
   }
-
-  @Post('/teams/:teamId/member/:memberId')
-  @HttpCode(201)
-  async addMemberToTeam(
-    @Param('teamId', ParseIntPipe) teamId: number,
-    @Param('memberId', ParseIntPipe) memberId: number,
-    @Body() addMemberToTeamDto: AddMemberForDevTeamDto,
-  ) {
-    const result = await this.devBattleService.addMemberToTeam(teamId, memberId, addMemberToTeamDto);
-
-    if (result.statusCode === 200) {
-      return result;
-    }
-
-    // 새로운 멤버인 경우
-    const memberForDevTeam = result.data;
-    const member = memberForDevTeam.user;
-    const team = memberForDevTeam.team;
-
-    return {
-      statusCode: 201,
-      message: 'Member has been added to team',
-      data: {
-        member: {
-          id: member.id,
-          nickname: member.nickname,
-          position: memberForDevTeam.position,
-        },
-        team: {
-          id: team.id,
-          name: team.name,
-        },
-      },
-    };
-  }
-
 
 
   @Get('/teams')
