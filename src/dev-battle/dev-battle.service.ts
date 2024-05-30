@@ -31,6 +31,19 @@ export class DevBattleService {
     private usersRepo: Repository<UsersModel>,
   ) { }
 
+  async deleteDevProgressForTeam(idForProgressForDevBattle: number): Promise<{ message: string }> {
+    const devProgressForTeam = await this.devProgressForTeamRepo.findOne({
+      where: { id: idForProgressForDevBattle },
+    });
+
+    if (!devProgressForTeam) {
+      throw new NotFoundException(`DevProgressForTeam with ID ${idForProgressForDevBattle} not found`);
+    }
+
+    await this.devProgressForTeamRepo.remove(devProgressForTeam);
+    return { message: 'DevProgressForTeam deleted successfully' };
+  }
+
   async addMemberToTeam(
     teamId: number,
     memberId: number,

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, ParseIntPipe, NotFoundException, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, ParseIntPipe, NotFoundException, Res, BadRequestException } from '@nestjs/common';
 import { DevBattleService } from './dev-battle.service';
 import { CreateDevBattleDto } from './dto/create-dev-battle.dto';
 import { UpdateDevBattleDto } from './dto/update-dev-battle.dto';
@@ -12,6 +12,22 @@ import { AddMemberForDevTeamDto } from './dto/add-member-for-dev-team.dto';
 @Controller('dev-battle')
 export class DevBattleController {
   constructor(private readonly devBattleService: DevBattleService) { }
+
+  @Delete('/progressForDevBattle/:idForProgressForDevBattle')
+  @HttpCode(200)
+  async deleteDevProgressForTeam(
+    @Param('idForProgressForDevBattle', ParseIntPipe) idForProgressForDevBattle: number,
+  ): Promise<{ message: string }> {
+    console.log('task 요청!');
+    try {
+      return await this.devBattleService.deleteDevProgressForTeam(idForProgressForDevBattle);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new BadRequestException(error.message);
+      }
+      throw error;
+    }
+  }
 
   @Post('/teams/:teamId/progress')
   @HttpCode(201)
