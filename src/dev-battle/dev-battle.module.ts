@@ -8,6 +8,7 @@ import { TeamForDevBattle } from './entities/team-for-dev-battle.entity';
 import { DevProgressForTeam } from './entities/dev-progress-for-team.entity';
 import { MemberForDevTeam } from './entities/member-for-dev-team.entity';
 import { UsersModel } from 'src/users/entities/users.entity';
+import { DevSpecForTeamBattle } from './entities/dev-spec-for-team-battle.entity';
 
 
 @Module({
@@ -18,7 +19,8 @@ import { UsersModel } from 'src/users/entities/users.entity';
       TeamForDevBattle,
       DevProgressForTeam,
       MemberForDevTeam,
-      UsersModel
+      UsersModel,
+      DevSpecForTeamBattle
     ])
   ],
   controllers: [DevBattleController],

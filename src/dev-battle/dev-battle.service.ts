@@ -92,11 +92,11 @@ export class DevBattleService {
     }
 
     // Delete the team's dev progress records
-    const devProgressRecords = await this.devProgressForTeamRepo.findBy({ team: team });
+    const devProgressRecords = await this.devProgressForTeamRepo.findBy({ id: team.id });
     await this.devProgressForTeamRepo.remove(devProgressRecords);
 
     // Delete the team's member records
-    const memberRecords = await this.memberForDevTeamRepo.findBy({ team: team });
+    const memberRecords = await this.memberForDevTeamRepo.findBy({ id: team.id });
     await this.memberForDevTeamRepo.remove(memberRecords);
 
     // Delete the team record

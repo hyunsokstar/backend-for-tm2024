@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, On
 import { DevBattle } from './dev-battle.entity';
 import { DevProgressForTeam } from './dev-progress-for-team.entity';
 import { MemberForDevTeam } from './member-for-dev-team.entity';
+import { DevSpecForTeamBattle } from './dev-spec-for-team-battle.entity';
 
 @Entity()
 export class TeamForDevBattle {
@@ -25,4 +26,7 @@ export class TeamForDevBattle {
 
     @OneToMany(() => MemberForDevTeam, member => member.team)
     members: MemberForDevTeam[];
+
+    @OneToMany(() => DevSpecForTeamBattle, (devSpec) => devSpec.devTeam)
+    devSpecs: DevSpecForTeamBattle[];
 }

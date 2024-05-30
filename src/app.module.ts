@@ -60,6 +60,7 @@ import { TagForDevBattle } from "./dev-battle/entities/tag.entity";
 import { TeamForDevBattle } from "./dev-battle/entities/team-for-dev-battle.entity";
 import { DevProgressForTeam } from "./dev-battle/entities/dev-progress-for-team.entity";
 import { MemberForDevTeam } from "./dev-battle/entities/member-for-dev-team.entity";
+import { DevSpecForTeamBattle } from "./dev-battle/entities/dev-spec-for-team-battle.entity";
 
 @Module({
   imports: [
@@ -112,7 +113,8 @@ import { MemberForDevTeam } from "./dev-battle/entities/member-for-dev-team.enti
         TagForDevBattle,
         TeamForDevBattle,
         DevProgressForTeam,
-        MemberForDevTeam
+        MemberForDevTeam,
+        DevSpecForTeamBattle
       ],
       synchronize: true,
     }),

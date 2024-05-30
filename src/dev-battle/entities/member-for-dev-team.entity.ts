@@ -23,6 +23,9 @@ export class MemberForDevTeam {
     @CreateDateColumn({ type: 'timestamp' })
     createdAt: Date;
 
+    // @ManyToOne(() => TeamForDevBattle, team => team.members, { onDelete: 'CASCADE', cascade: true })
+    // @JoinColumn()
+    // team: TeamForDevBattle;
     @ManyToOne(() => TeamForDevBattle, team => team.members, { onDelete: 'CASCADE', cascade: true })
     @JoinColumn()
     team: TeamForDevBattle;
