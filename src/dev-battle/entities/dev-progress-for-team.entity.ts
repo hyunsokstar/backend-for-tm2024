@@ -11,6 +11,9 @@ export enum DevStatus {
     COMPLETE = 'complete',
 }
 
+// @PrimaryGeneratedColumn()
+// id: number;
+
 @Entity('dev_progress_for_team')
 export class DevProgressForTeam {
     @PrimaryGeneratedColumn('uuid')

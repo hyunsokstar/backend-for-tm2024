@@ -102,8 +102,15 @@ export class DevBattleService {
 
   async findAllDevBattle(): Promise<DevBattle[]> {
     return await this.devBattleRepo.find({
-      relations: ['tags', 'teams', 'teams.devProgressForTeams', 'teams.members', 'teams.members.user'], // Include 'teams.members.user' in the relations array
-      order: { id: 'ASC' },
+      relations: ['tags', 'teams', 'teams.devProgressForTeams', 'teams.members', 'teams.members.user'],
+      order: {
+        id: 'ASC',
+        teams: {
+          devProgressForTeams: {
+            id: 'ASC', // teams.devProgressForTeams 엔티티 내 id 필드 오름차순 정렬
+          },
+        },
+      },
     });
   }
 

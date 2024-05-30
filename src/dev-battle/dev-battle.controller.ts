@@ -13,6 +13,15 @@ import { AddMemberForDevTeamDto } from './dto/add-member-for-dev-team.dto';
 export class DevBattleController {
   constructor(private readonly devBattleService: DevBattleService) { }
 
+  @Post('/teams/:teamId/progress')
+  @HttpCode(201)
+  async addDevProgressForTeam(
+    @Param('teamId', ParseIntPipe) teamId: number, // ParseIntPipe를 사용하여 string을 number로 변환
+    @Body() addDevProgressForTeamDto: AddDevProgressForTeamDto,
+  ): Promise<DevProgressForTeam> {
+    return await this.devBattleService.addDevProgressForTeam(teamId, addDevProgressForTeamDto);
+  }
+
   @Post('/teams/:teamId/member/:memberId')
   @HttpCode(201)
   async addMemberToTeam(
@@ -84,19 +93,9 @@ export class DevBattleController {
     }
   }
 
-
   @Get('/teams')
   async getAllTeams(): Promise<TeamForDevBattle[]> {
     return await this.devBattleService.getAllTeams();
-  }
-
-  @Post('/teams/:teamId/progress')
-  @HttpCode(201)
-  async addDevProgressForTeam(
-    @Param('teamId', ParseIntPipe) teamId: number, // ParseIntPipe를 사용하여 string을 number로 변환
-    @Body() addDevProgressForTeamDto: AddDevProgressForTeamDto,
-  ): Promise<DevProgressForTeam> {
-    return await this.devBattleService.addDevProgressForTeam(teamId, addDevProgressForTeamDto);
   }
 
   @Patch(':id/tag')
