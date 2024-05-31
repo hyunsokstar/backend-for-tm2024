@@ -39,7 +39,6 @@ export class DevBattleService {
     fieldName: string,
     itemText: string,
   ): Promise<void> {
-
     console.log("teamId fieldName itemText :", teamId, fieldName, itemText);
 
     const team = await this.teamForDevBattleRepo.findOne({ where: { id: teamId } });
