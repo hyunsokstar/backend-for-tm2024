@@ -39,7 +39,7 @@ export class DevBattleController {
   @Post('/teams/:teamId/progress')
   @HttpCode(201)
   async addDevProgressForTeam(
-    @Param('teamId', ParseIntPipe) teamId: number, // ParseIntPipe를 사용하여 string을 number로 변환
+    @Param('teamId', ParseIntPipe) teamId: number,
     @Body() addDevProgressForTeamDto: AddDevProgressForTeamDto,
   ): Promise<DevProgressForTeam> {
     return await this.devBattleService.addDevProgressForTeam(teamId, addDevProgressForTeamDto);

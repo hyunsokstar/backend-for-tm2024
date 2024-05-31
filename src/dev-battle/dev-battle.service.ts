@@ -96,7 +96,6 @@ export class DevBattleService {
       throw new NotFoundException(`Team with ID ${teamId} not found`);
     }
 
-    // Delete the team's dev progress records
     const devProgressRecords = await this.devProgressForTeamRepo.findBy({ id: team.id });
     await this.devProgressForTeamRepo.remove(devProgressRecords);
 
