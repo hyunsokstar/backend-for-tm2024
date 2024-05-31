@@ -13,6 +13,22 @@ import { AddItemToSpecificFieldForTeamDevSpecDto } from './dto/add-Item-to-Speci
 export class DevBattleController {
   constructor(private readonly devBattleService: DevBattleService) { }
 
+  @Patch('/team/:teamId/update-dev-spec/:fieldName')
+  async updateForSpecificDevSpecForNotArryTypeForTeamBattle(
+    @Param('teamId', ParseIntPipe) teamId: number,
+    @Param('fieldName') fieldName: string,
+    @Body('itemText') itemText: string,
+  ): Promise<{ message: string }> {
+    await this.devBattleService.updateForSpecificDevSpecForNotArryTypeForTeamBattle(
+      teamId,
+      fieldName,
+      itemText,
+    );
+
+    return { message: 'Successfully updated the field for team\'s dev spec' };
+
+  }
+
   @Patch('/team/:teamId/update-dev-spec-specific-field')
   async addItemToSpecificFieldForDevSpec(
     @Param('teamId', ParseIntPipe) teamId: number,

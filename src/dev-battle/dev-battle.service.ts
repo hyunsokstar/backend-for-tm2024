@@ -34,6 +34,48 @@ export class DevBattleService {
     private devSpecForTeamBattleRepo: Repository<DevSpecForTeamBattle>,
   ) { }
 
+  async updateForSpecificDevSpecForNotArryTypeForTeamBattle(
+    teamId: number,
+    fieldName: string,
+    itemText: string,
+  ): Promise<void> {
+
+    console.log("teamId fieldName itemText :", teamId, fieldName, itemText);
+
+    const team = await this.teamForDevBattleRepo.findOne({ where: { id: teamId } });
+    if (!team) {
+      throw new NotFoundException('Team not found');
+    }
+
+    let devSpec = await this.devSpecForTeamBattleRepo.findOne({
+      where: {
+        devTeam: { id: team.id },
+      },
+    });
+
+    if (!devSpec) {
+      devSpec = new DevSpecForTeamBattle();
+    }
+
+    const validFields = [
+      'backendLanguage',
+      'frontendLanguage',
+      'orm',
+      'css',
+      'app',
+    ];
+
+    if (validFields.includes(fieldName)) {
+      devSpec[fieldName] = itemText;
+    } else {
+      throw new BadRequestException(
+        `Field name '${fieldName}' is not a valid string field in DevSpecForTeamBattle entity`,
+      );
+    }
+
+    await this.devSpecForTeamBattleRepo.save(devSpec, { reload: true });
+  }
+
   async addItemToSpecificFieldForDevSpec(
     teamId: number,
     devSpecForTeamBattleUpdateDto: AddItemToSpecificFieldForTeamDevSpecDto,
@@ -47,7 +89,6 @@ export class DevBattleService {
       throw new NotFoundException('Team not found');
     }
 
-    // Retrieve the DevSpecForTeamBattle object that corresponds to the provided fieldName
     const fieldName = devSpecForTeamBattleUpdateDto.fieldName;
     let devSpec = await this.devSpecForTeamBattleRepo.findOne({
       where: {

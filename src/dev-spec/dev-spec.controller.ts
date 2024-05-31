@@ -38,7 +38,6 @@ export class DevSpecController {
   @Get('grouped-by-category')
   findAllGroupedByCategory(): Promise<GroupedDevSpecs> {
     console.log("grouped-by-category !! ");
-
     return this.devSpecService.findAllGroupedByCategory();
   }
 

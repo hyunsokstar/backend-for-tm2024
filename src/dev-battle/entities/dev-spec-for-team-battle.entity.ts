@@ -1,11 +1,9 @@
-// File name: dev-spec-for-team-battle.entity.ts
-
+// dev-spec-for-team-battle.entity.ts
 import {
     Entity,
     PrimaryGeneratedColumn,
     Column,
     CreateDateColumn,
-    UpdateDateColumn,
     ManyToOne,
 } from 'typeorm';
 import { TeamForDevBattle } from './team-for-dev-battle.entity';
