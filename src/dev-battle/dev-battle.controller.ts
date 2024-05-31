@@ -7,11 +7,43 @@ import { DevBattle } from './entities/dev-battle.entity';
 import { AddDevProgressForTeamDto } from './dto/add-dev-progress-for-team.dto';
 import { DevProgressForTeam } from './entities/dev-progress-for-team.entity';
 import { TeamForDevBattle } from './entities/team-for-dev-battle.entity';
-import { AddMemberForDevTeamDto } from './dto/add-member-for-dev-team.dto';
+import { AddItemToSpecificFieldForTeamDevSpecDto } from './dto/add-Item-to-Specific-field-for-team-dev-spec.dto';
 
 @Controller('dev-battle')
 export class DevBattleController {
   constructor(private readonly devBattleService: DevBattleService) { }
+
+  @Patch('/team/:teamId/update-dev-spec-specific-field')
+  async addItemToSpecificFieldForDevSpec(
+    @Param('teamId', ParseIntPipe) teamId: number,
+    @Body() devSpecForTeamBattleUpdateDto: AddItemToSpecificFieldForTeamDevSpecDto,
+  ): Promise<void> {
+    await this.devBattleService.addItemToSpecificFieldForDevSpec(teamId, devSpecForTeamBattleUpdateDto);
+  }
+
+  @Delete('/teams/:teamId')
+  async deleteTeam(@Param('teamId', ParseIntPipe) teamId: number, @Res() res): Promise<void> {
+    await this.devBattleService.deleteTeamForDevBattle(teamId);
+
+    // Return an appropriate response object
+    const responseObject = { message: `Team with ID ${teamId} deleted successfully` };
+    res.status(200).json(responseObject);
+  }
+
+  @Post(':devBattleId/add-team')
+  async addTeamToDevBattle(@Param('devBattleId') devBattleId: number, @Body() addTeamToDevBattleDto: AddTeamToDevBattleDto): Promise<DevBattle> {
+    console.log("dev battle team add ??");
+    return await this.devBattleService.addTeamToDevBattle(devBattleId, addTeamToDevBattleDto);
+  }
+
+  @Post('/teams/:teamId/progress')
+  @HttpCode(201)
+  async addDevProgressForTeam(
+    @Param('teamId', ParseIntPipe) teamId: number, // ParseIntPipe를 사용하여 string을 number로 변환
+    @Body() addDevProgressForTeamDto: AddDevProgressForTeamDto,
+  ): Promise<DevProgressForTeam> {
+    return await this.devBattleService.addDevProgressForTeam(teamId, addDevProgressForTeamDto);
+  }
 
   @Delete('/progressForDevBattle/:idForProgressForDevBattle')
   @HttpCode(200)
@@ -27,15 +59,6 @@ export class DevBattleController {
       }
       throw error;
     }
-  }
-
-  @Post('/teams/:teamId/progress')
-  @HttpCode(201)
-  async addDevProgressForTeam(
-    @Param('teamId', ParseIntPipe) teamId: number, // ParseIntPipe를 사용하여 string을 number로 변환
-    @Body() addDevProgressForTeamDto: AddDevProgressForTeamDto,
-  ): Promise<DevProgressForTeam> {
-    return await this.devBattleService.addDevProgressForTeam(teamId, addDevProgressForTeamDto);
   }
 
   @Post('/teams/:teamId/member/:memberId')
@@ -74,21 +97,6 @@ export class DevBattleController {
         },
       },
     };
-  }
-
-  @Delete('/teams/:teamId')
-  async deleteTeam(@Param('teamId', ParseIntPipe) teamId: number, @Res() res): Promise<void> {
-    await this.devBattleService.deleteTeamForDevBattle(teamId);
-
-    // Return an appropriate response object
-    const responseObject = { message: `Team with ID ${teamId} deleted successfully` };
-    res.status(200).json(responseObject);
-  }
-
-  @Post(':devBattleId/add-team')
-  async addTeamToDevBattle(@Param('devBattleId') devBattleId: number, @Body() addTeamToDevBattleDto: AddTeamToDevBattleDto): Promise<DevBattle> {
-    console.log("dev battle team add ??");
-    return await this.devBattleService.addTeamToDevBattle(devBattleId, addTeamToDevBattleDto);
   }
 
   @Post()

@@ -15,10 +15,10 @@ export class DevSpecForTeamBattle {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ type: 'varchar', length: 255 })
+    @Column({ type: 'varchar', length: 255, nullable: true })
     backendLanguage: string;
 
-    @Column({ type: 'varchar', length: 255 })
+    @Column({ type: 'varchar', length: 255, nullable: true })
     frontendLanguage: string;
 
     @Column({ type: 'simple-array', nullable: true })
@@ -45,6 +45,9 @@ export class DevSpecForTeamBattle {
     @CreateDateColumn({ type: 'timestamp' })
     createdAt: Date;
 
-    @ManyToOne(() => TeamForDevBattle, (team) => team.devSpecs)
-    devTeam: TeamForDevBattle;
+    @ManyToOne(() => TeamForDevBattle, (team) => team.devSpecs, {
+        cascade: true, // 여기서 cascade 옵션을 true로 설정합니다.
+        onDelete: 'CASCADE', // 또는 onDelete 옵션을 'CASCADE'로 설정할 수도 있습니다.
+    })
+    devTeam: TeamForDevBattle;;
 }
