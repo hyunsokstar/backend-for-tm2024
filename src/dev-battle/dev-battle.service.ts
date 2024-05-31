@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { UpdateDevBattleDto } from './dto/update-dev-battle.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DevBattle } from './entities/dev-battle.entity';
-import { MoreThan, Not, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreateDevBattleDto } from './dto/create-dev-battle.dto';
 import { TagForDevBattle } from './entities/tag.entity';
 import { TeamForDevBattle } from './entities/team-for-dev-battle.entity';
