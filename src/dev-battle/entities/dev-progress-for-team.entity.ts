@@ -28,6 +28,9 @@ export class DevProgressForTeam {
     @Column('text', { nullable: true })
     youtubeUrl: string;
 
+    @Column({ type: 'int', nullable: true })
+    skilNoteId: number;
+
     @Column('text', { nullable: true })
     noteUrl: string;
 

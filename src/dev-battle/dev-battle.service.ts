@@ -42,6 +42,56 @@ export class DevBattleService {
 
   ) { }
 
+  async deleteTeamForDevBattle(teamId: number): Promise<void> {
+    const team = await this.teamForDevBattleRepo.findOneBy({ id: teamId });
+
+    if (!team) {
+      throw new NotFoundException(`Team with ID ${teamId} not found`);
+    }
+
+    // Find the associated TechNotesModel
+    const techNote = await this.techNotesModelRepo.findOneBy({ id: team.techNoteId });
+
+    if (techNote) {
+      // Delete the associated TechNotesModel
+      await this.techNotesModelRepo.remove(techNote);
+    }
+
+    // const devProgressRecords = await this.devProgressForTeamRepo.findBy({ id: team.id });
+
+    const devProgressRecord = await this.devProgressForTeamRepo.findOne({ where: { id: team.id } });
+
+    if (devProgressRecord) {
+      // Find the associated SkilNotesModel
+      const skilNote = await this.skilNotesModelRepo.findOneBy({ id: devProgressRecord.skilNoteId });
+
+      if (skilNote) {
+        // Delete the associated SkilNotesModel
+        await this.skilNotesModelRepo.remove(skilNote);
+      }
+
+      // todo: devProgressRecords.skilNoteId 에 해당 하는 skilNote 삭제
+
+      await this.devProgressForTeamRepo.remove(devProgressRecord);
+
+      // Delete the team's member records
+      const memberRecords = await this.memberForDevTeamRepo.findBy({ id: team.id });
+      await this.memberForDevTeamRepo.remove(memberRecords);
+
+      // Delete dev specs for team id
+      const devSpecs = await this.devSpecForTeamBattleRepo
+        .createQueryBuilder("devSpec")
+        .leftJoinAndSelect("devSpec.devTeam", "devTeam")
+        .where("devTeam.id = :id", { id: teamId })
+        .getMany();
+
+      await this.devSpecForTeamBattleRepo.remove(devSpecs);
+
+      // Delete the team record
+      await this.teamForDevBattleRepo.remove(team);
+    }
+  }
+
   async addDevProgressForTeam(teamId: number, addDevProgressForTeamDto: AddDevProgressForTeamDto): Promise<DevProgressForTeam> {
     const team = await this.teamForDevBattleRepo.findOne({ where: { id: teamId } });
 
@@ -70,6 +120,7 @@ export class DevBattleService {
     devProgress.figmaUrl = addDevProgressForTeamDto.figmaUrl;
     devProgress.youtubeUrl = addDevProgressForTeamDto.youtubeUrl;
     devProgress.noteUrl = `http://13.209.211.181:3000/Note/SkilNoteContents/${savedSkilNote.id}/1`;
+    devProgress.skilNoteId = skilNote.id
     devProgress.status = addDevProgressForTeamDto.status;
     devProgress.team = team;
 
@@ -92,41 +143,6 @@ export class DevBattleService {
 
   //   return await this.devProgressForTeamRepo.save(devProgress);
   // }
-
-  async deleteTeamForDevBattle(teamId: number): Promise<void> {
-    const team = await this.teamForDevBattleRepo.findOneBy({ id: teamId });
-
-    if (!team) {
-      throw new NotFoundException(`Team with ID ${teamId} not found`);
-    }
-
-    // Find the associated TechNotesModel
-    const techNote = await this.techNotesModelRepo.findOneBy({ id: team.techNoteId });
-
-    if (techNote) {
-      // Delete the associated TechNotesModel
-      await this.techNotesModelRepo.remove(techNote);
-    }
-
-    const devProgressRecords = await this.devProgressForTeamRepo.findBy({ id: team.id });
-    await this.devProgressForTeamRepo.remove(devProgressRecords);
-
-    // Delete the team's member records
-    const memberRecords = await this.memberForDevTeamRepo.findBy({ id: team.id });
-    await this.memberForDevTeamRepo.remove(memberRecords);
-
-    // Delete dev specs for team id
-    const devSpecs = await this.devSpecForTeamBattleRepo
-      .createQueryBuilder("devSpec")
-      .leftJoinAndSelect("devSpec.devTeam", "devTeam")
-      .where("devTeam.id = :id", { id: teamId })
-      .getMany();
-
-    await this.devSpecForTeamBattleRepo.remove(devSpecs);
-
-    // Delete the team record
-    await this.teamForDevBattleRepo.remove(team);
-  }
 
   async addTeamToDevBattle(
     devBattleId: number,
