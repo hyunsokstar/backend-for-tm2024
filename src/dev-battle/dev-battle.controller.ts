@@ -13,6 +13,15 @@ import { AddItemToSpecificFieldForTeamDevSpecDto } from './dto/add-Item-to-Speci
 export class DevBattleController {
   constructor(private readonly devBattleService: DevBattleService) { }
 
+  @Post('/teams/:teamId/progress')
+  @HttpCode(201)
+  async addDevProgressForTeam(
+    @Param('teamId', ParseIntPipe) teamId: number,
+    @Body() addDevProgressForTeamDto: AddDevProgressForTeamDto,
+  ): Promise<DevProgressForTeam> {
+    return await this.devBattleService.addDevProgressForTeam(teamId, addDevProgressForTeamDto);
+  }
+
   @Post(':devBattleId/add-team')
   async addTeamToDevBattle(@Param('devBattleId') devBattleId: number, @Body() addTeamToDevBattleDto: AddTeamToDevBattleDto): Promise<DevBattle> {
     console.log("dev battle team add ??");
@@ -48,15 +57,6 @@ export class DevBattleController {
     @Body() devSpecForTeamBattleUpdateDto: AddItemToSpecificFieldForTeamDevSpecDto,
   ): Promise<void> {
     await this.devBattleService.addItemToSpecificFieldForDevSpec(teamId, devSpecForTeamBattleUpdateDto);
-  }
-
-  @Post('/teams/:teamId/progress')
-  @HttpCode(201)
-  async addDevProgressForTeam(
-    @Param('teamId', ParseIntPipe) teamId: number,
-    @Body() addDevProgressForTeamDto: AddDevProgressForTeamDto,
-  ): Promise<DevProgressForTeam> {
-    return await this.devBattleService.addDevProgressForTeam(teamId, addDevProgressForTeamDto);
   }
 
   @Delete('/progressForDevBattle/:idForProgressForDevBattle')

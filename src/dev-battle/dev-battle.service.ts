@@ -14,6 +14,7 @@ import { UsersModel } from 'src/users/entities/users.entity';
 import { DevSpecForTeamBattle } from './entities/dev-spec-for-team-battle.entity';
 import { AddItemToSpecificFieldForTeamDevSpecDto } from './dto/add-Item-to-Specific-field-for-team-dev-spec.dto';
 import { TechNotesModel } from 'src/technotes/entities/technotes.entity';
+import { SkilNotesModel } from 'src/technotes/entities/skilnotes.entity';
 
 @Injectable()
 export class DevBattleService {
@@ -36,7 +37,61 @@ export class DevBattleService {
     @InjectRepository(TechNotesModel)
     private techNotesModelRepo: Repository<TechNotesModel>,
 
+    @InjectRepository(SkilNotesModel)
+    private skilNotesModelRepo: Repository<SkilNotesModel>,
+
   ) { }
+
+  async addDevProgressForTeam(teamId: number, addDevProgressForTeamDto: AddDevProgressForTeamDto): Promise<DevProgressForTeam> {
+    const team = await this.teamForDevBattleRepo.findOne({ where: { id: teamId } });
+
+    console.log("team : ", team);
+
+
+    if (!team) {
+      throw new NotFoundException(`Team with ID ${teamId} not found`);
+    }
+
+    const targetTechNote = await this.techNotesModelRepo.findOne({ where: { id: team.techNoteId } });
+
+    if (!targetTechNote) {
+      throw new NotFoundException(`targetTechNote with ID ${team.techNoteId} not found`);
+    }
+
+    // SkilNotesModel 추가
+    const skilNote = this.skilNotesModelRepo.create({
+      title: addDevProgressForTeamDto.task,
+      techNote: targetTechNote,
+    });
+    const savedSkilNote = await this.skilNotesModelRepo.save(skilNote);
+
+    const devProgress = new DevProgressForTeam();
+    devProgress.task = addDevProgressForTeamDto.task;
+    devProgress.figmaUrl = addDevProgressForTeamDto.figmaUrl;
+    devProgress.youtubeUrl = addDevProgressForTeamDto.youtubeUrl;
+    devProgress.noteUrl = `http://13.209.211.181:3000/Note/SkilNoteContents/${savedSkilNote.id}/1`;
+    devProgress.status = addDevProgressForTeamDto.status;
+    devProgress.team = team;
+
+    return await this.devProgressForTeamRepo.save(devProgress);
+  }
+
+  // async addDevProgressForTeam(teamId: number, addDevProgressForTeamDto: AddDevProgressForTeamDto): Promise<DevProgressForTeam> {
+  //   const team = await this.teamForDevBattleRepo.findOne({ where: { id: teamId } });
+  //   if (!team) {
+  //     throw new NotFoundException(`Team with ID ${teamId} not found`);
+  //   }
+
+  //   const devProgress = new DevProgressForTeam();
+  //   devProgress.task = addDevProgressForTeamDto.task;
+  //   devProgress.figmaUrl = addDevProgressForTeamDto.figmaUrl;
+  //   devProgress.youtubeUrl = addDevProgressForTeamDto.youtubeUrl;
+  //   devProgress.noteUrl = addDevProgressForTeamDto.noteUrl;
+  //   devProgress.status = addDevProgressForTeamDto.status;
+  //   devProgress.team = team;
+
+  //   return await this.devProgressForTeamRepo.save(devProgress);
+  // }
 
   async deleteTeamForDevBattle(teamId: number): Promise<void> {
     const team = await this.teamForDevBattleRepo.findOneBy({ id: teamId });
@@ -291,24 +346,6 @@ export class DevBattleService {
     // Save the updated DevSpecForTeamBattle object to the database
     await this.devSpecForTeamBattleRepo.save(devSpec, { reload: true });
   }
-
-  async addDevProgressForTeam(teamId: number, addDevProgressForTeamDto: AddDevProgressForTeamDto): Promise<DevProgressForTeam> {
-    const team = await this.teamForDevBattleRepo.findOne({ where: { id: teamId } });
-    if (!team) {
-      throw new NotFoundException(`Team with ID ${teamId} not found`);
-    }
-
-    const devProgress = new DevProgressForTeam();
-    devProgress.task = addDevProgressForTeamDto.task;
-    devProgress.figmaUrl = addDevProgressForTeamDto.figmaUrl;
-    devProgress.youtubeUrl = addDevProgressForTeamDto.youtubeUrl;
-    devProgress.noteUrl = addDevProgressForTeamDto.noteUrl;
-    devProgress.status = addDevProgressForTeamDto.status;
-    devProgress.team = team;
-
-    return await this.devProgressForTeamRepo.save(devProgress);
-  }
-
 
   async deleteDevProgressForTeam(idForProgressForDevBattle: number): Promise<{ message: string }> {
     const devProgressForTeam = await this.devProgressForTeamRepo.findOne({

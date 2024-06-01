@@ -10,6 +10,7 @@ import { MemberForDevTeam } from './entities/member-for-dev-team.entity';
 import { UsersModel } from 'src/users/entities/users.entity';
 import { DevSpecForTeamBattle } from './entities/dev-spec-for-team-battle.entity';
 import { TechNotesModel } from 'src/technotes/entities/technotes.entity';
+import { SkilNotesModel } from 'src/technotes/entities/skilnotes.entity';
 
 
 @Module({
@@ -22,7 +23,8 @@ import { TechNotesModel } from 'src/technotes/entities/technotes.entity';
       MemberForDevTeam,
       UsersModel,
       DevSpecForTeamBattle,
-      TechNotesModel
+      TechNotesModel,
+      SkilNotesModel
     ])
   ],
   controllers: [DevBattleController],
