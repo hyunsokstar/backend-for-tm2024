@@ -276,14 +276,12 @@ export class TechnotesService {
             .leftJoinAndSelect('techNotes.skilnotes', 'skilnotes')
             .leftJoinAndSelect('techNotes.participants', 'participants')
             .leftJoinAndSelect('participants.user', 'user')
-            // .leftJoinAndSelect('user.takenCoursesForSkilNote', 'takenCoursesForSkilNote')
             .leftJoinAndSelect('techNotes.likes', 'likes')
             .leftJoinAndSelect('likes.user', 'likeUser')
             .leftJoinAndSelect('techNotes.bookMarks', 'bookMarks')
             .leftJoinAndSelect('bookMarks.user', 'bookMarksUser')
             .getManyAndCount();
 
-        // countForLikes 및 countForBookMarks를 계산하여 결과에 추가
         const techNoteListWithCounts = techNoteList.map(techNote => {
             techNote.countForLikes = techNote.likes.length; // 수정 필요
             techNote.countForBookMarks = techNote.bookMarks.length; // 수정 필요
@@ -298,16 +296,12 @@ export class TechnotesService {
             techNoteListWithCounts.sort((a, b) => b.countForLikes - a.countForLikes);
         }
 
-        // isBestByBookMarks 가 true 일 경우 countForBookMarks 기준으로 큰거부터
         if (isBestByBookMarks == "true") {
             techNoteListWithCounts.sort((a, b) => b.countForBookMarks - a.countForBookMarks);
         }
 
-
         console.log("isBestByLikes at skilnote: ", isBestByLikes);
         console.log("isBestByBookMarks : at skilnote", isBestByBookMarks);
-
-        // console.log("techNoteListWithCounts : ", techNoteListWithCounts);
 
         return {
             techNoteList: techNoteListWithCounts,
@@ -315,7 +309,6 @@ export class TechnotesService {
             perPage
         };
     }
-
 
     async getAllSkilNotes(
         pageNum: number = 1,
@@ -325,7 +318,6 @@ export class TechnotesService {
         totalCount: number,
         perPage: number,
     }> {
-        // return this.techNotesRepo.find();
 
         const [skilNoteList, totalCount] = await this.skilNotesRepo.findAndCount({
             skip: (pageNum - 1) * perPage,
@@ -343,11 +335,7 @@ export class TechnotesService {
         }
     }
 
-    // saveTechNotes
     async saveTechNotes(techNotesToSave: any[], loginUser: UsersModel, roadMapId?: any): Promise<any> {
-        // console.log("techNotesToSave : ", techNotesToSave);
-        // console.log("todoRowsForSave.length : ", techNotesToSave.length);
-
         let count = 0;
 
         let roadMapObj;

@@ -18,6 +18,12 @@ export class TeamForDevBattle {
     @CreateDateColumn()
     createdAt: Date;
 
+    @Column({ type: 'int', nullable: true })
+    techNoteId: number;
+
+    @Column({ type: 'text', nullable: true })
+    techNoteListUrl: string;
+
     @ManyToOne(() => DevBattle, (devBattle) => devBattle.teams)
     devBattle: DevBattle;
 
@@ -30,3 +36,6 @@ export class TeamForDevBattle {
     @OneToMany(() => DevSpecForTeamBattle, (devSpec) => devSpec.devTeam)
     devSpecs: DevSpecForTeamBattle[];
 }
+
+// techNoteId(number)
+// techNoteListUrl(url)

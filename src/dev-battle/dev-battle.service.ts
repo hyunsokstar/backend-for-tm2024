@@ -13,10 +13,10 @@ import { MemberForDevTeam } from './entities/member-for-dev-team.entity';
 import { UsersModel } from 'src/users/entities/users.entity';
 import { DevSpecForTeamBattle } from './entities/dev-spec-for-team-battle.entity';
 import { AddItemToSpecificFieldForTeamDevSpecDto } from './dto/add-Item-to-Specific-field-for-team-dev-spec.dto';
+import { TechNotesModel } from 'src/technotes/entities/technotes.entity';
 
 @Injectable()
 export class DevBattleService {
-
   constructor(
     @InjectRepository(DevBattle)
     private devBattleRepo: Repository<DevBattle>,
@@ -32,7 +32,66 @@ export class DevBattleService {
     private usersRepo: Repository<UsersModel>,
     @InjectRepository(DevSpecForTeamBattle)
     private devSpecForTeamBattleRepo: Repository<DevSpecForTeamBattle>,
+
+    @InjectRepository(TechNotesModel)
+    private techNotesModelRepo: Repository<TechNotesModel>,
+
   ) { }
+
+  async addTeamToDevBattle(
+    devBattleId: number,
+    addTeamDto: AddTeamToDevBattleDto,
+  ): Promise<DevBattle> {
+    const { name, description } = addTeamDto;
+
+    // 해당 DevBattle을 찾음
+    const devBattle = await this.devBattleRepo.findOne({
+      where: { id: devBattleId },
+      relations: ['teams'], // 관련된 teams도 로드
+    });
+
+    if (!devBattle) {
+      // DevBattle이 없을 경우 예외 처리
+      throw new Error(`DevBattle with id ${devBattleId} not found`);
+    }
+
+    // TeamForDevBattle 엔티티 생성
+    const team = this.teamForDevBattleRepo.create({
+      name,
+      description,
+      devBattle,
+    });
+
+    // 데이터베이스에 저장
+    const savedTeam = await this.teamForDevBattleRepo.save(team);
+
+    // DevSpecForTeamBattle 엔티티 생성
+    const devSpecForTeamBattle = this.devSpecForTeamBattleRepo.create({
+      // 여기서는 빈 값으로 설정하지만, 필요에 따라 초기값을 설정할 수 있습니다.
+      backendLanguage: null,
+      frontendLanguage: null,
+      backendLibrary: null,
+      frontendLibrary: null,
+      orm: null,
+      css: null,
+      app: null,
+      collaborationTool: null,
+      devops: null,
+      devTeam: savedTeam, // 여기서 savedTeam을 할당합니다.
+    });
+
+    // DevSpecForTeamBattle을 데이터베이스에 저장합니다.
+    const savedDevSpecForTeamBattle = await this.devSpecForTeamBattleRepo.save(devSpecForTeamBattle);
+
+    // DevBattle에 저장된 팀 추가
+    devBattle.teams.push(savedTeam);
+
+    // DevBattle 업데이트
+    await this.devBattleRepo.save(devBattle);
+
+    // 업데이트된 DevBattle 반환
+    return devBattle;
+  }
 
   async updateForSpecificDevSpecForNotArryTypeForTeamBattle(
     teamId: number,
@@ -155,62 +214,6 @@ export class DevBattleService {
     // Delete the team record
     await this.teamForDevBattleRepo.remove(team);
   }
-
-  async addTeamToDevBattle(
-    devBattleId: number,
-    addTeamDto: AddTeamToDevBattleDto,
-  ): Promise<DevBattle> {
-    const { name, description } = addTeamDto;
-
-    // 해당 DevBattle을 찾음
-    const devBattle = await this.devBattleRepo.findOne({
-      where: { id: devBattleId },
-      relations: ['teams'], // 관련된 teams도 로드
-    });
-
-    if (!devBattle) {
-      // DevBattle이 없을 경우 예외 처리
-      throw new Error(`DevBattle with id ${devBattleId} not found`);
-    }
-
-    // TeamForDevBattle 엔티티 생성
-    const team = this.teamForDevBattleRepo.create({
-      name,
-      description,
-      devBattle,
-    });
-
-    // 데이터베이스에 저장
-    const savedTeam = await this.teamForDevBattleRepo.save(team);
-
-    // DevSpecForTeamBattle 엔티티 생성
-    const devSpecForTeamBattle = this.devSpecForTeamBattleRepo.create({
-      // 여기서는 빈 값으로 설정하지만, 필요에 따라 초기값을 설정할 수 있습니다.
-      backendLanguage: null,
-      frontendLanguage: null,
-      backendLibrary: null,
-      frontendLibrary: null,
-      orm: null,
-      css: null,
-      app: null,
-      collaborationTool: null,
-      devops: null,
-      devTeam: savedTeam, // 여기서 savedTeam을 할당합니다.
-    });
-
-    // DevSpecForTeamBattle을 데이터베이스에 저장합니다.
-    const savedDevSpecForTeamBattle = await this.devSpecForTeamBattleRepo.save(devSpecForTeamBattle);
-
-    // DevBattle에 저장된 팀 추가
-    devBattle.teams.push(savedTeam);
-
-    // DevBattle 업데이트
-    await this.devBattleRepo.save(devBattle);
-
-    // 업데이트된 DevBattle 반환
-    return devBattle;
-  }
-
 
   async addDevProgressForTeam(teamId: number, addDevProgressForTeamDto: AddDevProgressForTeamDto): Promise<DevProgressForTeam> {
     const team = await this.teamForDevBattleRepo.findOne({ where: { id: teamId } });

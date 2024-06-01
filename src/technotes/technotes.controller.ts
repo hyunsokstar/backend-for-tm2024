@@ -4,11 +4,7 @@ import { DtoForCreateTechNote } from "./dtos/dtoForCreateTechNote.dto";
 
 @Controller('technotes')
 export class TechnotesController {
-
     constructor(private readonly technotesService: TechnotesService) { }
-
-    // techNoteId 와 userId 받아서
-    // getAllCorriculmnsForUserCorricumnsForSkilNotes
 
     @Get('/corriculmnsForSkilnote')
     async getAllCorriculmnsForUserCorricumnsForSkilNotes(
