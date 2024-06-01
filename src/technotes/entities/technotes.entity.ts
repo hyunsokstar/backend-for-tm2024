@@ -6,13 +6,6 @@ import { bookMarksForTechNoteModel } from './bookMarks.entity';
 import { RoadMapModel } from './roadMap.entity';
 import { ParticipantsForTechNoteModel } from './participantsForTechNote.entity';
 
-// export enum TodoStatus {
-//     READY = 'ready',
-//     PROGRESS = 'progress',
-//     TESTING = 'testing',
-//     COMPLETED = 'complete',
-// }
-
 @Entity()
 export class TechNotesModel {
     @PrimaryGeneratedColumn()

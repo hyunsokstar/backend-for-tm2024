@@ -347,6 +347,7 @@ export class TechnotesService {
     async saveTechNotes(techNotesToSave: any[], loginUser: UsersModel, roadMapId?: any): Promise<any> {
         // console.log("techNotesToSave : ", techNotesToSave);
         // console.log("todoRowsForSave.length : ", techNotesToSave.length);
+
         let count = 0;
 
         let roadMapObj;
