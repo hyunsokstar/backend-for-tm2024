@@ -38,6 +38,41 @@ export class DevBattleService {
 
   ) { }
 
+  async deleteTeamForDevBattle(teamId: number): Promise<void> {
+    const team = await this.teamForDevBattleRepo.findOneBy({ id: teamId });
+
+    if (!team) {
+      throw new NotFoundException(`Team with ID ${teamId} not found`);
+    }
+
+    // Find the associated TechNotesModel
+    const techNote = await this.techNotesModelRepo.findOneBy({ id: team.techNoteId });
+
+    if (techNote) {
+      // Delete the associated TechNotesModel
+      await this.techNotesModelRepo.remove(techNote);
+    }
+
+    const devProgressRecords = await this.devProgressForTeamRepo.findBy({ id: team.id });
+    await this.devProgressForTeamRepo.remove(devProgressRecords);
+
+    // Delete the team's member records
+    const memberRecords = await this.memberForDevTeamRepo.findBy({ id: team.id });
+    await this.memberForDevTeamRepo.remove(memberRecords);
+
+    // Delete dev specs for team id
+    const devSpecs = await this.devSpecForTeamBattleRepo
+      .createQueryBuilder("devSpec")
+      .leftJoinAndSelect("devSpec.devTeam", "devTeam")
+      .where("devTeam.id = :id", { id: teamId })
+      .getMany();
+
+    await this.devSpecForTeamBattleRepo.remove(devSpecs);
+
+    // Delete the team record
+    await this.teamForDevBattleRepo.remove(team);
+  }
+
   async addTeamToDevBattle(
     devBattleId: number,
     addTeamDto: AddTeamToDevBattleDto,
@@ -64,6 +99,20 @@ export class DevBattleService {
 
     // 데이터베이스에 저장
     const savedTeam = await this.teamForDevBattleRepo.save(team);
+
+    // TechNotesModel 엔티티 생성
+    const techNote = this.techNotesModelRepo.create({
+      title: `${savedTeam.name} 팀 ${savedTeam.description} 에 대한 테크 노트`,
+      category: `${savedTeam.name} 팀`,
+    });
+
+    // TechNotesModel 데이터베이스에 저장
+    const savedTechNote = await this.techNotesModelRepo.save(techNote);
+
+    // savedTeam의 techNoteId와 techNoteListUrl 업데이트
+    savedTeam.techNoteId = savedTechNote.id;
+    savedTeam.techNoteListUrl = `http://13.209.211.181:3000/Note/TechNoteList/${savedTechNote.id}/SkilNoteListPage`;
+    await this.teamForDevBattleRepo.save(savedTeam);
 
     // DevSpecForTeamBattle 엔티티 생성
     const devSpecForTeamBattle = this.devSpecForTeamBattleRepo.create({
@@ -92,6 +141,61 @@ export class DevBattleService {
     // 업데이트된 DevBattle 반환
     return devBattle;
   }
+
+  // async addTeamToDevBattle(
+  //   devBattleId: number,
+  //   addTeamDto: AddTeamToDevBattleDto,
+  // ): Promise<DevBattle> {
+  //   const { name, description } = addTeamDto;
+
+  //   // 해당 DevBattle을 찾음
+  //   const devBattle = await this.devBattleRepo.findOne({
+  //     where: { id: devBattleId },
+  //     relations: ['teams'], // 관련된 teams도 로드
+  //   });
+
+  //   if (!devBattle) {
+  //     // DevBattle이 없을 경우 예외 처리
+  //     throw new Error(`DevBattle with id ${devBattleId} not found`);
+  //   }
+
+  //   // TeamForDevBattle 엔티티 생성
+  //   const team = this.teamForDevBattleRepo.create({
+  //     name,
+  //     description,
+  //     devBattle,
+  //   });
+
+  //   // 데이터베이스에 저장
+  //   const savedTeam = await this.teamForDevBattleRepo.save(team);
+
+  //   // DevSpecForTeamBattle 엔티티 생성
+  //   const devSpecForTeamBattle = this.devSpecForTeamBattleRepo.create({
+  //     // 여기서는 빈 값으로 설정하지만, 필요에 따라 초기값을 설정할 수 있습니다.
+  //     backendLanguage: null,
+  //     frontendLanguage: null,
+  //     backendLibrary: null,
+  //     frontendLibrary: null,
+  //     orm: null,
+  //     css: null,
+  //     app: null,
+  //     collaborationTool: null,
+  //     devops: null,
+  //     devTeam: savedTeam, // 여기서 savedTeam을 할당합니다.
+  //   });
+
+  //   // DevSpecForTeamBattle을 데이터베이스에 저장합니다.
+  //   const savedDevSpecForTeamBattle = await this.devSpecForTeamBattleRepo.save(devSpecForTeamBattle);
+
+  //   // DevBattle에 저장된 팀 추가
+  //   devBattle.teams.push(savedTeam);
+
+  //   // DevBattle 업데이트
+  //   await this.devBattleRepo.save(devBattle);
+
+  //   // 업데이트된 DevBattle 반환
+  //   return devBattle;
+  // }
 
   async updateForSpecificDevSpecForNotArryTypeForTeamBattle(
     teamId: number,
@@ -186,33 +290,6 @@ export class DevBattleService {
 
     // Save the updated DevSpecForTeamBattle object to the database
     await this.devSpecForTeamBattleRepo.save(devSpec, { reload: true });
-  }
-
-  async deleteTeamForDevBattle(teamId: number): Promise<void> {
-    const team = await this.teamForDevBattleRepo.findOneBy({ id: teamId });
-
-    if (!team) {
-      throw new NotFoundException(`Team with ID ${teamId} not found`);
-    }
-
-    const devProgressRecords = await this.devProgressForTeamRepo.findBy({ id: team.id });
-    await this.devProgressForTeamRepo.remove(devProgressRecords);
-
-    // Delete the team's member records
-    const memberRecords = await this.memberForDevTeamRepo.findBy({ id: team.id });
-    await this.memberForDevTeamRepo.remove(memberRecords);
-
-    // Delete dev specs for team id
-    const devSpecs = await this.devSpecForTeamBattleRepo
-      .createQueryBuilder("devSpec")
-      .leftJoinAndSelect("devSpec.devTeam", "devTeam")
-      .where("devTeam.id = :id", { id: teamId })
-      .getMany();
-
-    await this.devSpecForTeamBattleRepo.remove(devSpecs);
-
-    // Delete the team record
-    await this.teamForDevBattleRepo.remove(team);
   }
 
   async addDevProgressForTeam(teamId: number, addDevProgressForTeamDto: AddDevProgressForTeamDto): Promise<DevProgressForTeam> {

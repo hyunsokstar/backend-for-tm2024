@@ -13,28 +13,10 @@ import { AddItemToSpecificFieldForTeamDevSpecDto } from './dto/add-Item-to-Speci
 export class DevBattleController {
   constructor(private readonly devBattleService: DevBattleService) { }
 
-  @Patch('/team/:teamId/update-dev-spec/:fieldName')
-  async updateForSpecificDevSpecForNotArryTypeForTeamBattle(
-    @Param('teamId', ParseIntPipe) teamId: number,
-    @Param('fieldName') fieldName: string,
-    @Body('itemText') itemText: string,
-  ): Promise<{ message: string }> {
-    await this.devBattleService.updateForSpecificDevSpecForNotArryTypeForTeamBattle(
-      teamId,
-      fieldName,
-      itemText,
-    );
-
-    return { message: 'Successfully updated the field for team\'s dev spec' };
-
-  }
-
-  @Patch('/team/:teamId/update-dev-spec-specific-field')
-  async addItemToSpecificFieldForDevSpec(
-    @Param('teamId', ParseIntPipe) teamId: number,
-    @Body() devSpecForTeamBattleUpdateDto: AddItemToSpecificFieldForTeamDevSpecDto,
-  ): Promise<void> {
-    await this.devBattleService.addItemToSpecificFieldForDevSpec(teamId, devSpecForTeamBattleUpdateDto);
+  @Post(':devBattleId/add-team')
+  async addTeamToDevBattle(@Param('devBattleId') devBattleId: number, @Body() addTeamToDevBattleDto: AddTeamToDevBattleDto): Promise<DevBattle> {
+    console.log("dev battle team add ??");
+    return await this.devBattleService.addTeamToDevBattle(devBattleId, addTeamToDevBattleDto);
   }
 
   @Delete('/teams/:teamId')
@@ -46,10 +28,26 @@ export class DevBattleController {
     res.status(200).json(responseObject);
   }
 
-  @Post(':devBattleId/add-team')
-  async addTeamToDevBattle(@Param('devBattleId') devBattleId: number, @Body() addTeamToDevBattleDto: AddTeamToDevBattleDto): Promise<DevBattle> {
-    console.log("dev battle team add ??");
-    return await this.devBattleService.addTeamToDevBattle(devBattleId, addTeamToDevBattleDto);
+  @Patch('/team/:teamId/update-dev-spec/:fieldName')
+  async updateForSpecificDevSpecForNotArryTypeForTeamBattle(
+    @Param('teamId', ParseIntPipe) teamId: number,
+    @Param('fieldName') fieldName: string,
+    @Body('itemText') itemText: string,
+  ): Promise<{ message: string }> {
+    await this.devBattleService.updateForSpecificDevSpecForNotArryTypeForTeamBattle(
+      teamId,
+      fieldName,
+      itemText,
+    );
+    return { message: 'Successfully updated the field for team\'s dev spec' };
+  }
+
+  @Patch('/team/:teamId/update-dev-spec-specific-field')
+  async addItemToSpecificFieldForDevSpec(
+    @Param('teamId', ParseIntPipe) teamId: number,
+    @Body() devSpecForTeamBattleUpdateDto: AddItemToSpecificFieldForTeamDevSpecDto,
+  ): Promise<void> {
+    await this.devBattleService.addItemToSpecificFieldForDevSpec(teamId, devSpecForTeamBattleUpdateDto);
   }
 
   @Post('/teams/:teamId/progress')
