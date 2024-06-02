@@ -62,7 +62,7 @@ export class DevRelayService {
 
 
   async createDevAssignmentSubmission(devAssignmentId: number, createDevAssignmentSubmissionDto: CreateDevAssignmentSubmissionDto): Promise<DevAssignmentSubmission> {
-    const { title, noteUrl, figmaUrl, youtubeUrl } = createDevAssignmentSubmissionDto;
+    const { title, figmaUrl, youtubeUrl } = createDevAssignmentSubmissionDto;
 
     // DevAssignment 조회
     const devAssignment = await this.devAssignmentRepo.findOne({
