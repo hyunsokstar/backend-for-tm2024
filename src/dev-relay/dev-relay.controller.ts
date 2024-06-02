@@ -15,7 +15,6 @@ import { SubjectResponse } from './interface/subject-response.interface';
 export class DevRelayController {
   constructor(private readonly devRelayService: DevRelayService) { }
 
-  // dev-assignment-submission 추가
   @Post('dev-assignment/:id/dev-assignment-submission')
   async createDevAssignmentSubmission(
     @Param('id') devAssignmentId: number,
