@@ -17,11 +17,17 @@ export class DevAssignment {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ type: 'varchar', default: WeekDay.MONDAY })
-    day: WeekDay;
+    @Column({ type: 'varchar', default: WeekDay.MONDAY, nullable: true })
+    title: WeekDay;
 
-    @Column({ type: 'varchar', length: 255 })
-    title: string;
+    @Column({ type: 'varchar', length: 255, nullable: true })
+    subtitle: string;
+
+    @Column({ type: 'int', nullable: true })
+    techNoteId: number;
+
+    @Column({ type: 'text', nullable: true })
+    techNoteListUrl: string;
 
     @ManyToOne(() => CategoryForDevAssignment, category => category.devAssignments, { cascade: true })
     category: CategoryForDevAssignment;

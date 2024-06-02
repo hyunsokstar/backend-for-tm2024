@@ -15,6 +15,43 @@ import { SubjectResponse } from './interface/subject-response.interface';
 export class DevRelayController {
   constructor(private readonly devRelayService: DevRelayService) { }
 
+  @Post('dev-assignment/:id/dev-assignment-submission')
+  async createDevAssignmentSubmission(
+    @Param('id') devAssignmentId: number,
+    @Body() createDevAssignmentSubmissionDto: CreateDevAssignmentSubmissionDto,
+  ) {
+    console.log("dev-assignment-submission 생성 요청 check : ", devAssignmentId);
+    return this.devRelayService.createDevAssignmentSubmission(devAssignmentId, createDevAssignmentSubmissionDto);
+  }
+
+  @Delete('dev-assignment-submission/:id')
+  @HttpCode(200)
+  async deleteDevAssignmentSubmission(@Param('id') id: number): Promise<{ message: string }> {
+    return this.devRelayService.deleteDevAssignmentSubmission(id);
+  }
+
+  @Delete('dev-assignment/:id')
+  @HttpCode(200)
+  async deleteDevAssignment(@Param('id') id: number): Promise<object> {
+    await this.devRelayService.deleteDevAssignment(id);
+    return { message: `DevAssignment has been deleted successfully. ofr ${id}` };
+  }
+
+  @Post(':categoryId/create-dev-assignment')
+  createDevAssignment(@Param('categoryId') categoryId: number, @Body() createDevAssignmentDto: CreateDevAssignmentDto) {
+    return this.devRelayService.createDevAssignment(categoryId, createDevAssignmentDto);
+  }
+
+  @Get('subjects')
+  async getAllSubjects(): Promise<SubjectResponse[]> {
+    return this.devRelayService.getAllSubjects();
+  }
+
+  @Post('subject/:subjectId/category')
+  async createCategory(@Param('subjectId') subjectId: number, @Body('name') name: string) {
+    return await this.devRelayService.createCategoryForSubject(name, subjectId);
+  }
+
   @Delete('categories/:id')
   async deleteCategory(@Param('id') id: number): Promise<any> {
     console.log("cateogory delete 요청 check !");
@@ -53,11 +90,6 @@ export class DevRelayController {
     return { updatedCategoryCount };
   }
 
-  @Get('subjects')
-  async getAllSubjects(): Promise<SubjectResponse[]> {
-    return this.devRelayService.getAllSubjects();
-  }
-
   @Put('category-for-dev-assignment/:id')
   updateCategoryForDevAssginment(
     @Param('id') id: number,
@@ -66,12 +98,6 @@ export class DevRelayController {
     console.log("category-for-dev-assignment 2 : ", id);
 
     return this.devRelayService.updateCategoryForDevAssginment(id, updateCategoryDto);
-  }
-
-
-  @Post(':categoryId/create-dev-assignment')
-  createDevAssignment(@Param('categoryId') categoryId: number, @Body() createDevAssignmentDto: CreateDevAssignmentDto) {
-    return this.devRelayService.createDevAssignment(categoryId, createDevAssignmentDto);
   }
 
   @Get(':categoryId/dev-assignments')
@@ -92,20 +118,6 @@ export class DevRelayController {
   @Post('categories')
   async createCategories(@Body() categoriesDto: CategoryForDevAssignmentDto[]) {
     return this.devRelayService.createCategories(categoriesDto);
-  }
-
-  @Post('category')
-  async createCategory(@Body() categoryDto: CategoryForDevAssignmentDto) {
-    return this.devRelayService.createCategory(categoryDto);
-  }
-
-  @Post(':id/dev-assignment-submission')
-  async createDevAssignmentSubmission(
-    @Param('id') devAssignmentId: number,
-    @Body() createDevAssignmentSubmissionDto: CreateDevAssignmentSubmissionDto,
-  ) {
-    console.log("devAssignmentId : ", devAssignmentId);
-    return this.devRelayService.createDevAssignmentSubmission(devAssignmentId, createDevAssignmentSubmissionDto);
   }
 
   @Get('')

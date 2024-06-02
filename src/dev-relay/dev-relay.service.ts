@@ -12,9 +12,10 @@ import { CategoryForDevAssignment } from './entities/category-for-dev-assignment
 import { CategoryForDevAssignmentDto } from './dto/category-for-dev-assignment.dto';
 import { SubjectForCategory } from './entities/subject-for-category.entity';
 import { CreateSubjectDto } from './dto/subject-for-category.dto';
-import { UpdateSubjectForCategoryDto } from './dto/update-subject-for-category.dto';
 import { SubjectResponse } from './interface/subject-response.interface';
 import { CategoryResponse } from './interface/category-response.interface';
+import { TechNotesModel } from 'src/technotes/entities/technotes.entity';
+import { SkilNotesModel } from 'src/technotes/entities/skilnotes.entity';
 
 @Injectable()
 export class DevRelayService {
@@ -33,7 +34,155 @@ export class DevRelayService {
     @InjectRepository(SubjectForCategory)
     private subjectForCategoryRepo: Repository<SubjectForCategory>,
 
+    @InjectRepository(TechNotesModel)
+    private techNotesModelRepo: Repository<TechNotesModel>,
+
+    @InjectRepository(SkilNotesModel)
+    private skilNotesModelRepo: Repository<SkilNotesModel>,
+
   ) { }
+
+  async deleteDevAssignmentSubmission(id: number): Promise<{ message: string }> {
+    const submission = await this.devAssignmentSubmissionRepo.findOneBy({ id });
+
+    if (!submission) {
+      throw new NotFoundException(`DevAssignmentSubmission with ID "${id}" not found`);
+    }
+
+    // skilNoteId를 사용하여 SkilNotesModel 엔티티 삭제
+    const skilNote = await this.skilNotesModelRepo.findOneBy({ id: submission.skilNoteId });
+    if (skilNote) {
+      await this.skilNotesModelRepo.remove(skilNote);
+    }
+
+    await this.devAssignmentSubmissionRepo.remove(submission);
+
+    return { message: `DevAssignmentSubmission has been deleted successfully. for ${id}` };
+  }
+
+
+  async createDevAssignmentSubmission(devAssignmentId: number, createDevAssignmentSubmissionDto: CreateDevAssignmentSubmissionDto): Promise<DevAssignmentSubmission> {
+    const { title, noteUrl, figmaUrl, youtubeUrl } = createDevAssignmentSubmissionDto;
+
+    // DevAssignment 조회
+    const devAssignment = await this.devAssignmentRepo.findOne({
+      where: { id: devAssignmentId },
+    });
+
+    // devAssignment.techNoteId
+    // devAssignment.techNoteListUrl
+
+    const targetTechNote = await this.techNotesModelRepo.findOne({ where: { id: devAssignment.techNoteId } });
+
+    const skilNote = this.skilNotesModelRepo.create({
+      title: title,
+      techNote: targetTechNote,
+    });
+
+    const savedSkilNote = await this.skilNotesModelRepo.save(skilNote);
+
+    if (!devAssignment) {
+      throw new NotFoundException(`Dev Assignment with ID ${devAssignmentId} not found`);
+    }
+
+    // DevAssignmentSubmission 생성
+    const devAssignmentSubmission = this.devAssignmentSubmissionRepo.create({
+      title,
+      skilNoteId: savedSkilNote.id,
+      noteUrl: `http://13.209.211.181:3000/Note/SkilNoteContents/${savedSkilNote.id}/1`,
+      figmaUrl,
+      youtubeUrl,
+      devAssignment, // 이 부분이 수정된 부분입니다.
+    });
+
+    return await this.devAssignmentSubmissionRepo.save(devAssignmentSubmission);
+  }
+
+  async createCategoryForSubject(name: string, subjectId: number) {
+    console.log("name :::::::: ", name);
+    const subject = await this.subjectForCategoryRepo.findOne({ where: { id: subjectId } });
+    if (!subject) {
+      throw new NotFoundException(`Subject with ID ${subjectId} not found`);
+    }
+    const category = this.categoryForDevAssignmentRepo.create({ name, subject });
+    return this.categoryForDevAssignmentRepo.save(category);
+  }
+
+
+  async deleteDevAssignment(id: number): Promise<void> {
+    const devAssignment = await this.devAssignmentRepo.findOne({ where: { id } });
+
+    if (!devAssignment) {
+      throw new NotFoundException(`DevAssignment with ID "${id}" not found`);
+    }
+
+    // 해당 DevAssignment에 대한 TechNotesModel 삭제
+    if (devAssignment.techNoteId) {
+      await this.techNotesModelRepo.delete(devAssignment.techNoteId);
+    }
+
+    // 해당 DevAssignment에 대한 제출 데이터 모두 삭제
+    const devAssignmentSubmissions = await this.devAssignmentSubmissionRepo.find({
+      where: { devAssignment },
+    });
+    await this.devAssignmentSubmissionRepo.remove(devAssignmentSubmissions);
+
+    // DevAssignment 엔티티 삭제
+    await this.devAssignmentRepo.remove(devAssignment);
+  }
+
+
+  async createDevAssignment(categoryId: number, createDevAssignmentDto: CreateDevAssignmentDto): Promise<DevAssignment> {
+    const category = await this.categoryForDevAssignmentRepo.findOne({
+      where: {
+        id: categoryId
+      }
+    });
+
+    if (!category) {
+      throw new NotFoundException('해당 카테고리를 찾을 수 없습니다.');
+    }
+
+    const { title, subtitle } = createDevAssignmentDto;
+
+    // TechNotesModel 엔티티 생성
+    const techNote = this.techNotesModelRepo.create({
+      title: `${title} 에 대한 테크 노트`,
+      category: `${subtitle}`,
+    });
+
+    // TechNotesModel 데이터베이스에 저장
+    const savedTechNote = await this.techNotesModelRepo.save(techNote);
+
+    const newAssignment = await this.devAssignmentRepo.create({ title, subtitle, category });
+    const savedDevAssignment = await this.devAssignmentRepo.save(newAssignment);
+
+    // DevAssignment update
+    savedDevAssignment.techNoteId = savedTechNote.id;
+    savedDevAssignment.techNoteListUrl = `http://13.209.211.181:3000/Note/TechNoteList/${savedTechNote.id}/SkilNoteListPage`;
+
+    // DevAssignment 저장
+    await this.devAssignmentRepo.save(savedDevAssignment);
+
+    return savedDevAssignment;
+  }
+
+
+
+  async getAllSubjects(): Promise<SubjectResponse[]> {
+    const subjects = await this.subjectForCategoryRepo.find({
+      relations: ['categories'],
+      order: {
+        id: 'ASC',
+      },
+    });
+
+    return subjects.map(subject => ({
+      id: subject.id,
+      name: subject.name,
+      countForCategories: subject.categories.length,
+    }));
+  }
 
   async deleteCategory(id: number): Promise<CategoryResponse> {
     const category = await this.categoryForDevAssignmentRepo.findOneBy({ id });
@@ -124,25 +273,6 @@ export class DevRelayService {
   }
 
 
-  async getAllSubjects(): Promise<SubjectResponse[]> {
-    const subjects = await this.subjectForCategoryRepo.find({
-      relations: ['categories'],
-      order: {
-        id: 'ASC',
-      },
-    });
-
-    return subjects.map(subject => ({
-      id: subject.id,
-      name: subject.name,
-      countForCategories: subject.categories.length,
-    }));
-  }
-
-
-
-
-
   async updateCategoryForDevAssginment(id: number, updateCategoryDto: CategoryForDevAssignmentDto): Promise<CategoryForDevAssignmentDto> {
     const category = await this.categoryForDevAssignmentRepo.findOne({ where: { id: id } });
     if (!category) {
@@ -174,24 +304,6 @@ export class DevRelayService {
     });
   }
 
-  async createDevAssignment(categoryId: number, createDevAssignmentDto: CreateDevAssignmentDto): Promise<DevAssignment> {
-    // 해당 categoryId에 대한 카테고리가 존재하는지 확인
-    const category = await this.categoryForDevAssignmentRepo.findOne({
-      where: {
-        id: categoryId
-      }
-    });
-
-    if (!category) {
-      throw new NotFoundException('해당 카테고리를 찾을 수 없습니다.');
-    }
-
-    // DevAssignment 생성
-    const { day, title } = createDevAssignmentDto;
-    const newAssignment = this.devAssignmentRepo.create({ day, title, category });
-    return this.devAssignmentRepo.save(newAssignment);
-  }
-
 
   async createDevAssignments(categoryId: number, createDevAssignmentsDto: CreateDevAssignmentDto[]): Promise<DevAssignment[]> {
     // 해당 categoryId에 대한 카테고리가 존재하는지 확인
@@ -203,12 +315,12 @@ export class DevRelayService {
     // createDevAssignmentsDto 배열을 순회하면서 DevAssignment 생성
     const devAssignments: DevAssignment[] = [];
     for (const assignmentDto of createDevAssignmentsDto) {
-      const { title, day } = assignmentDto;
+      const { title, subtitle } = assignmentDto;
 
       // DevAssignment 생성
       const devAssignment = this.devAssignmentRepo.create({
         title,
-        day,
+        subtitle,
         category: category,
       });
 
@@ -230,51 +342,6 @@ export class DevRelayService {
     });
     return this.categoryForDevAssignmentRepo.save(categories);
   }
-
-  async createCategory(categoryDto: CategoryForDevAssignmentDto) {
-    const { name } = categoryDto;
-    const category = this.categoryForDevAssignmentRepo.create({ name });
-    return this.categoryForDevAssignmentRepo.save(category);
-  }
-
-  async createDevAssignmentSubmission(devAssignmentId: number, createDevAssignmentSubmissionDto: CreateDevAssignmentSubmissionDto): Promise<DevAssignmentSubmission> {
-    const { title, noteUrl, figmaUrl, youtubeUrl } = createDevAssignmentSubmissionDto;
-
-    // DevAssignment 조회
-    const devAssignment = await this.devAssignmentRepo.findOne({
-      where: { id: devAssignmentId },
-    });
-
-    if (!devAssignment) {
-      throw new NotFoundException(`Dev Assignment with ID ${devAssignmentId} not found`);
-    }
-
-    // DevAssignmentSubmission 생성
-    const devAssignmentSubmission = this.devAssignmentSubmissionRepo.create({
-      title,
-      noteUrl,
-      figmaUrl,
-      youtubeUrl,
-      devAssignment, // 이 부분이 수정된 부분입니다.
-    });
-
-    return await this.devAssignmentSubmissionRepo.save(devAssignmentSubmission);
-  }
-
-  // async createDevAssignments(createDevAssignmentsDto: CreateDevAssignmentDto[]): Promise<DevAssignment[]> {
-  //   const createdAssignments: DevAssignment[] = [];
-  //   for (const assignmentDto of createDevAssignmentsDto) {
-  //     const createdAssignment = await this.createDevAssignment(assignmentDto);
-  //     createdAssignments.push(createdAssignment);
-  //   }
-  //   return createdAssignments;
-  // }
-
-  // async createDevAssignment(createDevAssignmentDto: CreateDevAssignmentDto): Promise<DevAssignment> {
-  //   const { day, title } = createDevAssignmentDto;
-  //   const newAssignment = this.devAssignmentRepo.create({ day, title });
-  //   return this.devAssignmentRepo.save(newAssignment);
-  // }
 
   async findAllDevRelays(): Promise<DevRelay[]> {
     return await this.devRelayRepo.find();

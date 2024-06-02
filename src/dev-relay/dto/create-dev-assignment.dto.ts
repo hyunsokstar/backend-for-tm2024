@@ -4,9 +4,9 @@ import { WeekDay } from '../entities/dev-assignment.entity';
 
 export class CreateDevAssignmentDto {
     @IsString()
-    day: WeekDay;
+    title: WeekDay;
 
     @IsString()
-    title: string;
+    subtitle: string;
 
 }
