@@ -44,6 +44,7 @@ export class DevBattleService {
 
   async deleteTeamForDevBattle(teamId: number): Promise<void> {
     const team = await this.teamForDevBattleRepo.findOneBy({ id: teamId });
+    console.log("삭제할 team : ", team);
 
     if (!team) {
       throw new NotFoundException(`Team with ID ${teamId} not found`);
@@ -53,25 +54,13 @@ export class DevBattleService {
     const techNote = await this.techNotesModelRepo.findOneBy({ id: team.techNoteId });
 
     if (techNote) {
-      // Delete the associated TechNotesModel
       await this.techNotesModelRepo.remove(techNote);
+      console.log("delete team 1");
     }
 
-    // const devProgressRecords = await this.devProgressForTeamRepo.findBy({ id: team.id });
-
-    const devProgressRecord = await this.devProgressForTeamRepo.findOne({ where: { id: team.id } });
+    const devProgressRecord = await this.devProgressForTeamRepo.find({ where: { team: { id: team.id } } });
 
     if (devProgressRecord) {
-      // Find the associated SkilNotesModel
-      const skilNote = await this.skilNotesModelRepo.findOneBy({ id: devProgressRecord.skilNoteId });
-
-      if (skilNote) {
-        // Delete the associated SkilNotesModel
-        await this.skilNotesModelRepo.remove(skilNote);
-      }
-
-      // todo: devProgressRecords.skilNoteId 에 해당 하는 skilNote 삭제
-
       await this.devProgressForTeamRepo.remove(devProgressRecord);
 
       // Delete the team's member records
@@ -93,10 +82,9 @@ export class DevBattleService {
   }
 
   async addDevProgressForTeam(teamId: number, addDevProgressForTeamDto: AddDevProgressForTeamDto): Promise<DevProgressForTeam> {
+    console.log("teamId : ", teamId);
     const team = await this.teamForDevBattleRepo.findOne({ where: { id: teamId } });
-
     console.log("team : ", team);
-
 
     if (!team) {
       throw new NotFoundException(`Team with ID ${teamId} not found`);

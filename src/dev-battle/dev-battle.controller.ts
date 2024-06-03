@@ -8,7 +8,6 @@ import { AddDevProgressForTeamDto } from './dto/add-dev-progress-for-team.dto';
 import { DevProgressForTeam } from './entities/dev-progress-for-team.entity';
 import { TeamForDevBattle } from './entities/team-for-dev-battle.entity';
 import { AddItemToSpecificFieldForTeamDevSpecDto } from './dto/add-Item-to-Specific-field-for-team-dev-spec.dto';
-
 @Controller('dev-battle')
 export class DevBattleController {
   constructor(private readonly devBattleService: DevBattleService) { }
@@ -30,6 +29,10 @@ export class DevBattleController {
 
   @Delete('/teams/:teamId')
   async deleteTeam(@Param('teamId', ParseIntPipe) teamId: number, @Res() res): Promise<void> {
+
+    console.log("team delete check teamId : ", teamId);
+
+
     await this.devBattleService.deleteTeamForDevBattle(teamId);
 
     // Return an appropriate response object
