@@ -12,6 +12,7 @@ import { AddItemToSpecificFieldForTeamDevSpecDto } from './dto/add-Item-to-Speci
 export class DevBattleController {
   constructor(private readonly devBattleService: DevBattleService) { }
 
+  // progress 추가
   @Post('/teams/:teamId/progress')
   @HttpCode(201)
   async addDevProgressForTeam(
