@@ -15,6 +15,36 @@ import { SubjectResponse } from './interface/subject-response.interface';
 export class DevRelayController {
   constructor(private readonly devRelayService: DevRelayService) { }
 
+  @Delete('subjects/:id')
+  async deleteSubject(@Param('id') id: number): Promise<{ id: number; name: string }> {
+    const subject = await this.devRelayService.deleteSubject(id);
+    return { id: subject.id, name: subject.name };
+  }
+
+  @Delete('dev-assignment/:id')
+  @HttpCode(200)
+  async deleteDevAssignment(@Param('id') id: number): Promise<object> {
+    await this.devRelayService.deleteDevAssignment(id);
+    return { message: `DevAssignment has been deleted successfully. ofr ${id}` };
+  }
+
+  @Put('subject/:subjectId/update-name')
+  async updateSubjectName(
+    @Param('subjectId') subjectId: number,
+    @Body('name') name: string,
+  ): Promise<{ id: number, name: string }> {
+    const updatedSubject = await this.devRelayService.updateSubjectName(
+      subjectId,
+      name,
+    );
+
+    return {
+      id: updatedSubject.id,
+      name: updatedSubject.name,
+    };
+
+  }
+
   @Post('dev-assignment/:id/dev-assignment-submission')
   async createDevAssignmentSubmission(
     @Param('id') devAssignmentId: number,
@@ -28,13 +58,6 @@ export class DevRelayController {
   @HttpCode(200)
   async deleteDevAssignmentSubmission(@Param('id') id: number): Promise<{ message: string }> {
     return this.devRelayService.deleteDevAssignmentSubmission(id);
-  }
-
-  @Delete('dev-assignment/:id')
-  @HttpCode(200)
-  async deleteDevAssignment(@Param('id') id: number): Promise<object> {
-    await this.devRelayService.deleteDevAssignment(id);
-    return { message: `DevAssignment has been deleted successfully. ofr ${id}` };
   }
 
   @Post(':categoryId/create-dev-assignment')
@@ -57,13 +80,6 @@ export class DevRelayController {
     console.log("cateogory delete 요청 check !");
     const category = await this.devRelayService.deleteCategory(id);
     return { message: `Category with ID ${id} has been deleted.`, name: category.name };
-  }
-
-
-  @Delete('subjects/:id')
-  async deleteSubject(@Param('id') id: number): Promise<{ id: number; name: string }> {
-    const subject = await this.devRelayService.deleteSubject(id);
-    return { id: subject.id, name: subject.name };
   }
 
   @Post('subjects')

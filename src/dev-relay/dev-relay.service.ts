@@ -42,6 +42,17 @@ export class DevRelayService {
 
   ) { }
 
+  async updateSubjectName(subjectId: number, name: string): Promise<SubjectForCategory> {
+    const subject = await this.subjectForCategoryRepo.findOne({ where: { id: subjectId } });
+
+    if (!subject) {
+      throw new NotFoundException(`Subject with id ${subjectId} not found`);
+    }
+
+    subject.name = name;
+    return this.subjectForCategoryRepo.save(subject);
+  }
+
   async deleteDevAssignmentSubmission(id: number): Promise<{ message: string }> {
     const submission = await this.devAssignmentSubmissionRepo.findOneBy({ id });
 
