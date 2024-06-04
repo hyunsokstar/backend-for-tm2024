@@ -8,11 +8,19 @@ import { AddDevProgressForTeamDto } from './dto/add-dev-progress-for-team.dto';
 import { DevProgressForTeam } from './entities/dev-progress-for-team.entity';
 import { TeamForDevBattle } from './entities/team-for-dev-battle.entity';
 import { AddItemToSpecificFieldForTeamDevSpecDto } from './dto/add-Item-to-Specific-field-for-team-dev-spec.dto';
+import { UpdateDevProgressForTeamDto } from './dto/update-dev-progress.dto';
 @Controller('dev-battle')
 export class DevBattleController {
   constructor(private readonly devBattleService: DevBattleService) { }
 
-  // progress 추가2
+  @Patch('/dev-progress/:progressId')
+  async updateDevProgressForTeam(
+    @Param('progressId', ParseIntPipe) progressId: number,
+    @Body() updateDevProgressForTeamDto: UpdateDevProgressForTeamDto,
+  ): Promise<DevProgressForTeam> {
+    return this.devBattleService.updateDevProgressForTeam(progressId, updateDevProgressForTeamDto);
+  }
+
   @Post('/teams/:teamId/progress')
   @HttpCode(201)
   async addDevProgressForTeam(
@@ -30,9 +38,7 @@ export class DevBattleController {
 
   @Delete('/teams/:teamId')
   async deleteTeam(@Param('teamId', ParseIntPipe) teamId: number, @Res() res): Promise<void> {
-
     console.log("team delete check teamId : ", teamId);
-
 
     await this.devBattleService.deleteTeamForDevBattle(teamId);
 

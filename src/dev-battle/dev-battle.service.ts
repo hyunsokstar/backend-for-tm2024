@@ -15,6 +15,7 @@ import { DevSpecForTeamBattle } from './entities/dev-spec-for-team-battle.entity
 import { AddItemToSpecificFieldForTeamDevSpecDto } from './dto/add-Item-to-Specific-field-for-team-dev-spec.dto';
 import { TechNotesModel } from 'src/technotes/entities/technotes.entity';
 import { SkilNotesModel } from 'src/technotes/entities/skilnotes.entity';
+import { UpdateDevProgressForTeamDto } from './dto/update-dev-progress.dto';
 
 @Injectable()
 export class DevBattleService {
@@ -41,6 +42,29 @@ export class DevBattleService {
     private skilNotesModelRepo: Repository<SkilNotesModel>,
 
   ) { }
+
+  async updateDevProgressForTeam(
+    progressId: number,
+    updateDevProgressForTeamDto: UpdateDevProgressForTeamDto,
+  ): Promise<DevProgressForTeam> {
+    const devProgressForTeam = await this.devProgressForTeamRepo.findOneBy({ id: progressId });
+
+    if (!devProgressForTeam) {
+      throw new NotFoundException('Dev progress for team not found');
+    }
+
+    const { task, figmaUrl, youtubeUrl, noteUrl, status } = updateDevProgressForTeamDto;
+
+    devProgressForTeam.task = task ?? devProgressForTeam.task;
+    devProgressForTeam.figmaUrl = figmaUrl ?? devProgressForTeam.figmaUrl;
+    devProgressForTeam.youtubeUrl = youtubeUrl ?? devProgressForTeam.youtubeUrl;
+    devProgressForTeam.noteUrl = noteUrl ?? devProgressForTeam.noteUrl;
+    devProgressForTeam.status = status ?? devProgressForTeam.status;
+
+    await this.devProgressForTeamRepo.save(devProgressForTeam);
+
+    return devProgressForTeam;
+  }
 
   async deleteTeamForDevBattle(teamId: number): Promise<void> {
     const team = await this.teamForDevBattleRepo.findOneBy({ id: teamId });
