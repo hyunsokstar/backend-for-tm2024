@@ -30,7 +30,6 @@ export class RoadMapModel {
     @OneToMany(() => TechNotesModel, techNote => techNote.roadMap)
     techNotes: TechNotesModel[]
 
-    // participants
     @OneToMany(() => ParticipantsForRoadMapModel, techNote => techNote.roadMap)
     participants: ParticipantsForRoadMapModel[]
 

@@ -7,6 +7,7 @@ import { CreateRoadMapDto } from '../dtos/createRoadMapDto.dto';
 import { RoadMapListDto } from '../dtos/roadMapList.dto';
 import { IParameterForSaveRoadMaps, ReponseTypeForGetAllRoadMapList, ResponseTypeForSaveRoadMaps } from './types/TypeForRoadMap';
 import { UsersModel } from 'src/users/entities/users.entity';
+import { TechNotesModel } from '../entities/technotes.entity';
 
 @Injectable()
 export class RoadmapService {
@@ -16,7 +17,8 @@ export class RoadmapService {
         private roadMapRepo: Repository<RoadMapModel>,
         @InjectRepository(UsersModel)
         private usersRepo: Repository<UsersModel>,
-
+        @InjectRepository(TechNotesModel)
+        private techNotesRepo: Repository<TechNotesModel>,
         @InjectRepository(ParticipantsForRoadMapModel)
         private ParticipantsForRoadRepo: Repository<ParticipantsForRoadMapModel>
     ) { }

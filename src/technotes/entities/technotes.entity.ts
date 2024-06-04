@@ -47,5 +47,4 @@ export class TechNotesModel {
     countForLikes: number;
     countForBookMarks: number;
     countForSkilNotes: number;
-
 }

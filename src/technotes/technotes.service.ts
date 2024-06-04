@@ -19,6 +19,7 @@ export class TechnotesService {
     constructor(
         @InjectRepository(TechNotesModel)
         private techNotesRepo: Repository<TechNotesModel>,
+
         @InjectRepository(RoadMapModel)
         private roadMapsRepo: Repository<RoadMapModel>,
 
@@ -44,6 +45,166 @@ export class TechnotesService {
         private readonly participantsForSkilNoteRepo: Repository<ParticipantsForSkilNoteModel>,
 
     ) { }
+
+    async getTechNotesByRoadMapId(
+        roadMapId: number,
+        pageNum: number = 1,
+        perPage: number = 10,
+        searchOption: string,
+        searchText: string,
+        isBestByLikes,
+        isBestByBookMarks
+    ): Promise<{
+        techNoteList: TechNotesModel[];
+        totalCount: number;
+        perPage: number;
+    }> {
+        const roadMap = await this.roadMapsRepo.findOne({
+            where: { id: roadMapId },
+            relations: [
+                'techNotes',
+                'techNotes.writer',
+                'techNotes.skilnotes',
+                'techNotes.participants',
+                'techNotes.participants.user',
+                'techNotes.likes',
+                'techNotes.likes.user',
+                'techNotes.bookMarks',
+                'techNotes.bookMarks.user',
+            ],
+        });
+
+        if (!roadMap) {
+            throw new HttpException('RoadMap not found', HttpStatus.NOT_FOUND);
+        }
+
+        let query = this.techNotesRepo
+            .createQueryBuilder('techNotes')
+            .where('techNotes.roadMapId = :roadMapId', { roadMapId })
+            .skip((pageNum - 1) * perPage)
+            .take(perPage)
+            .orderBy('techNotes.id', 'DESC');
+
+        // 검색 옵션에 따라 where 조건 추가
+        if (searchOption && searchText) {
+            if (searchOption === 'email') {
+                query = query.where('writer.email LIKE :searchText', {
+                    searchText: `%${searchText}%`,
+                });
+            } else {
+                query = query
+                    .where(`techNotes.${searchOption} LIKE :searchText`, {
+                        searchText: `%${searchText}%`,
+                    })
+                    .andWhere('techNotes.roadMapId = :roadMapId', { roadMapId });
+            }
+        }
+
+        const [techNoteList, totalCount] = await query
+            .leftJoinAndSelect('techNotes.writer', 'writer')
+            .leftJoinAndSelect('techNotes.skilnotes', 'skilnotes')
+            .leftJoinAndSelect('techNotes.participants', 'participants')
+            .leftJoinAndSelect('participants.user', 'user')
+            .leftJoinAndSelect('techNotes.likes', 'likes')
+            .leftJoinAndSelect('likes.user', 'likeUser')
+            .leftJoinAndSelect('techNotes.bookMarks', 'bookMarks')
+            .leftJoinAndSelect('bookMarks.user', 'bookMarksUser')
+            .getManyAndCount();
+
+        const techNoteListWithCounts = techNoteList.map((techNote) => {
+            techNote.countForLikes = techNote.likes.length;
+            techNote.countForBookMarks = techNote.bookMarks.length;
+            techNote.countForSkilNotes = techNote.skilnotes.length;
+            return techNote;
+        });
+
+        if (isBestByLikes == 'true') {
+            techNoteListWithCounts.sort((a, b) => b.countForLikes - a.countForLikes);
+        }
+
+        if (isBestByBookMarks == 'true') {
+            techNoteListWithCounts.sort((a, b) => b.countForBookMarks - a.countForBookMarks);
+        }
+
+        return {
+            techNoteList: techNoteListWithCounts,
+            totalCount,
+            perPage,
+        };
+    }
+
+    async getAllTechNotes(
+        pageNum: number = 1,
+        perPage: number = 10,
+        searchOption: string,
+        searchText: string,
+        isBestByLikes,
+        isBestByBookMarks
+    ): Promise<{
+        techNoteList: TechNotesModel[];
+        totalCount: number;
+        perPage: number;
+    }> {
+
+        console.log("pageNum : ", pageNum);
+        console.log("perPage : ", perPage);
+        console.log("searchOption : ", searchOption);
+        console.log("searchText : ", searchText);
+
+        let query = this.techNotesRepo.createQueryBuilder('techNotes')
+            .skip((pageNum - 1) * perPage)
+            .take(perPage)
+            .orderBy('techNotes.id', 'DESC');
+
+        // 검색 옵션에 따라 where 조건 추가
+        if (searchOption && searchText) {
+            if (searchOption === "email") {
+                query = query
+                    .where('writer.email LIKE :searchText', { searchText: `%${searchText}%` });
+            } else {
+                query = query.where(`techNotes.${searchOption} LIKE :searchText`, { searchText: `%${searchText}%` });
+
+            }
+        }
+
+        const [techNoteList, totalCount] = await query
+            .leftJoinAndSelect('techNotes.writer', 'writer')
+            .leftJoinAndSelect('techNotes.skilnotes', 'skilnotes')
+            .leftJoinAndSelect('techNotes.participants', 'participants')
+            .leftJoinAndSelect('participants.user', 'user')
+            .leftJoinAndSelect('techNotes.likes', 'likes')
+            .leftJoinAndSelect('likes.user', 'likeUser')
+            .leftJoinAndSelect('techNotes.bookMarks', 'bookMarks')
+            .leftJoinAndSelect('bookMarks.user', 'bookMarksUser')
+            .getManyAndCount();
+
+        const techNoteListWithCounts = techNoteList.map(techNote => {
+            techNote.countForLikes = techNote.likes.length; // 수정 필요
+            techNote.countForBookMarks = techNote.bookMarks.length; // 수정 필요
+            techNote.countForSkilNotes = techNote.skilnotes.length; // 수정 필요
+            return techNote;
+        });
+
+        // console.log("techNoteList ?? ", techNoteList);
+
+        if (isBestByLikes == "true") {
+            console.log("excute check 11111");
+            techNoteListWithCounts.sort((a, b) => b.countForLikes - a.countForLikes);
+        }
+
+        if (isBestByBookMarks == "true") {
+            techNoteListWithCounts.sort((a, b) => b.countForBookMarks - a.countForBookMarks);
+        }
+
+        console.log("isBestByLikes at skilnote: ", isBestByLikes);
+        console.log("isBestByBookMarks : at skilnote", isBestByBookMarks);
+
+        return {
+            techNoteList: techNoteListWithCounts,
+            totalCount,
+            perPage
+        };
+    }
 
     async toggleLikeForTechNote(userId: number, techNoteId: number): Promise<boolean> {
         const user = await this.usersRepository.findOne({ where: { id: userId } });
@@ -235,79 +396,6 @@ export class TechnotesService {
         techNote.roadMap = roadmapObj;
 
         return this.techNotesRepo.save(techNote);
-    }
-
-    async getAllTechNotes(
-        pageNum: number = 1,
-        perPage: number = 10,
-        searchOption: string,
-        searchText: string,
-        isBestByLikes,
-        isBestByBookMarks
-    ): Promise<{
-        techNoteList: TechNotesModel[];
-        totalCount: number;
-        perPage: number;
-    }> {
-
-        console.log("pageNum : ", pageNum);
-        console.log("perPage : ", perPage);
-        console.log("searchOption : ", searchOption);
-        console.log("searchText : ", searchText);
-
-        let query = this.techNotesRepo.createQueryBuilder('techNotes')
-            .skip((pageNum - 1) * perPage)
-            .take(perPage)
-            .orderBy('techNotes.id', 'DESC');
-
-        // 검색 옵션에 따라 where 조건 추가
-        if (searchOption && searchText) {
-            if (searchOption === "email") {
-                query = query
-                    .where('writer.email LIKE :searchText', { searchText: `%${searchText}%` });
-            } else {
-                query = query.where(`techNotes.${searchOption} LIKE :searchText`, { searchText: `%${searchText}%` });
-
-            }
-        }
-
-        const [techNoteList, totalCount] = await query
-            .leftJoinAndSelect('techNotes.writer', 'writer')
-            .leftJoinAndSelect('techNotes.skilnotes', 'skilnotes')
-            .leftJoinAndSelect('techNotes.participants', 'participants')
-            .leftJoinAndSelect('participants.user', 'user')
-            .leftJoinAndSelect('techNotes.likes', 'likes')
-            .leftJoinAndSelect('likes.user', 'likeUser')
-            .leftJoinAndSelect('techNotes.bookMarks', 'bookMarks')
-            .leftJoinAndSelect('bookMarks.user', 'bookMarksUser')
-            .getManyAndCount();
-
-        const techNoteListWithCounts = techNoteList.map(techNote => {
-            techNote.countForLikes = techNote.likes.length; // 수정 필요
-            techNote.countForBookMarks = techNote.bookMarks.length; // 수정 필요
-            techNote.countForSkilNotes = techNote.skilnotes.length; // 수정 필요
-            return techNote;
-        });
-
-        // console.log("techNoteList ?? ", techNoteList);
-
-        if (isBestByLikes == "true") {
-            console.log("excute check 11111");
-            techNoteListWithCounts.sort((a, b) => b.countForLikes - a.countForLikes);
-        }
-
-        if (isBestByBookMarks == "true") {
-            techNoteListWithCounts.sort((a, b) => b.countForBookMarks - a.countForBookMarks);
-        }
-
-        console.log("isBestByLikes at skilnote: ", isBestByLikes);
-        console.log("isBestByBookMarks : at skilnote", isBestByBookMarks);
-
-        return {
-            techNoteList: techNoteListWithCounts,
-            totalCount,
-            perPage
-        };
     }
 
     async getAllSkilNotes(

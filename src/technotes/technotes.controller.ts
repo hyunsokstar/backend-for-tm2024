@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Post, Query, Req, Res } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Query, Req, Res } from "@nestjs/common";
 import { TechnotesService } from "./technotes.service";
 import { DtoForCreateTechNote } from "./dtos/dtoForCreateTechNote.dto";
 
@@ -6,23 +6,28 @@ import { DtoForCreateTechNote } from "./dtos/dtoForCreateTechNote.dto";
 export class TechnotesController {
     constructor(private readonly technotesService: TechnotesService) { }
 
-    @Get('/corriculmnsForSkilnote')
-    async getAllCorriculmnsForUserCorricumnsForSkilNotes(
-        @Query('techNoteId') techNoteId,
-        @Query('userId') userId,
+    @Get('for-road-map/:roadMapId/techNoteList')
+    async getTechNotesByRoadMapId(
+        @Param('roadMapId') roadMapId: number,
+        @Query('pageNum') pageNum = 1,
+        @Query('perPage') perPage = 10,
+        @Query('searchOption') searchOption = "",
+        @Query('searchText') searchText = "",
+        @Query('isBestByLikes') isBestByLikes = false,
+        @Query('isBestByBookMarks') isBestByBookMarks = false,
         @Req() req
     ) {
-        const response = await this.technotesService.getAllCorriculmnsForUserCorricumnsForSkilNotes(
-            techNoteId, userId
+        return this.technotesService.getTechNotesByRoadMapId(
+            roadMapId,
+            pageNum,
+            perPage,
+            searchOption,
+            searchText,
+            isBestByLikes,
+            isBestByBookMarks
         );
-
-        return response
     }
 
-    @Post() // POST 요청을 처리하는 엔드포인트 추가
-    async createTechNoteForRoadMap(@Body() dto: DtoForCreateTechNote) {
-        return this.technotesService.createTechNote(dto);
-    }
 
     @Get()
     async getAllTechNoteList(
@@ -45,9 +50,22 @@ export class TechnotesController {
         );
     }
 
-    // userId, techNoteId 받아서 techNote에 대한 좋아요 실행하는 controller 작성 하기
-    // post, /likeTechNote
-    // service 와 연동
+    @Get('/corriculmnsForSkilnote')
+    async getAllCorriculmnsForUserCorricumnsForSkilNotes(
+        @Query('techNoteId') techNoteId,
+        @Query('userId') userId,
+        @Req() req
+    ) {
+        const response = await this.technotesService.getAllCorriculmnsForUserCorricumnsForSkilNotes(
+            techNoteId, userId
+        );
+        return response
+    }
+
+    @Post() // POST 요청을 처리하는 엔드포인트 추가
+    async createTechNoteForRoadMap(@Body() dto: DtoForCreateTechNote) {
+        return this.technotesService.createTechNote(dto);
+    }
 
     @Post('create/forRoadMap') // POST 요청을 처리하는 엔드포인트 추가
     async createTechNote(@Body() dto: DtoForCreateTechNote) {
@@ -82,10 +100,6 @@ export class TechnotesController {
 
             return await this.technotesService.deleteForCheckNoteIdsForCheckedIds(checkedIds, loginUser);
 
-            // return {
-            //     message: `총 ${deletedCount}명의 유저가 삭제되었습니다.`,
-            // };
-
         } catch (error) {
             throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -104,9 +118,6 @@ export class TechnotesController {
         res.status(200).json({ success: true, searchResult });
     }
 
-    // userId, techNoteId 받아서 techNote에 대한 좋아요 실행하는 controller 작성 하기
-    // post, /likeTechNote
-    // service 와 연동
     @Post('/likeTechNote')
     async toggleLikeForTechNote(
         @Req() req,
