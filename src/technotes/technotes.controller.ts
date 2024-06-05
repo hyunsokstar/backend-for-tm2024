@@ -6,6 +6,7 @@ import { DtoForCreateTechNote } from "./dtos/dtoForCreateTechNote.dto";
 export class TechnotesController {
     constructor(private readonly technotesService: TechnotesService) { }
 
+    // tech note list for road map
     @Get('for-road-map/:roadMapId/techNoteList')
     async getTechNotesByRoadMapId(
         @Param('roadMapId') roadMapId: number,
