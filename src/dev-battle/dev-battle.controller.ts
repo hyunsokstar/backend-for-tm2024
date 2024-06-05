@@ -13,6 +13,7 @@ import { UpdateDevProgressForTeamDto } from './dto/update-dev-progress.dto';
 export class DevBattleController {
   constructor(private readonly devBattleService: DevBattleService) { }
 
+  // progress 추가
   @Patch('/dev-progress/:progressId')
   async updateDevProgressForTeam(
     @Param('progressId', ParseIntPipe) progressId: number,
