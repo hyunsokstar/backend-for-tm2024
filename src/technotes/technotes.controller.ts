@@ -10,7 +10,7 @@ export class TechnotesController {
     async getTechNotesByRoadMapId(
         @Param('roadMapId') roadMapId: number,
         @Query('pageNum') pageNum = 1,
-        @Query('perPage') perPage = 10,
+        @Query('perPage') perPage = 20,
         @Query('searchOption') searchOption = "",
         @Query('searchText') searchText = "",
         @Query('isBestByLikes') isBestByLikes = false,
