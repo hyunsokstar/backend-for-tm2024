@@ -40,10 +40,7 @@ export class DevBattleController {
   @Delete('/teams/:teamId')
   async deleteTeam(@Param('teamId', ParseIntPipe) teamId: number, @Res() res): Promise<void> {
     console.log("team delete check teamId : ", teamId);
-
     await this.devBattleService.deleteTeamForDevBattle(teamId);
-
-    // Return an appropriate response object
     const responseObject = { message: `Team with ID ${teamId} deleted successfully` };
     res.status(200).json(responseObject);
   }
@@ -92,17 +89,13 @@ export class DevBattleController {
     @Param('teamId', ParseIntPipe) teamId: number,
     @Param('memberId', ParseIntPipe) memberId: number,
   ) {
-
     console.log("멤버 추가 요청 받음 ", teamId, memberId);
-
-
     const result = await this.devBattleService.addMemberToTeam(teamId, memberId);
 
     if (result.statusCode === 200) {
       return result;
     }
 
-    // 새로운 멤버인 경우
     const memberForDevTeam = result.data;
     const member = memberForDevTeam.user;
     const team = memberForDevTeam.team;
