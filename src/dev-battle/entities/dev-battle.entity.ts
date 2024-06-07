@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, OneToMany } from 'typeorm';
 import { TagForDevBattle } from './tag.entity';
 import { TeamForDevBattle } from './team-for-dev-battle.entity';
+import { TodoForDevBattleSubject } from './todo-for-dev-battle-subject.entity';
 
 @Entity()
 export class DevBattle {
@@ -16,5 +17,8 @@ export class DevBattle {
 
     @OneToMany(() => TeamForDevBattle, (team) => team.devBattle)
     teams: TeamForDevBattle[];
+
+    @OneToMany(() => TodoForDevBattleSubject, (todo) => todo.devBattle, { cascade: true })
+    todos: TodoForDevBattleSubject[];
 
 }

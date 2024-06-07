@@ -9,9 +9,27 @@ import { DevProgressForTeam } from './entities/dev-progress-for-team.entity';
 import { TeamForDevBattle } from './entities/team-for-dev-battle.entity';
 import { AddItemToSpecificFieldForTeamDevSpecDto } from './dto/add-Item-to-Specific-field-for-team-dev-spec.dto';
 import { UpdateDevProgressForTeamDto } from './dto/update-dev-progress.dto';
+import { AddTodoForDevBattleDto } from './dto/add-todo-for-dev-battle.dto';
+import { TodoForDevBattleSubject } from './entities/todo-for-dev-battle-subject.entity';
 @Controller('dev-battle')
 export class DevBattleController {
   constructor(private readonly devBattleService: DevBattleService) { }
+
+  @Post('/:devBattleId/todo')
+  @HttpCode(201)
+  async addTodoForDevBattle(
+    @Param('devBattleId', ParseIntPipe) devBattleId: number,
+    @Body() addTodoForDevBattleDto: AddTodoForDevBattleDto,
+  ): Promise<TodoForDevBattleSubject> {
+    console.log("dev battle id : ", devBattleId);
+
+    return await this.devBattleService.addTodoForDevBattle(devBattleId, addTodoForDevBattleDto);
+  }
+
+  @Get()
+  findAll() {
+    return this.devBattleService.findAllDevBattle();
+  }
 
   // progress 추가
   @Patch('/dev-progress/:progressId')
@@ -143,11 +161,6 @@ export class DevBattleController {
   @Patch(':id/tag')
   async addTagToDevBattle(@Param('id') devBattleId: number, @Body('textForTag') textForTag: string) {
     return await this.devBattleService.addTagToDevBattle(devBattleId, textForTag);
-  }
-
-  @Get()
-  findAll() {
-    return this.devBattleService.findAllDevBattle();
   }
 
   @Post('bulk-create')

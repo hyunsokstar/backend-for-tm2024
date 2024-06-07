@@ -16,6 +16,8 @@ import { AddItemToSpecificFieldForTeamDevSpecDto } from './dto/add-Item-to-Speci
 import { TechNotesModel } from 'src/technotes/entities/technotes.entity';
 import { SkilNotesModel } from 'src/technotes/entities/skilnotes.entity';
 import { UpdateDevProgressForTeamDto } from './dto/update-dev-progress.dto';
+import { TodoForDevBattleSubject } from './entities/todo-for-dev-battle-subject.entity';
+import { AddTodoForDevBattleDto } from './dto/add-todo-for-dev-battle.dto';
 
 @Injectable()
 export class DevBattleService {
@@ -41,7 +43,50 @@ export class DevBattleService {
     @InjectRepository(SkilNotesModel)
     private skilNotesModelRepo: Repository<SkilNotesModel>,
 
+    @InjectRepository(TodoForDevBattleSubject)
+    private todoForDevBattleSubjectRepo: Repository<TodoForDevBattleSubject>,
+
   ) { }
+
+  async addTodoForDevBattle(devBattleId: number, addTodoForDevBattleDto: AddTodoForDevBattleDto): Promise<TodoForDevBattleSubject> {
+    const devBattle = await this.devBattleRepo.findOneBy({ id: devBattleId });
+    if (!devBattle) {
+      throw new NotFoundException(`DevBattle with ID ${devBattleId} not found`);
+    }
+
+    console.log("addTodoForDevBattleDto.dueDate ? ", addTodoForDevBattleDto.dueDate);
+
+
+    const todo = new TodoForDevBattleSubject();
+    todo.title = addTodoForDevBattleDto.title;
+    todo.description = addTodoForDevBattleDto.description;
+    todo.dueDate = addTodoForDevBattleDto.dueDate ? addTodoForDevBattleDto.dueDate : null;
+    todo.devBattle = devBattle;
+
+    return await this.todoForDevBattleSubjectRepo.save(todo);
+  }
+
+  async findAllDevBattle(): Promise<DevBattle[]> {
+    return await this.devBattleRepo.find({
+      relations: [
+        'tags',
+        'teams',
+        'teams.devProgressForTeams',
+        'teams.members',
+        'teams.members.user',
+        'teams.devSpecs',
+        'todos',
+      ],
+      order: {
+        id: 'ASC',
+        teams: {
+          devProgressForTeams: {
+            id: 'ASC',
+          },
+        },
+      },
+    });
+  }
 
   async updateDevProgressForTeam(
     progressId: number,
@@ -139,22 +184,7 @@ export class DevBattleService {
     return await this.devProgressForTeamRepo.save(devProgress);
   }
 
-  // async addDevProgressForTeam(teamId: number, addDevProgressForTeamDto: AddDevProgressForTeamDto): Promise<DevProgressForTeam> {
-  //   const team = await this.teamForDevBattleRepo.findOne({ where: { id: teamId } });
-  //   if (!team) {
-  //     throw new NotFoundException(`Team with ID ${teamId} not found`);
-  //   }
 
-  //   const devProgress = new DevProgressForTeam();
-  //   devProgress.task = addDevProgressForTeamDto.task;
-  //   devProgress.figmaUrl = addDevProgressForTeamDto.figmaUrl;
-  //   devProgress.youtubeUrl = addDevProgressForTeamDto.youtubeUrl;
-  //   devProgress.noteUrl = addDevProgressForTeamDto.noteUrl;
-  //   devProgress.status = addDevProgressForTeamDto.status;
-  //   devProgress.team = team;
-
-  //   return await this.devProgressForTeamRepo.save(devProgress);
-  // }
 
   async addTeamToDevBattle(
     devBattleId: number,
@@ -225,60 +255,7 @@ export class DevBattleService {
     return devBattle;
   }
 
-  // async addTeamToDevBattle(
-  //   devBattleId: number,
-  //   addTeamDto: AddTeamToDevBattleDto,
-  // ): Promise<DevBattle> {
-  //   const { name, description } = addTeamDto;
 
-  //   // 해당 DevBattle을 찾음
-  //   const devBattle = await this.devBattleRepo.findOne({
-  //     where: { id: devBattleId },
-  //     relations: ['teams'], // 관련된 teams도 로드
-  //   });
-
-  //   if (!devBattle) {
-  //     // DevBattle이 없을 경우 예외 처리
-  //     throw new Error(`DevBattle with id ${devBattleId} not found`);
-  //   }
-
-  //   // TeamForDevBattle 엔티티 생성
-  //   const team = this.teamForDevBattleRepo.create({
-  //     name,
-  //     description,
-  //     devBattle,
-  //   });
-
-  //   // 데이터베이스에 저장
-  //   const savedTeam = await this.teamForDevBattleRepo.save(team);
-
-  //   // DevSpecForTeamBattle 엔티티 생성
-  //   const devSpecForTeamBattle = this.devSpecForTeamBattleRepo.create({
-  //     // 여기서는 빈 값으로 설정하지만, 필요에 따라 초기값을 설정할 수 있습니다.
-  //     backendLanguage: null,
-  //     frontendLanguage: null,
-  //     backendLibrary: null,
-  //     frontendLibrary: null,
-  //     orm: null,
-  //     css: null,
-  //     app: null,
-  //     collaborationTool: null,
-  //     devops: null,
-  //     devTeam: savedTeam, // 여기서 savedTeam을 할당합니다.
-  //   });
-
-  //   // DevSpecForTeamBattle을 데이터베이스에 저장합니다.
-  //   const savedDevSpecForTeamBattle = await this.devSpecForTeamBattleRepo.save(devSpecForTeamBattle);
-
-  //   // DevBattle에 저장된 팀 추가
-  //   devBattle.teams.push(savedTeam);
-
-  //   // DevBattle 업데이트
-  //   await this.devBattleRepo.save(devBattle);
-
-  //   // 업데이트된 DevBattle 반환
-  //   return devBattle;
-  // }
 
   async updateForSpecificDevSpecForNotArryTypeForTeamBattle(
     teamId: number,
@@ -436,27 +413,6 @@ export class DevBattleService {
     }
 
     await this.devBattleRepo.remove(devBattle);
-  }
-
-  async findAllDevBattle(): Promise<DevBattle[]> {
-    return await this.devBattleRepo.find({
-      relations: [
-        'tags',
-        'teams',
-        'teams.devProgressForTeams',
-        'teams.members',
-        'teams.members.user',
-        'teams.devSpecs', // Added this line to include DevSpecForTeamBattle entities
-      ],
-      order: {
-        id: 'ASC',
-        teams: {
-          devProgressForTeams: {
-            id: 'ASC', // teams.devProgressForTeams 엔티티 내 id 필드 오름차순 정렬
-          },
-        },
-      },
-    });
   }
 
 

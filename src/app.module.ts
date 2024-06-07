@@ -61,6 +61,7 @@ import { TeamForDevBattle } from "./dev-battle/entities/team-for-dev-battle.enti
 import { DevProgressForTeam } from "./dev-battle/entities/dev-progress-for-team.entity";
 import { MemberForDevTeam } from "./dev-battle/entities/member-for-dev-team.entity";
 import { DevSpecForTeamBattle } from "./dev-battle/entities/dev-spec-for-team-battle.entity";
+import { TodoForDevBattleSubject } from "./dev-battle/entities/todo-for-dev-battle-subject.entity";
 
 @Module({
   imports: [
@@ -114,7 +115,8 @@ import { DevSpecForTeamBattle } from "./dev-battle/entities/dev-spec-for-team-ba
         TeamForDevBattle,
         DevProgressForTeam,
         MemberForDevTeam,
-        DevSpecForTeamBattle
+        DevSpecForTeamBattle,
+        TodoForDevBattleSubject
       ],
       synchronize: true,
     }),
@@ -143,29 +145,7 @@ import { DevSpecForTeamBattle } from "./dev-battle/entities/dev-spec-for-team-ba
     },
   ],
 })
-// export class AppModule { }
 
-// export class AppModule implements NestModule {
-//   configure(consumer: MiddlewareConsumer) {
-//     consumer
-//       .apply(AuthMiddleware) // 사용할 미들웨어
-//       // .forRoutes('/users/login-check-by-accessToken');
-//       // .forRoutes(
-//       //   '/users/login-check-by-accessToken',
-//       //   '/users/login-check-by-refreshToken'
-//       // ); // 적용할 경로 설정
-//       .forRoutes(
-//         // '/users/login-check-by-accessToken',
-//         // '/users/login-check-by-refreshToken',
-//         '/technotes/saveTechNotes',
-//         '/skilnotes/saveRows',
-//         '/skilnotes/:skilNoteId/contents/:pageNum',
-//         '/skilnotes/content/:skilNoteContentId',
-//         '/skilnotes/content/deleteByCheckedIds',
-//         'todos/deleteTodosForCheckedRows'
-//       ); // 적용할 경로 설정
-//   }
-// }
 
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
