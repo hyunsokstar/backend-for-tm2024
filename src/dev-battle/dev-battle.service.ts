@@ -53,9 +53,7 @@ export class DevBattleService {
     if (!devBattle) {
       throw new NotFoundException(`DevBattle with ID ${devBattleId} not found`);
     }
-
     console.log("addTodoForDevBattleDto.dueDate ? ", addTodoForDevBattleDto.dueDate);
-
 
     const todo = new TodoForDevBattleSubject();
     todo.title = addTodoForDevBattleDto.title;

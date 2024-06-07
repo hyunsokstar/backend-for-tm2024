@@ -22,7 +22,6 @@ export class DevBattleController {
     @Body() addTodoForDevBattleDto: AddTodoForDevBattleDto,
   ): Promise<TodoForDevBattleSubject> {
     console.log("dev battle id : ", devBattleId);
-
     return await this.devBattleService.addTodoForDevBattle(devBattleId, addTodoForDevBattleDto);
   }
 
@@ -31,7 +30,7 @@ export class DevBattleController {
     return this.devBattleService.findAllDevBattle();
   }
 
-  // progress 추가
+
   @Patch('/dev-progress/:progressId')
   async updateDevProgressForTeam(
     @Param('progressId', ParseIntPipe) progressId: number,
