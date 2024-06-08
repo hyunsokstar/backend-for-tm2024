@@ -1,11 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, ParseIntPipe, NotFoundException, Res, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, ParseIntPipe, NotFoundException, Res, BadRequestException, HttpStatus } from '@nestjs/common';
 import { DevBattleService } from './dev-battle.service';
 import { CreateDevBattleDto } from './dto/create-dev-battle.dto';
 import { UpdateDevBattleDto } from './dto/update-dev-battle.dto';
 import { AddTeamToDevBattleDto } from './dto/add-team-to-dev-battle.dto';
 import { DevBattle } from './entities/dev-battle.entity';
 import { AddDevProgressForTeamDto } from './dto/add-dev-progress-for-team.dto';
-import { DevProgressForTeam } from './entities/dev-progress-for-team.entity';
+import { DevProgressForTeam, DevStatus } from './entities/dev-progress-for-team.entity';
 import { TeamForDevBattle } from './entities/team-for-dev-battle.entity';
 import { AddItemToSpecificFieldForTeamDevSpecDto } from './dto/add-Item-to-Specific-field-for-team-dev-spec.dto';
 import { UpdateDevProgressForTeamDto } from './dto/update-dev-progress.dto';
@@ -14,6 +14,28 @@ import { TodoForDevBattleSubject } from './entities/todo-for-dev-battle-subject.
 @Controller('dev-battle')
 export class DevBattleController {
   constructor(private readonly devBattleService: DevBattleService) { }
+
+  @Patch('/dev-progress/:devProgressId/update-status')
+  @HttpCode(HttpStatus.OK)
+  async updateDevProgressStatus(
+    @Param('devProgressId', ParseIntPipe) devProgressId: number,
+    @Body('status') status: string
+  ): Promise<{ message: string; devProgress: DevProgressForTeam }> {
+    // Validate status
+    if (!Object.values(DevStatus).includes(status as DevStatus)) {
+      throw new BadRequestException(`Invalid status: ${status}`);
+    }
+
+    try {
+      const devProgress = await this.devBattleService.updateDevProgressStatus(devProgressId, status as DevStatus);
+      return { message: 'Dev progress status updated successfully', devProgress };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.message);
+      }
+      throw new BadRequestException('Failed to update dev progress status');
+    }
+  }
 
   @Post('/:devBattleId/todo')
   @HttpCode(201)

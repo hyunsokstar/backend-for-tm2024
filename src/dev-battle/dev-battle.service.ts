@@ -7,7 +7,7 @@ import { CreateDevBattleDto } from './dto/create-dev-battle.dto';
 import { TagForDevBattle } from './entities/tag.entity';
 import { TeamForDevBattle } from './entities/team-for-dev-battle.entity';
 import { AddTeamToDevBattleDto } from './dto/add-team-to-dev-battle.dto';
-import { DevProgressForTeam } from './entities/dev-progress-for-team.entity';
+import { DevProgressForTeam, DevStatus } from './entities/dev-progress-for-team.entity';
 import { AddDevProgressForTeamDto } from './dto/add-dev-progress-for-team.dto';
 import { MemberForDevTeam } from './entities/member-for-dev-team.entity';
 import { UsersModel } from 'src/users/entities/users.entity';
@@ -47,6 +47,17 @@ export class DevBattleService {
     private todoForDevBattleSubjectRepo: Repository<TodoForDevBattleSubject>,
 
   ) { }
+
+  async updateDevProgressStatus(devProgressId: number, status: DevStatus): Promise<DevProgressForTeam> {
+    const devProgress = await this.devProgressForTeamRepo.findOne({ where: { id: devProgressId } });
+    if (!devProgress) {
+      throw new NotFoundException(`DevProgress with ID ${devProgressId} not found`);
+    }
+
+    devProgress.status = status;
+    await this.devProgressForTeamRepo.save(devProgress);
+    return devProgress;
+  }
 
   async addTodoForDevBattle(devBattleId: number, addTodoForDevBattleDto: AddTodoForDevBattleDto): Promise<TodoForDevBattleSubject> {
     const devBattle = await this.devBattleRepo.findOneBy({ id: devBattleId });
