@@ -18,7 +18,7 @@ export class DevBattle {
     @OneToMany(() => TeamForDevBattle, (team) => team.devBattle)
     teams: TeamForDevBattle[];
 
-    @OneToMany(() => TodoForDevBattleSubject, (todo) => todo.devBattle, { cascade: true })
+    @OneToMany(() => TodoForDevBattleSubject, (todo) => todo.devBattle)
     todos: TodoForDevBattleSubject[];
 
 }

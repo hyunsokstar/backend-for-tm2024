@@ -30,7 +30,6 @@ export class DevBattleController {
     return this.devBattleService.findAllDevBattle();
   }
 
-
   @Patch('/dev-progress/:progressId')
   async updateDevProgressForTeam(
     @Param('progressId', ParseIntPipe) progressId: number,

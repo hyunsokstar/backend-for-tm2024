@@ -28,6 +28,6 @@ export class TodoForDevBattleSubject {
     @UpdateDateColumn()
     updatedAt: Date;
 
-    @ManyToOne(() => DevBattle, (devBattle) => devBattle.todos)
+    @ManyToOne(() => DevBattle, (devBattle) => devBattle.todos, { onDelete: 'CASCADE' })
     devBattle: DevBattle;
 }
