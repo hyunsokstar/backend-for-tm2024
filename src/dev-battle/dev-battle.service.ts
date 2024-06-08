@@ -45,8 +45,23 @@ export class DevBattleService {
 
     @InjectRepository(TodoForDevBattleSubject)
     private todoForDevBattleSubjectRepo: Repository<TodoForDevBattleSubject>,
-
   ) { }
+
+  async updateDevBattleSubject(id: number, subject: string): Promise<DevBattle> {
+    if (!subject) {
+      throw new BadRequestException('Subject is required');
+    }
+
+    const devBattle = await this.devBattleRepo.findOne({ where: { id } });
+    if (!devBattle) {
+      throw new NotFoundException(`DevBattle with ID ${id} not found`);
+    }
+
+    devBattle.subject = subject;
+    await this.devBattleRepo.save(devBattle);
+
+    return devBattle;
+  }
 
   async updateDevProgressStatus(devProgressId: number, status: DevStatus): Promise<DevProgressForTeam> {
     const devProgress = await this.devProgressForTeamRepo.findOne({ where: { id: devProgressId } });
@@ -481,17 +496,7 @@ export class DevBattleService {
     return `This action returns a #${id} devBattle`;
   }
 
-  update(id: number, updateDevBattleDto: UpdateDevBattleDto) {
-    return `This action updates a #${id} devBattle`;
-  }
-
-
-}
-function IsNull() {
-  throw new Error('Function not implemented.');
 }
 
-function IsNullable(arg0: string): any {
-  throw new Error('Function not implemented.');
-}
+
 

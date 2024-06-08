@@ -15,6 +15,12 @@ import { TodoForDevBattleSubject } from './entities/todo-for-dev-battle-subject.
 export class DevBattleController {
   constructor(private readonly devBattleService: DevBattleService) { }
 
+  @Patch(':id')
+  async updateDevBattleSubject(@Param('id') id: string, @Body('subject') subject: string) {
+    const result = await this.devBattleService.updateDevBattleSubject(+id, subject);
+    return { message: `DevBattle with ID ${id} updated successfully`, devBattle: result };
+  }
+
   @Patch('/dev-progress/:devProgressId/update-status')
   @HttpCode(HttpStatus.OK)
   async updateDevProgressStatus(
@@ -193,9 +199,5 @@ export class DevBattleController {
     return this.devBattleService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDevBattleDto: UpdateDevBattleDto) {
-    return this.devBattleService.update(+id, updateDevBattleDto);
-  }
 
 }
