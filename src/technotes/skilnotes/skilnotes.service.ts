@@ -601,24 +601,26 @@ export class SkilnotesService {
             await this.skilNoteContentsRepo.findOne({
                 where: { id: parseInt(skilNoteContentId) },
                 relations: ['writer']
-            })
+            });
 
         console.log("skilNoteContentObj ????? ", skilNoteContentObj);
 
-
-        //
         if (skilNoteContentObj.writer.email !== loginUser.email) {
             throw new UnauthorizedException("작성자만 수정 할 수 있습니다.");
         }
 
+        // 파일 경로의 역슬래시를 슬래시로 변경
+        const updatedFilePath = dto.file.replace(/\\/g, '/');
+
         const update_result = await this.skilNoteContentsRepo.update(skilNoteContentId, {
             title: dto.title,
-            file: dto.file,
+            file: updatedFilePath,  // 변경된 파일 경로 사용
             content: dto.content,
         });
 
         return update_result;
     }
+
 
     // fix 
     async deleteSkilNoteContentForCheckedIds(
