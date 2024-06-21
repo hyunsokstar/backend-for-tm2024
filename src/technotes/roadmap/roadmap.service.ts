@@ -175,7 +175,7 @@ export class RoadmapService {
 
         try {
             // 이미 해당 유저에 대한 ParticipantsForRoadMapModel 데이터가 있는지 확인
-            const existingParticipant = await this.ParticipantsForRoadRepo.findOne({ where: { user: user } });
+            const existingParticipant = await this.ParticipantsForRoadRepo.findOne({ where: { user: { id: user.id } } });
 
             if (existingParticipant) {
                 // 이미 해당 유저에 대한 데이터가 있으면 삭제

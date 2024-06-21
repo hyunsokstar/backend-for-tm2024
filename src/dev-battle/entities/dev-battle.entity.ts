@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, OneToMan
 import { TagForDevBattle } from './tag.entity';
 import { TeamForDevBattle } from './team-for-dev-battle.entity';
 import { TodoForDevBattleSubject } from './todo-for-dev-battle-subject.entity';
+import { ChatRoom } from 'src/chatting/entities/chat-room.entity';
 
 @Entity()
 export class DevBattle {
@@ -21,4 +22,6 @@ export class DevBattle {
     @OneToMany(() => TodoForDevBattleSubject, (todo) => todo.devBattle)
     todos: TodoForDevBattleSubject[];
 
+    @OneToMany(() => ChatRoom, chatRoom => chatRoom.devBattle)
+    chatRooms: ChatRoom[];
 }

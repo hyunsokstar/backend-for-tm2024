@@ -62,6 +62,9 @@ import { DevProgressForTeam } from "./dev-battle/entities/dev-progress-for-team.
 import { MemberForDevTeam } from "./dev-battle/entities/member-for-dev-team.entity";
 import { DevSpecForTeamBattle } from "./dev-battle/entities/dev-spec-for-team-battle.entity";
 import { TodoForDevBattleSubject } from "./dev-battle/entities/todo-for-dev-battle-subject.entity";
+import { ChattingModule } from './chatting/chatting.module';
+import { ChatRoom } from "./chatting/entities/chat-room.entity";
+import { Message } from "./chatting/entities/message.entity";
 
 @Module({
   imports: [
@@ -116,7 +119,9 @@ import { TodoForDevBattleSubject } from "./dev-battle/entities/todo-for-dev-batt
         DevProgressForTeam,
         MemberForDevTeam,
         DevSpecForTeamBattle,
-        TodoForDevBattleSubject
+        TodoForDevBattleSubject,
+        ChatRoom,
+        Message
       ],
       synchronize: true,
     }),
@@ -136,6 +141,7 @@ import { TodoForDevBattleSubject } from "./dev-battle/entities/todo-for-dev-batt
     DevSpecModule,
     DevRelayModule,
     DevBattleModule,
+    ChattingModule,
   ],
   controllers: [AppController],
   providers: [AppService,

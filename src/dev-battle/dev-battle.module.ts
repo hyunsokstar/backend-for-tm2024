@@ -12,6 +12,7 @@ import { DevSpecForTeamBattle } from './entities/dev-spec-for-team-battle.entity
 import { TechNotesModel } from 'src/technotes/entities/technotes.entity';
 import { SkilNotesModel } from 'src/technotes/entities/skilnotes.entity';
 import { TodoForDevBattleSubject } from './entities/todo-for-dev-battle-subject.entity';
+import { ChatRoom } from 'src/chatting/entities/chat-room.entity';
 
 
 @Module({
@@ -26,7 +27,8 @@ import { TodoForDevBattleSubject } from './entities/todo-for-dev-battle-subject.
       DevSpecForTeamBattle,
       TechNotesModel,
       SkilNotesModel,
-      TodoForDevBattleSubject
+      TodoForDevBattleSubject,
+      ChatRoom
     ])
   ],
   controllers: [DevBattleController],

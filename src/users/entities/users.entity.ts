@@ -1,7 +1,7 @@
 // src\users\entities\users.entity.ts
 import { Max, Min } from "class-validator";
 import { GendersEnum, RolesEnum } from "../enums/roles.enum";
-import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, Unique } from "typeorm";
 import { UserPostingsModel } from "../../postings/entities/user_postings.entity";
 import { TodosModel } from "src/todos/entities/todos.entity";
 import { BookMarksForSkilNoteContentsModel } from "src/technotes/entities/bookMarksForSkilNoteContent.entity";
@@ -10,6 +10,7 @@ import { ParticipantsForSkilNoteModel } from "src/technotes/entities/participant
 import { PaymentsModelForCashPoints } from "./payment.entity";
 import { ChallengesModel } from "src/challenges/entities/challenge.entity";
 import { SubChallengesModel } from "src/challenges/entities/sub_challenge.entity";
+import { ChatRoom } from "src/chatting/entities/chat-room.entity";
 
 @Entity()
 @Unique(["email", "nickname"])
@@ -114,5 +115,8 @@ export class UsersModel {
 
     @OneToMany(() => PaymentsModelForCashPoints, paymentsModelForCashPoints => paymentsModelForCashPoints.user)
     paymentsForCashPoints: PaymentsModelForCashPoints
+
+    @ManyToOne(() => ChatRoom, chatRoom => chatRoom.users)
+    chatRoom: ChatRoom;
 
 }

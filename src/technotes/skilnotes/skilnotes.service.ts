@@ -97,11 +97,11 @@ export class SkilnotesService {
 
         try {
             // 대상 페이지의 내용을 가져옵니다.
-            const targetPages = await this.skilNoteContentsRepo.find({ where: { page: targetOrder, skilNote } });
+            const targetPages = await this.skilNoteContentsRepo.find({ where: { page: targetOrder, skilNote: { id: skilNote.id } } });
             console.log("targetPages : ", targetPages);
 
             // 목적지 페이지의 내용을 가져옵니다.
-            const destinationPages = await this.skilNoteContentsRepo.find({ where: { page: destinationOrder, skilNote } });
+            const destinationPages = await this.skilNoteContentsRepo.find({ where: { page: destinationOrder, skilNote: { id: skilNote.id } } });
             console.log("destinationPages : ", destinationPages);
 
             // 대상 및 목적지 페이지가 모두 존재하는지 확인합니다.
@@ -749,7 +749,7 @@ export class SkilnotesService {
 
         try {
             // 이미 해당 유저에 대한 ParticipantsForRoadMapModel 데이터가 있는지 확인
-            const existingParticipant = await this.ParticipantsForSkilNoteRepo.findOne({ where: { skilNote: skilNoteObj } });
+            const existingParticipant = await this.ParticipantsForSkilNoteRepo.findOne({ where: { skilNote: { id: skilNoteObj.id } } });
 
             if (existingParticipant) {
                 // 이미 해당 유저에 대한 데이터가 있으면 삭제

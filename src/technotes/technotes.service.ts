@@ -215,7 +215,7 @@ export class TechnotesService {
         }
 
         // 이미 좋아요를 했는지 확인
-        const existingLike = await this.likesForTechNoteRepo.findOne({ where: { user, techNote } });
+        const existingLike = await this.likesForTechNoteRepo.findOne({ where: { user: { id: user.id }, techNote: { id: techNote.id } } });
 
         if (existingLike) {
             // 이미 좋아요를 했을 경우 좋아요 취소
