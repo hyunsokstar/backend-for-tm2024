@@ -15,6 +15,11 @@ import { TodoForDevBattleSubject } from './entities/todo-for-dev-battle-subject.
 export class DevBattleController {
   constructor(private readonly devBattleService: DevBattleService) { }
 
+  @Get()
+  findAll() {
+    return this.devBattleService.findAllDevBattle();
+  }
+
   @Post()
   create(@Body() createDevBattleDto: CreateDevBattleDto, @Req() req) {
     const loginUser = req.user
@@ -65,10 +70,7 @@ export class DevBattleController {
     return await this.devBattleService.addTodoForDevBattle(devBattleId, addTodoForDevBattleDto);
   }
 
-  @Get()
-  findAll() {
-    return this.devBattleService.findAllDevBattle();
-  }
+
 
   @Patch('/dev-progress/:progressId')
   async updateDevProgressForTeam(

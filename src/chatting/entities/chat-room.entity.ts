@@ -32,7 +32,7 @@ export class ChatRoom {
     @OneToMany(() => Message, message => message.chatRoom)
     messages: Message[];
 
-    @ManyToOne(() => DevBattle, devBattle => devBattle.chatRooms)
+    @ManyToOne(() => DevBattle, devBattle => devBattle.chatRooms, { onDelete: 'CASCADE' })
     devBattle: DevBattle;
 
 }

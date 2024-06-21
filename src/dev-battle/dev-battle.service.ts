@@ -52,11 +52,56 @@ export class DevBattleService {
 
   ) { }
 
-  // async createDevBattle(createDevBattleDto: CreateDevBattleDto, loginUser): Promise<DevBattle> {
-  //   const devBattle = new DevBattle();
-  //   devBattle.subject = createDevBattleDto.subject;
-  //   return await this.devBattleRepo.save(devBattle);
+  // async findAllDevBattle(): Promise<DevBattle[]> {
+  //   return await this.devBattleRepo.find({
+  //     relations: [
+  //       'tags',
+  //       'teams',
+  //       'teams.devProgressForTeams',
+  //       'teams.members',
+  //       'teams.members.user',
+  //       'teams.devSpecs',
+  //       'todos',
+  //     ],
+  //     order: {
+  //       id: 'ASC',
+  //       teams: {
+  //         devProgressForTeams: {
+  //           id: 'ASC',
+  //         },
+  //       },
+  //     },
+  //   });
   // }
+  async findAllDevBattle(): Promise<DevBattle[]> {
+    return await this.devBattleRepo.find({
+      relations: [
+        'tags',
+        'teams',
+        'teams.devProgressForTeams',
+        'teams.members',
+        'teams.members.user',
+        'teams.devSpecs',
+        'todos',
+        'chatRooms',           // ChatRoom 관계 추가
+        'chatRooms.messages',  // ChatRoom의 messages 관계 추가
+      ],
+      order: {
+        id: 'ASC',
+        teams: {
+          devProgressForTeams: {
+            id: 'ASC',
+          },
+        },
+        chatRooms: {
+          created_at: 'ASC',   // ChatRoom 정렬 추가
+          messages: {
+            created_at: 'ASC', // Message 정렬 추가
+          },
+        },
+      },
+    });
+  }
 
   async createDevBattle(createDevBattleDto: CreateDevBattleDto, loginUser): Promise<DevBattle> {
     // 새로운 DevBattle 생성
@@ -124,28 +169,6 @@ export class DevBattleService {
     todo.devBattle = devBattle;
 
     return await this.todoForDevBattleSubjectRepo.save(todo);
-  }
-
-  async findAllDevBattle(): Promise<DevBattle[]> {
-    return await this.devBattleRepo.find({
-      relations: [
-        'tags',
-        'teams',
-        'teams.devProgressForTeams',
-        'teams.members',
-        'teams.members.user',
-        'teams.devSpecs',
-        'todos',
-      ],
-      order: {
-        id: 'ASC',
-        teams: {
-          devProgressForTeams: {
-            id: 'ASC',
-          },
-        },
-      },
-    });
   }
 
   async updateDevProgressForTeam(
