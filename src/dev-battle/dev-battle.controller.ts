@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, ParseIntPipe, NotFoundException, Res, BadRequestException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, ParseIntPipe, NotFoundException, Res, BadRequestException, HttpStatus, Req } from '@nestjs/common';
 import { DevBattleService } from './dev-battle.service';
 import { CreateDevBattleDto } from './dto/create-dev-battle.dto';
 import { UpdateDevBattleDto } from './dto/update-dev-battle.dto';
@@ -14,6 +14,18 @@ import { TodoForDevBattleSubject } from './entities/todo-for-dev-battle-subject.
 @Controller('dev-battle')
 export class DevBattleController {
   constructor(private readonly devBattleService: DevBattleService) { }
+
+  @Post()
+  create(@Body() createDevBattleDto: CreateDevBattleDto, @Req() req) {
+    const loginUser = req.user
+    if (!loginUser) {
+      return {
+        message: "로그인 하세요"
+      }
+    }
+
+    return this.devBattleService.createDevBattle(createDevBattleDto, loginUser);
+  }
 
   @Patch(':id')
   async updateDevBattleSubject(@Param('id') id: string, @Body('subject') subject: string) {
@@ -159,11 +171,6 @@ export class DevBattleController {
         },
       },
     };
-  }
-
-  @Post()
-  create(@Body() createDevBattleDto: CreateDevBattleDto) {
-    return this.devBattleService.createDevBattle(createDevBattleDto);
   }
 
   @Delete(':id')

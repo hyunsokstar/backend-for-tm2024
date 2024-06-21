@@ -27,7 +27,7 @@ export class UsersService {
             throw new Error('사용자를 찾을 수 없습니다.');
         }
 
-        const paymentHistory = await this.paymentsForCashPointsRepo.find({ where: { user } });
+        const paymentHistory = await this.paymentsForCashPointsRepo.find({ where: { user: { id: user.id } } });
         return paymentHistory;
     }
 
@@ -46,7 +46,7 @@ export class UsersService {
             }
 
             // 이미 해당 사용자가 동일한 결제 정보를 가지고 있는지 확인합니다.
-            const existingPayment = await this.paymentsForCashPointsRepo.findOne({ where: { user: user, merchantUid } });
+            const existingPayment = await this.paymentsForCashPointsRepo.findOne({ where: { user: { id: user.id }, merchantUid } });
 
             if (existingPayment) {
                 throw new Error("이미 해당 사용자가 동일한 결제 정보를 가지고 있습니다.");

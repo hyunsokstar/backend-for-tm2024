@@ -18,6 +18,7 @@ import { SkilNotesModel } from 'src/technotes/entities/skilnotes.entity';
 import { UpdateDevProgressForTeamDto } from './dto/update-dev-progress.dto';
 import { TodoForDevBattleSubject } from './entities/todo-for-dev-battle-subject.entity';
 import { AddTodoForDevBattleDto } from './dto/add-todo-for-dev-battle.dto';
+import { ChatRoom } from 'src/chatting/entities/chat-room.entity';
 
 @Injectable()
 export class DevBattleService {
@@ -45,7 +46,42 @@ export class DevBattleService {
 
     @InjectRepository(TodoForDevBattleSubject)
     private todoForDevBattleSubjectRepo: Repository<TodoForDevBattleSubject>,
+
+    @InjectRepository(ChatRoom)
+    private chatRoomRepo: Repository<ChatRoom>,
+
   ) { }
+
+  // async createDevBattle(createDevBattleDto: CreateDevBattleDto, loginUser): Promise<DevBattle> {
+  //   const devBattle = new DevBattle();
+  //   devBattle.subject = createDevBattleDto.subject;
+  //   return await this.devBattleRepo.save(devBattle);
+  // }
+
+  async createDevBattle(createDevBattleDto: CreateDevBattleDto, loginUser): Promise<DevBattle> {
+    // 새로운 DevBattle 생성
+    const devBattle = new DevBattle();
+    devBattle.subject = createDevBattleDto.subject;
+
+    // 새로운 ChatRoom 생성
+    const chatRoom = new ChatRoom();
+    chatRoom.devBattle = devBattle;
+
+    // 로그인 유저를 검색하여 추가
+    const loginUserEntity = await this.usersRepo.findOne({ where: { id: loginUser.id } });
+    if (!loginUserEntity) {
+      throw new NotFoundException(`Login user with ID ${loginUser.id} not found`);
+    }
+
+    chatRoom.users = [loginUserEntity]; // 로그인 유저를 채팅방에 추가
+
+    // DevBattle 및 ChatRoom 저장
+    await this.devBattleRepo.save(devBattle);
+    await this.chatRoomRepo.save(chatRoom);
+
+    return devBattle;
+  }
+
 
   async updateDevBattleSubject(id: number, subject: string): Promise<DevBattle> {
     if (!subject) {
@@ -484,12 +520,6 @@ export class DevBattleService {
     }
 
     return await this.devBattleRepo.save(devBattles);
-  }
-
-  async createDevBattle(createDevBattleDto: CreateDevBattleDto): Promise<DevBattle> {
-    const devBattle = new DevBattle();
-    devBattle.subject = createDevBattleDto.subject;
-    return await this.devBattleRepo.save(devBattle);
   }
 
   findOne(id: number) {

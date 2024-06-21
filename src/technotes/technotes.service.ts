@@ -242,7 +242,7 @@ export class TechnotesService {
         }
 
         // 이미 좋아요를 했는지 확인
-        const existingLike = await this.likesForSkilNoteRepo.findOne({ where: { user, skilNote } });
+        const existingLike = await this.likesForSkilNoteRepo.findOne({ where: { user: { id: user.id }, skilNote: { id: skilNote.id } } });
 
         if (existingLike) {
             // 이미 좋아요를 했을 경우 좋아요 취소
@@ -266,7 +266,7 @@ export class TechnotesService {
         }
 
         // 이미 좋아요를 했는지 확인
-        const existingBookMark = await this.bookMarksForTechNoteRepo.findOne({ where: { user, techNote } });
+        const existingBookMark = await this.bookMarksForTechNoteRepo.findOne({ where: { user: { id: user.id }, techNote: { id: techNote.id } } });
 
         if (existingBookMark) {
             // 이미 좋아요를 했을 경우 좋아요 취소
@@ -289,7 +289,7 @@ export class TechnotesService {
             return false;
         }
 
-        const existingBookMark = await this.bookMarksForSkilNoteRepo.findOne({ where: { user, skilNote } });
+        const existingBookMark = await this.bookMarksForSkilNoteRepo.findOne({ where: { user: { id: user.id }, skilNote: { id: skilNote.id } } });
 
         if (existingBookMark) {
             await this.bookMarksForSkilNoteRepo.remove(existingBookMark);
@@ -506,7 +506,7 @@ export class TechnotesService {
 
         try {
             // 이미 해당 유저에 대한 ParticipantsForRoadMapModel 데이터가 있는지 확인
-            const existingParticipant = await this.participantsForTechNoteRepo.findOne({ where: { user: user } });
+            const existingParticipant = await this.participantsForTechNoteRepo.findOne({ where: { user: { id: user.id } } });
 
             if (existingParticipant) {
                 // 이미 해당 유저에 대한 데이터가 있으면 삭제

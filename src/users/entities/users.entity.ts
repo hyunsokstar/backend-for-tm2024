@@ -116,7 +116,7 @@ export class UsersModel {
     @OneToMany(() => PaymentsModelForCashPoints, paymentsModelForCashPoints => paymentsModelForCashPoints.user)
     paymentsForCashPoints: PaymentsModelForCashPoints
 
-    @ManyToOne(() => ChatRoom, chatRoom => chatRoom.users)
-    chatRoom: ChatRoom;
+    @ManyToMany(() => ChatRoom, chatRoom => chatRoom.users)
+    chatRooms: ChatRoom[];
 
 }
