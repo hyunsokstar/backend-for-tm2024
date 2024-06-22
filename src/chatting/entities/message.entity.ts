@@ -9,8 +9,8 @@ export class Message {
     @PrimaryGeneratedColumn()
     id: number;
 
-    // @ManyToOne(() => UsersModel, { onDelete: 'CASCADE', nullable: true })
-    // writer: UsersModel;
+    @ManyToOne(() => UsersModel, { onDelete: 'CASCADE', nullable: true })
+    writer: UsersModel;
 
     @Column()
     content: string;

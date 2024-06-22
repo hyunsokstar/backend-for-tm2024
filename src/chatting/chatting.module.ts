@@ -13,7 +13,8 @@ import { UsersModel } from 'src/users/entities/users.entity';
       ChatRoom,
       Message,
       UsersModel,
-      DevBattle
+      DevBattle,
+      Message
     ])
   ],
   controllers: [ChattingController],
