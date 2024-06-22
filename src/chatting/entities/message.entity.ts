@@ -15,7 +15,7 @@ export class Message {
     @Column()
     content: string;
 
-    @ManyToOne(() => ChatRoom, chatRoom => chatRoom.messages)
+    @ManyToOne(() => ChatRoom, chatRoom => chatRoom.messages, { onDelete: 'CASCADE' })
     chatRoom: ChatRoom;
 
     @CreateDateColumn()

@@ -16,6 +16,13 @@ export class ChattingController {
     @Req() req
   ) {
     const loginUser = req.user;
+
+    if (!req.user) {
+      return {
+        message: "로그인 하세요"
+      }
+    }
+
     return this.chattingService.addMessage(chatRoomId, createMessageDto, loginUser);
   }
 

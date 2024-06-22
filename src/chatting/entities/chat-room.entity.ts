@@ -10,6 +10,9 @@ export class ChatRoom {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
+    @Column({ nullable: true, default: '' })
+    title: string;  // title 컬럼 추가, default: "" 및 null 허용
+
     @ManyToMany(() => UsersModel, user => user.chatRooms)
     @JoinTable({
         name: 'chat_room_users',
@@ -26,6 +29,7 @@ export class ChatRoom {
 
     @CreateDateColumn()
     created_at: Date;
+
     @UpdateDateColumn()
     updated_at: Date;
 

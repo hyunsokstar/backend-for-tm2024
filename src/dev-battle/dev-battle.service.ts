@@ -85,6 +85,7 @@ export class DevBattleService {
         'todos',
         'chatRooms',           // ChatRoom 관계 추가
         'chatRooms.messages',  // ChatRoom의 messages 관계 추가
+        'chatRooms.messages.writer'  // Message의 writer 관계 추가
       ],
       order: {
         id: 'ASC',
@@ -110,6 +111,7 @@ export class DevBattleService {
 
     // 새로운 ChatRoom 생성
     const chatRoom = new ChatRoom();
+    chatRoom.title = `${createDevBattleDto.subject}'s chatroom`;
     chatRoom.devBattle = devBattle;
 
     // 로그인 유저를 검색하여 추가
