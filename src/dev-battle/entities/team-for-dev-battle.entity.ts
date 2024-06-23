@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, OneToMany, OneToOne, JoinColumn } from 'typeorm';
 import { DevBattle } from './dev-battle.entity';
 import { DevProgressForTeam } from './dev-progress-for-team.entity';
 import { MemberForDevTeam } from './member-for-dev-team.entity';
@@ -37,7 +37,8 @@ export class TeamForDevBattle {
     @OneToMany(() => DevSpecForTeamBattle, (devSpec) => devSpec.devTeam)
     devSpecs: DevSpecForTeamBattle[];
 
-    @OneToMany(() => ChatRoom, chatRoom => chatRoom.devTeam)
-    chatRooms: ChatRoom[];
+    @OneToOne(() => ChatRoom, chatRoom => chatRoom.devTeam)
+    @JoinColumn()
+    chatRoom: ChatRoom;
 
 }

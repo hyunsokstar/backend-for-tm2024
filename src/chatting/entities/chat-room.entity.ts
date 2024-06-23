@@ -1,6 +1,6 @@
 // src/chat/entities/chat-room.entity.ts
 
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToMany, OneToMany, ManyToOne, JoinTable } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToMany, OneToMany, ManyToOne, JoinTable, OneToOne } from 'typeorm';
 import { UsersModel } from 'src/users/entities/users.entity';
 import { Message } from './message.entity';
 import { DevBattle } from 'src/dev-battle/entities/dev-battle.entity';
@@ -40,6 +40,6 @@ export class ChatRoom {
     @ManyToOne(() => DevBattle, devBattle => devBattle.chatRooms, { onDelete: 'CASCADE' })
     devBattle: DevBattle;
 
-    @ManyToOne(() => TeamForDevBattle, devTeam => devTeam.chatRooms, { onDelete: 'CASCADE' })
+    @OneToOne(() => TeamForDevBattle, devTeam => devTeam.chatRoom, { onDelete: 'CASCADE' })
     devTeam: TeamForDevBattle;
 }

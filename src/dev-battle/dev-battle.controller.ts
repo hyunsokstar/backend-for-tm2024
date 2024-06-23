@@ -15,6 +15,18 @@ import { TodoForDevBattleSubject } from './entities/todo-for-dev-battle-subject.
 export class DevBattleController {
   constructor(private readonly devBattleService: DevBattleService) { }
 
+  @Post(':devBattleId/add-team')
+  async addTeamToDevBattle(@Param('devBattleId') devBattleId: number, @Body() addTeamToDevBattleDto: AddTeamToDevBattleDto, @Req() req) {
+    console.log("dev battle team add ??");
+    const loginUser = req.user
+    if (!loginUser) {
+      return {
+        message: "로그인 하세요"
+      }
+    }
+    return await this.devBattleService.addTeamToDevBattle(devBattleId, addTeamToDevBattleDto, loginUser);
+  }
+
   @Get()
   findAll() {
     return this.devBattleService.findAllDevBattle();
@@ -87,12 +99,6 @@ export class DevBattleController {
     @Body() addDevProgressForTeamDto: AddDevProgressForTeamDto,
   ): Promise<DevProgressForTeam> {
     return await this.devBattleService.addDevProgressForTeam(teamId, addDevProgressForTeamDto);
-  }
-
-  @Post(':devBattleId/add-team')
-  async addTeamToDevBattle(@Param('devBattleId') devBattleId: number, @Body() addTeamToDevBattleDto: AddTeamToDevBattleDto): Promise<DevBattle> {
-    console.log("dev battle team add ??");
-    return await this.devBattleService.addTeamToDevBattle(devBattleId, addTeamToDevBattleDto);
   }
 
   @Delete('/teams/:teamId')

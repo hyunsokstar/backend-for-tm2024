@@ -52,27 +52,115 @@ export class DevBattleService {
 
   ) { }
 
-  // async findAllDevBattle(): Promise<DevBattle[]> {
-  //   return await this.devBattleRepo.find({
-  //     relations: [
-  //       'tags',
-  //       'teams',
-  //       'teams.devProgressForTeams',
-  //       'teams.members',
-  //       'teams.members.user',
-  //       'teams.devSpecs',
-  //       'todos',
-  //     ],
-  //     order: {
-  //       id: 'ASC',
-  //       teams: {
-  //         devProgressForTeams: {
-  //           id: 'ASC',
-  //         },
-  //       },
-  //     },
-  //   });
-  // }
+  async addTeamToDevBattle(
+    devBattleId: number,
+    addTeamDto: AddTeamToDevBattleDto,
+    loginUser
+  ): Promise<DevBattle> {
+    const { name, description } = addTeamDto;
+
+    // 해당 DevBattle을 찾음
+    const devBattle = await this.devBattleRepo.findOne({
+      where: { id: devBattleId },
+      relations: ['teams'], // 관련된 teams도 로드
+    });
+
+    if (!devBattle) {
+      // DevBattle이 없을 경우 예외 처리
+      throw new Error(`DevBattle with id ${devBattleId} not found`);
+    }
+
+    // TeamForDevBattle 엔티티 생성
+    const team = this.teamForDevBattleRepo.create({
+      name,
+      description,
+      devBattle,
+    });
+
+    // 새로운 ChatRoom 생성
+    const chatRoom = new ChatRoom();
+    chatRoom.title = `${team.name}'s chatroom`;
+    chatRoom.devTeam = team;
+
+    // 로그인 유저를 검색하여 추가
+    const loginUserEntity = await this.usersRepo.findOne({ where: { id: loginUser.id } });
+    if (!loginUserEntity) {
+      throw new NotFoundException(`Login user with ID ${loginUser.id} not found`);
+    }
+
+    chatRoom.users = [loginUserEntity]; // 로그인 유저를 채팅방에 추가
+
+
+    // 데이터베이스에 저장
+    const savedTeam = await this.teamForDevBattleRepo.save(team);
+
+    // TechNotesModel 엔티티 생성
+    const techNote = this.techNotesModelRepo.create({
+      title: `${savedTeam.name} 팀 ${savedTeam.description} 에 대한 테크 노트`,
+      category: `${savedTeam.name} 팀`,
+    });
+
+    // TechNotesModel 데이터베이스에 저장
+    const savedTechNote = await this.techNotesModelRepo.save(techNote);
+
+    // savedTeam의 techNoteId와 techNoteListUrl 업데이트
+    savedTeam.techNoteId = savedTechNote.id;
+    savedTeam.techNoteListUrl = `http://13.209.211.181:3000/Note/TechNoteList/${savedTechNote.id}/SkilNoteListPage`;
+    await this.teamForDevBattleRepo.save(savedTeam);
+
+    // DevSpecForTeamBattle 엔티티 생성
+    const devSpecForTeamBattle = this.devSpecForTeamBattleRepo.create({
+      // 여기서는 빈 값으로 설정하지만, 필요에 따라 초기값을 설정할 수 있습니다.
+      backendLanguage: null,
+      frontendLanguage: null,
+      backendLibrary: null,
+      frontendLibrary: null,
+      orm: null,
+      css: null,
+      app: null,
+      collaborationTool: null,
+      devops: null,
+      devTeam: savedTeam, // 여기서 savedTeam을 할당합니다.
+    });
+
+    // DevSpecForTeamBattle을 데이터베이스에 저장합니다.
+    const savedDevSpecForTeamBattle = await this.devSpecForTeamBattleRepo.save(devSpecForTeamBattle);
+
+    // DevBattle에 저장된 팀 추가
+    devBattle.teams.push(savedTeam);
+
+    // DevBattle 업데이트
+    await this.devBattleRepo.save(devBattle);
+
+    // 업데이트된 DevBattle 반환
+    return devBattle;
+  }
+
+  async createDevBattle(createDevBattleDto: CreateDevBattleDto, loginUser): Promise<DevBattle> {
+    // 새로운 DevBattle 생성
+    const devBattle = new DevBattle();
+    devBattle.subject = createDevBattleDto.subject;
+
+    // 새로운 ChatRoom 생성
+    const chatRoom = new ChatRoom();
+    chatRoom.title = `${createDevBattleDto.subject}'s chatroom`;
+    chatRoom.devBattle = devBattle;
+
+    // 로그인 유저를 검색하여 추가
+    const loginUserEntity = await this.usersRepo.findOne({ where: { id: loginUser.id } });
+    if (!loginUserEntity) {
+      throw new NotFoundException(`Login user with ID ${loginUser.id} not found`);
+    }
+
+    chatRoom.users = [loginUserEntity]; // 로그인 유저를 채팅방에 추가
+
+    // DevBattle 및 ChatRoom 저장
+    await this.devBattleRepo.save(devBattle);
+    await this.chatRoomRepo.save(chatRoom);
+
+    return devBattle;
+  }
+
   async findAllDevBattle(): Promise<DevBattle[]> {
     return await this.devBattleRepo.find({
       relations: [
@@ -103,32 +191,6 @@ export class DevBattleService {
       },
     });
   }
-
-  async createDevBattle(createDevBattleDto: CreateDevBattleDto, loginUser): Promise<DevBattle> {
-    // 새로운 DevBattle 생성
-    const devBattle = new DevBattle();
-    devBattle.subject = createDevBattleDto.subject;
-
-    // 새로운 ChatRoom 생성
-    const chatRoom = new ChatRoom();
-    chatRoom.title = `${createDevBattleDto.subject}'s chatroom`;
-    chatRoom.devBattle = devBattle;
-
-    // 로그인 유저를 검색하여 추가
-    const loginUserEntity = await this.usersRepo.findOne({ where: { id: loginUser.id } });
-    if (!loginUserEntity) {
-      throw new NotFoundException(`Login user with ID ${loginUser.id} not found`);
-    }
-
-    chatRoom.users = [loginUserEntity]; // 로그인 유저를 채팅방에 추가
-
-    // DevBattle 및 ChatRoom 저장
-    await this.devBattleRepo.save(devBattle);
-    await this.chatRoomRepo.save(chatRoom);
-
-    return devBattle;
-  }
-
 
   async updateDevBattleSubject(id: number, subject: string): Promise<DevBattle> {
     if (!subject) {
@@ -268,78 +330,6 @@ export class DevBattleService {
 
     return await this.devProgressForTeamRepo.save(devProgress);
   }
-
-
-
-  async addTeamToDevBattle(
-    devBattleId: number,
-    addTeamDto: AddTeamToDevBattleDto,
-  ): Promise<DevBattle> {
-    const { name, description } = addTeamDto;
-
-    // 해당 DevBattle을 찾음
-    const devBattle = await this.devBattleRepo.findOne({
-      where: { id: devBattleId },
-      relations: ['teams'], // 관련된 teams도 로드
-    });
-
-    if (!devBattle) {
-      // DevBattle이 없을 경우 예외 처리
-      throw new Error(`DevBattle with id ${devBattleId} not found`);
-    }
-
-    // TeamForDevBattle 엔티티 생성
-    const team = this.teamForDevBattleRepo.create({
-      name,
-      description,
-      devBattle,
-    });
-
-    // 데이터베이스에 저장
-    const savedTeam = await this.teamForDevBattleRepo.save(team);
-
-    // TechNotesModel 엔티티 생성
-    const techNote = this.techNotesModelRepo.create({
-      title: `${savedTeam.name} 팀 ${savedTeam.description} 에 대한 테크 노트`,
-      category: `${savedTeam.name} 팀`,
-    });
-
-    // TechNotesModel 데이터베이스에 저장
-    const savedTechNote = await this.techNotesModelRepo.save(techNote);
-
-    // savedTeam의 techNoteId와 techNoteListUrl 업데이트
-    savedTeam.techNoteId = savedTechNote.id;
-    savedTeam.techNoteListUrl = `http://13.209.211.181:3000/Note/TechNoteList/${savedTechNote.id}/SkilNoteListPage`;
-    await this.teamForDevBattleRepo.save(savedTeam);
-
-    // DevSpecForTeamBattle 엔티티 생성
-    const devSpecForTeamBattle = this.devSpecForTeamBattleRepo.create({
-      // 여기서는 빈 값으로 설정하지만, 필요에 따라 초기값을 설정할 수 있습니다.
-      backendLanguage: null,
-      frontendLanguage: null,
-      backendLibrary: null,
-      frontendLibrary: null,
-      orm: null,
-      css: null,
-      app: null,
-      collaborationTool: null,
-      devops: null,
-      devTeam: savedTeam, // 여기서 savedTeam을 할당합니다.
-    });
-
-    // DevSpecForTeamBattle을 데이터베이스에 저장합니다.
-    const savedDevSpecForTeamBattle = await this.devSpecForTeamBattleRepo.save(devSpecForTeamBattle);
-
-    // DevBattle에 저장된 팀 추가
-    devBattle.teams.push(savedTeam);
-
-    // DevBattle 업데이트
-    await this.devBattleRepo.save(devBattle);
-
-    // 업데이트된 DevBattle 반환
-    return devBattle;
-  }
-
 
 
   async updateForSpecificDevSpecForNotArryTypeForTeamBattle(
