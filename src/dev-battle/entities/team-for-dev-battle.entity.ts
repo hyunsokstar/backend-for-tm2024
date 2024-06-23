@@ -24,7 +24,7 @@ export class TeamForDevBattle {
     @Column({ type: 'text', nullable: true })
     techNoteListUrl: string;
 
-    @ManyToOne(() => DevBattle, (devBattle) => devBattle.teams)
+    @ManyToOne(() => DevBattle, (devBattle) => devBattle.teams, { onDelete: "CASCADE" })
     devBattle: DevBattle;
 
     @OneToMany(() => DevProgressForTeam, (devProgressForTeam) => devProgressForTeam.team)
