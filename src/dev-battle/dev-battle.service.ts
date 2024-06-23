@@ -80,7 +80,6 @@ export class DevBattleService {
     // 새로운 ChatRoom 생성
     const chatRoom = new ChatRoom();
     chatRoom.title = `${team.name}'s chatroom`;
-    chatRoom.devTeam = team;
 
     // 로그인 유저를 검색하여 추가
     const loginUserEntity = await this.usersRepo.findOne({ where: { id: loginUser.id } });
@@ -90,7 +89,10 @@ export class DevBattleService {
 
     chatRoom.users = [loginUserEntity]; // 로그인 유저를 채팅방에 추가
 
+    // ChatRoom을 먼저 저장
+    const savedChatRoom = await this.chatRoomRepo.save(chatRoom);
 
+    team.chatRoom = savedChatRoom;
     // 데이터베이스에 저장
     const savedTeam = await this.teamForDevBattleRepo.save(team);
 

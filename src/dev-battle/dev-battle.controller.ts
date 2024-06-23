@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, ParseIntPipe, NotFoundException, Res, BadRequestException, HttpStatus, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, ParseIntPipe, NotFoundException, Res, BadRequestException, HttpStatus, Req, UnauthorizedException } from '@nestjs/common';
 import { DevBattleService } from './dev-battle.service';
 import { CreateDevBattleDto } from './dto/create-dev-battle.dto';
 import { UpdateDevBattleDto } from './dto/update-dev-battle.dto';
@@ -17,12 +17,12 @@ export class DevBattleController {
 
   @Post(':devBattleId/add-team')
   async addTeamToDevBattle(@Param('devBattleId') devBattleId: number, @Body() addTeamToDevBattleDto: AddTeamToDevBattleDto, @Req() req) {
-    console.log("dev battle team add ??");
+    console.log("devBattleId ??", devBattleId);
+    console.log("addTeamToDevBattleDto ??", addTeamToDevBattleDto);
     const loginUser = req.user
     if (!loginUser) {
-      return {
-        message: "로그인 하세요"
-      }
+      console.log("here 11?");
+      throw new UnauthorizedException('로그인이 필요합니다.');
     }
     return await this.devBattleService.addTeamToDevBattle(devBattleId, addTeamToDevBattleDto, loginUser);
   }
