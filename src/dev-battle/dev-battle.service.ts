@@ -169,6 +169,8 @@ export class DevBattleService {
         'tags',
         'teams',
         'teams.devProgressForTeams',
+        'teams.chatRoom',
+        'teams.chatRoom.messages',
         'teams.members',
         'teams.members.user',
         'teams.devSpecs',
