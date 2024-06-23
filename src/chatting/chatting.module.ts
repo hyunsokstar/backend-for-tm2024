@@ -6,6 +6,7 @@ import { ChatRoom } from './entities/chat-room.entity';
 import { Message } from './entities/message.entity';
 import { DevBattle } from 'src/dev-battle/entities/dev-battle.entity';
 import { UsersModel } from 'src/users/entities/users.entity';
+import { TeamForDevBattle } from 'src/dev-battle/entities/team-for-dev-battle.entity';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { UsersModel } from 'src/users/entities/users.entity';
       Message,
       UsersModel,
       DevBattle,
+      TeamForDevBattle,
       Message
     ])
   ],

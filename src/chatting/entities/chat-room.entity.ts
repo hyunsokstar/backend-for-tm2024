@@ -4,6 +4,7 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 import { UsersModel } from 'src/users/entities/users.entity';
 import { Message } from './message.entity';
 import { DevBattle } from 'src/dev-battle/entities/dev-battle.entity';
+import { TeamForDevBattle } from 'src/dev-battle/entities/team-for-dev-battle.entity';
 
 @Entity()
 export class ChatRoom {
@@ -39,4 +40,6 @@ export class ChatRoom {
     @ManyToOne(() => DevBattle, devBattle => devBattle.chatRooms, { onDelete: 'CASCADE' })
     devBattle: DevBattle;
 
+    @ManyToOne(() => TeamForDevBattle, devTeam => devTeam.chatRooms, { onDelete: 'CASCADE' })
+    devTeam: TeamForDevBattle;
 }

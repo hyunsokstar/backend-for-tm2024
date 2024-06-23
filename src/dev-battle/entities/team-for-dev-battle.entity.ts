@@ -3,6 +3,7 @@ import { DevBattle } from './dev-battle.entity';
 import { DevProgressForTeam } from './dev-progress-for-team.entity';
 import { MemberForDevTeam } from './member-for-dev-team.entity';
 import { DevSpecForTeamBattle } from './dev-spec-for-team-battle.entity';
+import { ChatRoom } from 'src/chatting/entities/chat-room.entity';
 
 @Entity()
 export class TeamForDevBattle {
@@ -35,7 +36,8 @@ export class TeamForDevBattle {
 
     @OneToMany(() => DevSpecForTeamBattle, (devSpec) => devSpec.devTeam)
     devSpecs: DevSpecForTeamBattle[];
-}
 
-// techNoteId(number)
-// techNoteListUrl(url)
+    @OneToMany(() => ChatRoom, chatRoom => chatRoom.devTeam)
+    chatRooms: ChatRoom[];
+
+}
