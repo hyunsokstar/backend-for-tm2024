@@ -11,6 +11,7 @@ import { PaymentsModelForCashPoints } from "./payment.entity";
 import { ChallengesModel } from "src/challenges/entities/challenge.entity";
 import { SubChallengesModel } from "src/challenges/entities/sub_challenge.entity";
 import { ChatRoom } from "src/chatting/entities/chat-room.entity";
+import { GlobalChatRoom } from "src/chatting/entities/global-chat-room.entity";
 
 @Entity()
 @Unique(["email", "nickname"])
@@ -118,5 +119,11 @@ export class UsersModel {
 
     @ManyToMany(() => ChatRoom, chatRoom => chatRoom.users)
     chatRooms: ChatRoom[];
+
+    @ManyToMany(() => GlobalChatRoom, globalChatRoom => globalChatRoom.users)
+    globalChatRooms: GlobalChatRoom[];
+
+    @OneToMany(() => GlobalChatRoom, globalChatRoom => globalChatRoom.owner)
+    ownedGlobalChatRooms: GlobalChatRoom[];
 
 }

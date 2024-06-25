@@ -65,6 +65,8 @@ import { TodoForDevBattleSubject } from "./dev-battle/entities/todo-for-dev-batt
 import { ChattingModule } from './chatting/chatting.module';
 import { ChatRoom } from "./chatting/entities/chat-room.entity";
 import { Message } from "./chatting/entities/message.entity";
+import { GlobalChatRoom } from "./chatting/entities/global-chat-room.entity";
+import { GlobalChatMessage } from "./chatting/entities/global-chat-message.entity";
 
 @Module({
   imports: [
@@ -121,7 +123,9 @@ import { Message } from "./chatting/entities/message.entity";
         DevSpecForTeamBattle,
         TodoForDevBattleSubject,
         ChatRoom,
-        Message
+        Message,
+        GlobalChatRoom,
+        GlobalChatMessage
       ],
       synchronize: true,
     }),

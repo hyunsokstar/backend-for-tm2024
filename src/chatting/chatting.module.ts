@@ -7,6 +7,8 @@ import { Message } from './entities/message.entity';
 import { DevBattle } from 'src/dev-battle/entities/dev-battle.entity';
 import { UsersModel } from 'src/users/entities/users.entity';
 import { TeamForDevBattle } from 'src/dev-battle/entities/team-for-dev-battle.entity';
+import { GlobalChatRoom } from './entities/global-chat-room.entity';
+import { GlobalChatMessage } from './entities/global-chat-message.entity';
 
 @Module({
   imports: [
@@ -16,7 +18,9 @@ import { TeamForDevBattle } from 'src/dev-battle/entities/team-for-dev-battle.en
       UsersModel,
       DevBattle,
       TeamForDevBattle,
-      Message
+      Message,
+      GlobalChatRoom,
+      GlobalChatMessage
     ])
   ],
   controllers: [ChattingController],
