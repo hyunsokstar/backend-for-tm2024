@@ -1,5 +1,4 @@
 // src/chat/entities/global-chat-room.entity.ts
-
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToMany, OneToMany, JoinTable, ManyToOne } from 'typeorm';
 import { UsersModel } from 'src/users/entities/users.entity';
 import { Message } from './message.entity';

@@ -29,15 +29,76 @@ export class ChattingService {
 
   ) { }
 
-  async getGlobalChatRoomById(id: string) {
+  async getGlobalChatRoomById(id: string, currentUser: any) {
+    // 채팅방 정보 가져오기 (사용자 정보 포함)
     const chatRoom = await this.globalChatRoomRepo.findOne({
       where: { id: id },
-      relations: ['owner', 'messages', 'messages.writer'],
+      relations: ['owner', 'users', 'messages', 'messages.writer'],
     });
+
     if (!chatRoom) {
       throw new NotFoundException(`Chat room with ID ${id} not found`);
     }
+
+    // 현재 로그인한 사용자가 채팅방에 없으면 추가
+    const isUserExist = chatRoom.users.some(u => u.id === currentUser.id);
+    if (!isUserExist) {
+      chatRoom.users.push(currentUser);
+      await this.globalChatRoomRepo.save(chatRoom); // 채팅방 업데이트
+    }
+
     return chatRoom;
+  }
+
+  async registerUserToChatRoom(roomId: string, userId: number): Promise<void> {
+    // 채팅방과 사용자 정보 가져오기 (관계 엔티티를 포함하여)
+    const chatRoom = await this.globalChatRoomRepo.findOne({
+      where: { id: roomId },
+      relations: { users: true }
+    });
+    if (!chatRoom) {
+      throw new NotFoundException(`Chat room with ID ${roomId} not found`);
+    }
+
+    const user = await this.usersRepo.findOne({
+      where: { id: userId }
+    });
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
+    // 이미 채팅방에 해당 유저가 있는지 확인 후 추가
+    const isUserExist = chatRoom.users.some(u => u.id === userId);
+    if (!isUserExist) {
+      chatRoom.users.push(user);
+      await this.globalChatRoomRepo.save(chatRoom); // 채팅방 업데이트
+    }
+  }
+
+  // 모든 글로벌 챗룸과 관련 메시지 삭제
+  async deleteAllGlobalChatRooms() {
+    // 모든 글로벌 챗룸 조회
+    const chatRooms = await this.globalChatRoomRepo.find({ relations: ['messages'] });
+
+    // 각 챗룸에 속한 메시지들을 삭제하고 챗룸 삭제
+    for (const chatRoom of chatRooms) {
+      await this.globalChatMessageRepo.remove(chatRoom.messages); // 챗룸에 속한 메시지 삭제
+      await this.globalChatRoomRepo.remove(chatRoom); // 챗룸 삭제
+    }
+
+    return { deletedCount: chatRooms.length };
+  }
+
+  async createGlobalChatRoom(title: string, ownerId: number): Promise<GlobalChatRoom> {
+    const owner = await this.usersRepo.findOne({ where: { id: ownerId } });
+    if (!owner) {
+      throw new NotFoundException(`User with ID ${ownerId} not found`);
+    }
+
+    const globalChatRoom = this.globalChatRoomRepo.create({ title, owner });
+    globalChatRoom.users = [owner]; // 현재 로그인한 사용자 추가
+
+    return await this.globalChatRoomRepo.save(globalChatRoom);
   }
 
   async addMessageToGlobalChatRoom(chatRoomId: string, createMessageDto: CreateMessageDto, loginUser: UsersModel) {
@@ -58,15 +119,6 @@ export class ChattingService {
 
   async getAllGlobalChatRooms() {
     return await this.globalChatRoomRepo.find({ relations: ['owner'] });
-  }
-
-  async createGlobalChatRoom(title: string, ownerId: number): Promise<GlobalChatRoom> {
-    const owner = await this.usersRepo.findOne({ where: { id: ownerId } });
-    if (!owner) {
-      throw new NotFoundException(`User with ID ${ownerId} not found`);
-    }
-    const globalChatRoom = this.globalChatRoomRepo.create({ title, owner });
-    return await this.globalChatRoomRepo.save(globalChatRoom);
   }
 
   async addMessage(chatRoomId: string, createMessageDto: CreateMessageDto, loginUser: UsersModel) {
