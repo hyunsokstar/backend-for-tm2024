@@ -356,7 +356,6 @@ export class TodosService {
 
                         else {
                             count += 1
-                            console.log("update check 2222222222");
 
                             await this.todosRepository.update(id, {
                                 manager: manager,
@@ -490,7 +489,6 @@ export class TodosService {
 
                         else {
                             count += 1
-                            console.log("update check 2222222222");
 
                             await this.supplementaryTodosRepo.update(id, {
                                 manager: manager,
@@ -991,6 +989,7 @@ export class TodosService {
         const { task, deadline, email, rowNum, todoStatusOption } = todoDto;
 
         console.log("todoStatusOption ?? ", todoStatusOption);
+        console.log("email ?? ", email);
 
         let statusOption;
         if (todoStatusOption === "idea") {
@@ -1006,9 +1005,6 @@ export class TodosService {
             statusOption = TodoStatus.COMPLETED
         }
 
-        console.log("statusOption : ", statusOption);
-
-
         const managerObj = await this.usersRepository.findOne({
             where: {
                 email: email
@@ -1023,7 +1019,8 @@ export class TodosService {
             const todo = this.todosRepository.create({
                 task,
                 deadline,
-                manager: statusOption === "entry" ? null : managerObj,
+                // manager: statusOption === "entry" ? null : managerObj,
+                manager: managerObj,
                 status: statusOption
             });
             todoPromises.push(this.todosRepository.save(todo));

@@ -115,7 +115,6 @@ export class TodosController {
         @Body() createTodoDto: SimpleCreateTodoDto,
     ) {
         console.log("createTodoDto : ", createTodoDto);
-
         await this.todosService.simpleCreateTodo(createTodoDto);
         return { message: "success", createTodoDto }
     }
