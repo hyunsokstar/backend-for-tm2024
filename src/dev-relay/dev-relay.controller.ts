@@ -10,10 +10,31 @@ import { DevAssignment } from './entities/dev-assignment.entity';
 import { SubjectForCategory } from './entities/subject-for-category.entity';
 import { CreateSubjectDto } from './dto/subject-for-category.dto';
 import { SubjectResponse } from './interface/subject-response.interface';
+import { CreateCategoriesForDevAssignmentDto } from './dto/create-categories-for-dev-assignment.dto';
 
 @Controller('dev-relay')
 export class DevRelayController {
   constructor(private readonly devRelayService: DevRelayService) { }
+
+  @Post('subject/:subjectId/categories')
+  async createCategories(
+    @Param('subjectId') subjectId: number,
+    @Body() createCategoriesDto: CreateCategoriesForDevAssignmentDto
+  ) {
+
+    console.log("createCategoriesDto: ", createCategoriesDto);
+    console.log("subjectId :", subjectId);
+
+    const categories = await this.devRelayService.createCategoriesForSubject(createCategoriesDto.name, subjectId);
+    return {
+      message: `${categories.length} categories were successfully added.`,
+    };
+  }
+
+  @Post('subject/:subjectId/category')
+  async createCategory(@Param('subjectId') subjectId: number, @Body('name') name: string) {
+    return await this.devRelayService.createCategoryForSubject(name, subjectId);
+  }
 
   @Delete('subjects/:id')
   async deleteSubject(@Param('id') id: number): Promise<{ id: number; name: string }> {
@@ -68,11 +89,6 @@ export class DevRelayController {
   @Get('subjects')
   async getAllSubjects(): Promise<SubjectResponse[]> {
     return this.devRelayService.getAllSubjects();
-  }
-
-  @Post('subject/:subjectId/category')
-  async createCategory(@Param('subjectId') subjectId: number, @Body('name') name: string) {
-    return await this.devRelayService.createCategoryForSubject(name, subjectId);
   }
 
   @Delete('categories/:id')
@@ -131,10 +147,10 @@ export class DevRelayController {
     return this.devRelayService.createDevAssignments(categoryId, createDevAssignmentsDto);
   }
 
-  @Post('categories')
-  async createCategories(@Body() categoriesDto: CategoryForDevAssignmentDto[]) {
-    return this.devRelayService.createCategories(categoriesDto);
-  }
+  // @Post('categories')
+  // async createCategories(@Body() categoriesDto: CategoryForDevAssignmentDto[]) {
+  //   return this.devRelayService.createCategories(categoriesDto);
+  // }
 
   @Get('')
   findAllDevRelays() {

@@ -42,6 +42,25 @@ export class DevRelayService {
 
   ) { }
 
+  async createCategoriesForSubject(names: string[], subjectId: number): Promise<CategoryForDevAssignment[]> {
+    const subject = await this.subjectForCategoryRepo.findOne({ where: { id: subjectId } });
+    if (!subject) {
+      throw new NotFoundException(`Subject with ID ${subjectId} not found`);
+    }
+    const categories = names.map(name => this.categoryForDevAssignmentRepo.create({ name, subject }));
+    return this.categoryForDevAssignmentRepo.save(categories);
+  }
+
+  async createCategoryForSubject(name: string, subjectId: number) {
+    console.log("name :::::::: ", name);
+    const subject = await this.subjectForCategoryRepo.findOne({ where: { id: subjectId } });
+    if (!subject) {
+      throw new NotFoundException(`Subject with ID ${subjectId} not found`);
+    }
+    const category = this.categoryForDevAssignmentRepo.create({ name, subject });
+    return this.categoryForDevAssignmentRepo.save(category);
+  }
+
   async updateSubjectName(subjectId: number, name: string): Promise<SubjectForCategory> {
     const subject = await this.subjectForCategoryRepo.findOne({ where: { id: subjectId } });
 
@@ -108,17 +127,6 @@ export class DevRelayService {
 
     return await this.devAssignmentSubmissionRepo.save(devAssignmentSubmission);
   }
-
-  async createCategoryForSubject(name: string, subjectId: number) {
-    console.log("name :::::::: ", name);
-    const subject = await this.subjectForCategoryRepo.findOne({ where: { id: subjectId } });
-    if (!subject) {
-      throw new NotFoundException(`Subject with ID ${subjectId} not found`);
-    }
-    const category = this.categoryForDevAssignmentRepo.create({ name, subject });
-    return this.categoryForDevAssignmentRepo.save(category);
-  }
-
 
   async deleteDevAssignment(id: number): Promise<void> {
     const devAssignment = await this.devAssignmentRepo.findOne({ where: { id } });
@@ -346,13 +354,13 @@ export class DevRelayService {
     return devAssignments;
   }
 
-  async createCategories(categoriesDto: CategoryForDevAssignmentDto[]) {
-    const categories = categoriesDto.map(categoryDto => {
-      const { name } = categoryDto;
-      return this.categoryForDevAssignmentRepo.create({ name });
-    });
-    return this.categoryForDevAssignmentRepo.save(categories);
-  }
+  // async createCategories(categoriesDto: CategoryForDevAssignmentDto[]) {
+  //   const categories = categoriesDto.map(categoryDto => {
+  //     const { name } = categoryDto;
+  //     return this.categoryForDevAssignmentRepo.create({ name });
+  //   });
+  //   return this.categoryForDevAssignmentRepo.save(categories);
+  // }
 
   async findAllDevRelays(): Promise<DevRelay[]> {
     return await this.devRelayRepo.find();
