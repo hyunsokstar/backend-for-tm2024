@@ -12,6 +12,35 @@ import { MultiUpdateTodoDto } from '../dtos/multi-update-todo.dto';
 export class TodosController {
     constructor(private readonly todosService: TodosService) { }
 
+    @Get('/user/:userId/completed')
+    async getUserCompletedTodoList(
+        @Param('userId') userId: number,
+        @Query('pageNum') pageNum = 1,
+        @Query('perPage') perPage = 20,
+    ): Promise<{ todoList: TodosModel[], totalCount: number, perPage: number }> {
+        return this.todosService.getUserCompletedTodoList(userId, pageNum, perPage);
+    }
+
+    @Get('completed')
+    async getCompletedTodoList(
+        @Query('pageNum') pageNum = 1,
+        @Query('perPage') perPage = 20,
+        @Req() req
+    ): Promise<{ usersEmailInfo: string[], todoList: TodosModel[], totalCount: number, perPage: number }> {
+        return this.todosService.getCompletedTodoList(pageNum, perPage);
+    }
+
+    @Get('uncompleted')
+    async getUncompletedTodoList(
+        @Query('pageNum') pageNum = 1,
+        @Query('perPage') perPage = 200,
+        @Query('todoStatusOption') todoStatusOption,
+        @Req() req
+    ): Promise<{ usersEmailInfo: string[], todoList: TodosModel[], totalCount: number, perPage: number }> {
+        // console.log("req.user : ", req.user);
+        return this.todosService.getUncompletedTodoList(pageNum, perPage, todoStatusOption);
+    }
+
     @Get('forUser')
     async getTodoListForUserId(
         @Query('userId') userId,
@@ -37,16 +66,7 @@ export class TodosController {
         return this.todosService.getTodosList(pageNum, perPage);
     }
 
-    @Get('uncompleted')
-    async getUncompletedTodoList(
-        @Query('pageNum') pageNum = 1,
-        @Query('perPage') perPage = 200,
-        @Query('todoStatusOption') todoStatusOption,
-        @Req() req
-    ): Promise<{ usersEmailInfo: string[], todoList: TodosModel[], totalCount: number, perPage: number }> {
-        // console.log("req.user : ", req.user);
-        return this.todosService.getUncompletedTodoList(pageNum, perPage, todoStatusOption);
-    }
+
 
 
     @Post('saveTodos') // API 엔드포인트 추가
