@@ -12,6 +12,18 @@ import { MultiUpdateTodoDto } from '../dtos/multi-update-todo.dto';
 export class TodosController {
     constructor(private readonly todosService: TodosService) { }
 
+    @Get('forUser')
+    async getTodoListForUserId(
+        @Query('userId') userId,
+        @Query('pageNum') pageNum = 1,
+        @Query('perPage') perPage = 200,
+        @Query('todoStatusOption') todoStatusOption,
+        @Req() req
+    ): Promise<{ usersEmailInfo: string[], todoList: TodosModel[], totalCount: number, perPage: number }> {
+        console.log("userId ?????????? : ", userId);
+        return this.todosService.getTodoListForUserId(pageNum, perPage, userId, todoStatusOption);
+    }
+
     @Post()
     async createTodo(@Body() createTodoDto: DtoForCreateTodo) {
         return this.todosService.create(createTodoDto);
@@ -23,18 +35,6 @@ export class TodosController {
         @Query('perPage') perPage = 200,
     ): Promise<{ usersEmailInfo: string[], todoList: TodosModel[], totalCount: number, perPage: number }> {
         return this.todosService.getTodosList(pageNum, perPage);
-    }
-
-    @Get('forUser')
-    async getTodoListForUserId(
-        @Query('userId') userId,
-        @Query('pageNum') pageNum = 1,
-        @Query('perPage') perPage = 200,
-        @Query('todoStatusOption') todoStatusOption,
-        @Req() req
-    ): Promise<{ usersEmailInfo: string[], todoList: TodosModel[], totalCount: number, perPage: number }> {
-        // console.log("req.user : ", req.user);
-        return this.todosService.getTodoListForUserId(pageNum, perPage, userId, todoStatusOption);
     }
 
     @Get('uncompleted')
