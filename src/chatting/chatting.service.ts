@@ -9,6 +9,8 @@ import { UsersModel } from 'src/users/entities/users.entity';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { Message } from './entities/message.entity';
 import { GlobalChatMessage } from './entities/global-chat-message.entity';
+import { UserChatRoom } from './entities/user-chat-room.entity';
+import { UserChatMessage } from './entities/user-chat-message.entity';
 
 @Injectable()
 export class ChattingService {
@@ -27,7 +29,25 @@ export class ChattingService {
     @InjectRepository(GlobalChatMessage)
     private globalChatMessageRepo: Repository<GlobalChatMessage>,
 
+    @InjectRepository(UserChatRoom)
+    private userChatRoomRepo: Repository<UserChatRoom>,
+
+    @InjectRepository(UserChatMessage)
+    private userChatMessageRepo: Repository<UserChatMessage>,
   ) { }
+  async getUserChatRoomInfo(userId: number): Promise<UserChatRoom[]> {
+    const user = await this.usersRepo.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException(`User with ID "${userId}" not found`);
+    }
+
+    const userChatRooms = await this.userChatRoomRepo.find({
+      where: { owner: { id: userId } },
+      relations: ['owner', 'users', 'messages'],
+    });
+
+    return userChatRooms;
+  }
 
   async getGlobalChatRoomById(id: string, currentUser: any) {
     // 채팅방 정보 가져오기 (사용자 정보 포함)

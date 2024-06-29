@@ -1,7 +1,7 @@
 // src\users\entities\users.entity.ts
 import { Max, Min } from "class-validator";
 import { GendersEnum, RolesEnum } from "../enums/roles.enum";
-import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
 import { UserPostingsModel } from "../../postings/entities/user_postings.entity";
 import { TodosModel } from "src/todos/entities/todos.entity";
 import { BookMarksForSkilNoteContentsModel } from "src/technotes/entities/bookMarksForSkilNoteContent.entity";
@@ -12,6 +12,7 @@ import { ChallengesModel } from "src/challenges/entities/challenge.entity";
 import { SubChallengesModel } from "src/challenges/entities/sub_challenge.entity";
 import { ChatRoom } from "src/chatting/entities/chat-room.entity";
 import { GlobalChatRoom } from "src/chatting/entities/global-chat-room.entity";
+import { UserChatRoom } from "src/chatting/entities/user-chat-room.entity";
 
 @Entity()
 @Unique(["email", "nickname"])
@@ -125,5 +126,11 @@ export class UsersModel {
 
     @OneToMany(() => GlobalChatRoom, globalChatRoom => globalChatRoom.owner)
     ownedGlobalChatRooms: GlobalChatRoom[];
+
+    @ManyToMany(() => UserChatRoom, userChatRoom => userChatRoom.users)
+    userChatRooms: UserChatRoom[];
+
+    @OneToOne(() => UserChatRoom, userChatRoom => userChatRoom.owner)
+    userChatRoom: UserChatRoom;
 
 }

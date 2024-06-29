@@ -67,6 +67,8 @@ import { ChatRoom } from "./chatting/entities/chat-room.entity";
 import { Message } from "./chatting/entities/message.entity";
 import { GlobalChatRoom } from "./chatting/entities/global-chat-room.entity";
 import { GlobalChatMessage } from "./chatting/entities/global-chat-message.entity";
+import { UserChatRoom } from "./chatting/entities/user-chat-room.entity";
+import { UserChatMessage } from "./chatting/entities/user-chat-message.entity";
 
 @Module({
   imports: [
@@ -125,7 +127,9 @@ import { GlobalChatMessage } from "./chatting/entities/global-chat-message.entit
         ChatRoom,
         Message,
         GlobalChatRoom,
-        GlobalChatMessage
+        GlobalChatMessage,
+        UserChatRoom,
+        UserChatMessage
       ],
       synchronize: true,
     }),

@@ -12,18 +12,9 @@ import { FollowUserDto } from './dtos/FollowUser.dto';
 export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
-  @Get()
-  async getAllUsers(
-    @Query('pageNum') pageNum: number = 1,
-  ): Promise<{ users: DtoForUserList[], totalCount: number, perPage: number }> {
-    const { users, totalCount, perPage } = await this.usersService.getAllUsers(pageNum);
-
-    return { users, totalCount, perPage };
-  }
-
   @Post()
   async SignUp(@Body() user: CreateUserDto) {
-    console.log("add user request check !");
+    console.log("signup check !!!!!!!!!!!!!!!!!!!!!");
 
     try {
       await this.usersService.checkDuplicateEmailAndNickname(user.email, user.nickname);
@@ -32,6 +23,15 @@ export class UsersController {
       console.log("error : ", error);
       throw new HttpException(error.message, HttpStatus.CONFLICT);
     }
+  }
+
+  @Get()
+  async getAllUsers(
+    @Query('pageNum') pageNum: number = 1,
+  ): Promise<{ users: DtoForUserList[], totalCount: number, perPage: number }> {
+    const { users, totalCount, perPage } = await this.usersService.getAllUsers(pageNum);
+
+    return { users, totalCount, perPage };
   }
 
   @Delete()

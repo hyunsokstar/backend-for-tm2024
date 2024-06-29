@@ -9,6 +9,8 @@ import { UsersModel } from 'src/users/entities/users.entity';
 import { TeamForDevBattle } from 'src/dev-battle/entities/team-for-dev-battle.entity';
 import { GlobalChatRoom } from './entities/global-chat-room.entity';
 import { GlobalChatMessage } from './entities/global-chat-message.entity';
+import { UserChatRoom } from './entities/user-chat-room.entity';
+import { UserChatMessage } from './entities/user-chat-message.entity';
 
 @Module({
   imports: [
@@ -20,7 +22,9 @@ import { GlobalChatMessage } from './entities/global-chat-message.entity';
       TeamForDevBattle,
       Message,
       GlobalChatRoom,
-      GlobalChatMessage
+      GlobalChatMessage,
+      UserChatRoom,
+      UserChatMessage
     ])
   ],
   controllers: [ChattingController],

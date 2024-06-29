@@ -21,5 +21,3 @@ export class GlobalChatMessage {
     @CreateDateColumn()
     created_at: Date;
 }
-
-

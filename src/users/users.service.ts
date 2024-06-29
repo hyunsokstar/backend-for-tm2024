@@ -9,6 +9,7 @@ import * as jwt from 'jsonwebtoken';
 import { UpdateUserDTO } from './dtos/UpdateUserDTO';
 import { FollowUserDto } from './dtos/FollowUser.dto';
 import { PaymentsModelForCashPoints } from './entities/payment.entity';
+import { UserChatRoom } from 'src/chatting/entities/user-chat-room.entity';
 
 @Injectable()
 export class UsersService {
@@ -18,8 +19,51 @@ export class UsersService {
         private readonly usersRepository: Repository<UsersModel>,
         private readonly configService: ConfigService,
         @InjectRepository(PaymentsModelForCashPoints)
-        private readonly paymentsForCashPointsRepo: Repository<PaymentsModelForCashPoints>
+        private readonly paymentsForCashPointsRepo: Repository<PaymentsModelForCashPoints>,
+        @InjectRepository(UserChatRoom)
+        private readonly userChatRoomRepo: Repository<UserChatRoom>,
+
     ) { }
+
+    async CreateUser(user: Partial<UsersModel>): Promise<UsersModel> {
+        const hashedPassword = await this.hashPassword(user.password); // 비밀번호를 해시화
+        const userToCreate = {
+            ...user,
+            password: hashedPassword, // 해시된 비밀번호로 교체
+        };
+        const createdUser = await this.usersRepository.save(userToCreate);
+        // 채팅방 생성
+        await this.createUserChatRoom(createdUser);
+        return createdUser;
+    }
+
+    private async hashPassword(password: string): Promise<string> {
+        const saltOrRounds = 10;
+        const salt = await bcrypt.genSalt(saltOrRounds); // 솔트 생성
+        return bcrypt.hash(password, salt); // 솔트를 이용하여 비밀번호를 해시화
+    }
+
+    async createUserChatRoom(user: UsersModel): Promise<UserChatRoom> {
+        const chatRoom = this.userChatRoomRepo.create({
+            owner: user,
+            title: `${user.nickname}'s Chat Room`,
+            users: [user]
+        });
+        return this.userChatRoomRepo.save(chatRoom);
+    }
+
+    async checkDuplicateEmailAndNickname(email: string, nickname: string): Promise<void> {
+        const existingUserByEmail = await this.usersRepository.findOne({ where: { email } });
+        const existingUserByNickname = await this.usersRepository.findOne({ where: { nickname } });
+
+        if (existingUserByEmail) {
+            throw new ConflictException('이미 존재하는 email 입니다.');
+        }
+
+        if (existingUserByNickname) {
+            throw new ConflictException('이미 존재하는 nickname 입니다.');
+        }
+    }
 
     async getUsersPaymentHistory(userId: number) {
         const user = await this.usersRepository.findOne({ where: { id: userId } });
@@ -199,38 +243,7 @@ export class UsersService {
         return { users: dtoUsers, totalCount, perPage };
     }
 
-    async CreateUser(user: Partial<UsersModel>) {
-        const hashedPassword = await this.hashPassword(user.password); // 비밀번호를 해시화
-        const userToCreate = {
-            ...user,
-            password: hashedPassword, // 해시된 비밀번호로 교체
-        };
-        return await this.usersRepository.save(userToCreate);
-    }
 
-    private async hashPassword(password: string): Promise<string> {
-        const saltOrRounds = 10;
-        const salt = await bcrypt.genSalt(saltOrRounds); // 솔트 생성
-
-        return bcrypt.hash(password, salt); // 솔트를 이용하여 비밀번호를 해시화
-    }
-
-    async createUser(user: Partial<UsersModel>): Promise<UsersModel> {
-        return await this.usersRepository.save(user);
-    }
-
-    async checkDuplicateEmailAndNickname(email: string, nickname: string): Promise<void> {
-        const existingUserByEmail = await this.usersRepository.findOne({ where: { email } });
-        const existingUserByNickname = await this.usersRepository.findOne({ where: { nickname } });
-
-        if (existingUserByEmail) {
-            throw new ConflictException('이미 존재하는 email 입니다.');
-        }
-
-        if (existingUserByNickname) {
-            throw new ConflictException('이미 존재하는 nickname 입니다.');
-        }
-    }
 
     async deleteUsersForCheckedIds(checkedIds: number[]): Promise<number> {
         try {

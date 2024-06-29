@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGuards, Req, UnauthorizedException, Put, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGuards, Req, UnauthorizedException, Put, NotFoundException, ParseUUIDPipe } from '@nestjs/common';
 import { ChattingService } from './chatting.service';
 import { CreateChattingDto } from './dto/create-chatting.dto';
 import { UpdateChattingDto } from './dto/update-chatting.dto';
@@ -8,8 +8,13 @@ import { CreateMessageDto } from './dto/create-message.dto';
 export class ChattingController {
   constructor(private readonly chattingService: ChattingService) { }
 
-  @Post('global-chat-room/:id/messages')
-  async addMessageToGlobalChatRoom(@Param('id') id: string, @Body() createMessageDto: CreateMessageDto, @Req() req) {
+  @Get('user/:userId/user-chat-room')
+  async getUserChatRoomInfo(@Param('userId', ParseIntPipe) userId: number) {
+    return this.chattingService.getUserChatRoomInfo(userId);
+  }
+
+  @Post('global-chat-room/:userId/messages')
+  async addMessageToGlobalChatRoom(@Param('userId') id: string, @Body() createMessageDto: CreateMessageDto, @Req() req) {
     if (!req.user) {
       throw new UnauthorizedException('로그인 해주세요');
     }
