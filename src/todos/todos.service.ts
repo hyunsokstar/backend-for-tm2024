@@ -1,6 +1,6 @@
-import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, LessThan, Repository } from 'typeorm';
+import { Between, In, LessThan, Repository } from 'typeorm';
 import { TodoStatus, TodosModel } from './entities/todos.entity';
 import { DtoForCreateTodo } from './dtos/createTodo.dto';
 import { UsersModel } from 'src/users/entities/users.entity';
@@ -28,8 +28,92 @@ export class TodosService {
 
         @InjectRepository(SkilNoteContentsModel) // UsersModel의 Repository를 주입합니다.
         private readonly skilNoteContentsRepo: Repository<SkilNoteContentsModel>,
-
     ) { }
+
+    async getUserCompletedTaskStatics(userId: number, startDate: string, endDate: string) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);  // Include the entire end date
+
+        if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+            throw new BadRequestException('Invalid date format');
+        }
+
+        const user = await this.usersRepository.findOne({ where: { id: userId } });
+        if (!user) {
+            throw new NotFoundException(`User with ID ${userId} not found`);
+        }
+
+        const completedTasks = await this.todosRepository.find({
+            where: {
+                manager: { id: userId },
+                status: TodoStatus.COMPLETED,
+                completedAt: Between(start, end)
+            },
+            relations: ['manager']
+        });
+
+        const teamAverage = await this.getTeamAverageByDate(start, end);
+
+        const result = this.generateDateRange(start, end).map(date => {
+            const formattedDate = this.formatDate(date);
+            const tasksForDate = completedTasks.filter(task =>
+                task.completedAt.toDateString() === date.toDateString()
+            );
+            return {
+                date: formattedDate,
+                completedTasks: tasksForDate.length,
+                teamAverage: Number(teamAverage[date.toISOString().split('T')[0]]?.toFixed(2)) || 0
+            };
+        });
+
+        return result;
+    }
+
+    private generateDateRange(start: Date, end: Date): Date[] {
+        const dates = [];
+        for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+            dates.push(new Date(d));
+        }
+        return dates;
+    }
+
+    private async getTeamAverageByDate(startDate: Date, endDate: Date) {
+        const teamTasks = await this.todosRepository.find({
+            where: {
+                status: TodoStatus.COMPLETED,
+                completedAt: Between(startDate, endDate)
+            },
+            relations: ['manager']
+        });
+
+        const groupedByDateAndUser = teamTasks.reduce((acc, task) => {
+            const date = task.completedAt.toISOString().split('T')[0];
+            if (!acc[date]) {
+                acc[date] = {};
+            }
+            if (!acc[date][task.manager.id]) {
+                acc[date][task.manager.id] = 0;
+            }
+            acc[date][task.manager.id]++;
+            return acc;
+        }, {} as Record<string, Record<number, number>>);
+
+        return Object.entries(groupedByDateAndUser).reduce((acc, [date, users]) => {
+            const totalTasks = Object.values(users).reduce((sum, count) => sum + count, 0);
+            acc[date] = totalTasks / Object.keys(users).length;
+            return acc;
+        }, {} as Record<string, number>);
+    }
+
+    private formatDate(date: Date): string {
+        const month = date.getMonth() + 1;
+        const day = date.getDate();
+        const dayOfWeek = ['일', '월', '화', '수', '목', '금', '토'][date.getDay()];
+        return `${month}월 ${day}일 (${dayOfWeek})`;
+    }
+
+
     async getUserCompletedTodoList(
         userId: number,
         pageNum: number = 1,
@@ -361,9 +445,22 @@ export class TodosService {
                 throw new NotFoundException(`Todo with ID ${todoId} not found.`);
             }
 
+            console.log("defaultTodoStatus ?? : ", defaultTodoStatus);
+            console.log("todoStatusOption ?? : ", todoStatusOption);
+
+
             // 만약에 업데이트할 값이 존재한다면, 해당 값으로 업데이트합니다.
             if (defaultTodoStatus !== null && defaultTodoStatus !== "") {
                 todoToUpdate.status = todoStatusOption;
+                if (todoStatusOption === TodoStatus.COMPLETED) {
+                    todoToUpdate.completedAt = new Date();
+                    console.log("here 여기 실행 된거야 1111111?");
+                } else {
+                    // 상태가 COMPLETED가 아닐 경우, completedAt을 null로 설정
+                    console.log("here 여기 실행 된거야 2222222?");
+
+                    todoToUpdate.completedAt = null;
+                }
             }
             if (defaultDeadLine !== null && defaultDeadLine !== null) {
                 todoToUpdate.deadline = defaultDeadLine;

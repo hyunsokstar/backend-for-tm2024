@@ -1,5 +1,5 @@
 // TodosController.ts
-import { Controller, Post, Body, Get, Query, Delete, UseGuards, Req, Param } from '@nestjs/common';
+import { Controller, Post, Body, Get, Query, Delete, UseGuards, Req, Param, ParseIntPipe, HttpException, HttpStatus } from '@nestjs/common';
 import { TodosService } from '../todos.service';
 import { DtoForCreateTodo } from '../dtos/createTodo.dto';
 import { TodosModel } from '../entities/todos.entity';
@@ -7,10 +7,32 @@ import { AuthGuard } from 'src/guards/auth.guard';
 import { SimpleCreateTodoDto } from '../dtos/SimpleCreateToDo.dto';
 import { SimpleCreateSupplementTodoDto } from '../dtos/SimpleCreateSupplementToDo.dto';
 import { MultiUpdateTodoDto } from '../dtos/multi-update-todo.dto';
+import { DateRangeDto } from '../dtos/date-range-dto';
 
 @Controller('todos')
 export class TodosController {
     constructor(private readonly todosService: TodosService) { }
+
+    @Get('/user/:userId/statics/completed')
+    async getUserCompletedTaskStatics(
+        @Param('userId', ParseIntPipe) userId: number,
+        @Query() dateRange: DateRangeDto
+    ) {
+        try {
+            const result = await this.todosService.getUserCompletedTaskStatics(
+                userId,
+                dateRange.startDate,
+                dateRange.endDate
+            );
+            return { success: true, data: result };
+        } catch (error) {
+            throw new HttpException({
+                status: HttpStatus.BAD_REQUEST,
+                error: 'Failed to fetch task statistics',
+                message: error.message,
+            }, HttpStatus.BAD_REQUEST);
+        }
+    }
 
     @Get('/user/:userId/completed')
     async getUserCompletedTodoList(
