@@ -46,10 +46,14 @@ export class ChattingService {
       throw new NotFoundException(`UserChatRoom with ID ${chatRoomId} not found`);
     }
 
-    // 사용자가 채팅방에 속해 있는지 확인
-    // if (!chatRoom.users.some(chatUser => chatUser.id === user.id)) {
-    //   throw new UnauthorizedException('You are not a member of this chat room');
-    // }
+    // Check if the user is already in the chat room
+    const userInRoom = chatRoom.users.some(chatUser => chatUser.id === user.id);
+
+    if (!userInRoom) {
+      // Add the user to the chat room
+      chatRoom.users.push(user);
+      await this.userChatRoomRepo.save(chatRoom);
+    }
 
     const newMessage = this.userChatMessageRepo.create({
       ...createMessageDto,
