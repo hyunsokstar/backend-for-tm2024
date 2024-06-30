@@ -1,5 +1,5 @@
 import { GlobalChatRoom } from 'src/chatting/entities/global-chat-room.entity';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreateChattingDto } from './dto/create-chatting.dto';
 import { UpdateChattingDto } from './dto/update-chatting.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -35,20 +35,56 @@ export class ChattingService {
     @InjectRepository(UserChatMessage)
     private userChatMessageRepo: Repository<UserChatMessage>,
   ) { }
-  async getUserChatRoomInfo(userId: number): Promise<UserChatRoom[]> {
+
+  async addMessageToUserChatRoom(chatRoomId: string, createMessageDto: CreateMessageDto, user: UsersModel): Promise<UserChatMessage> {
+    const chatRoom = await this.userChatRoomRepo.findOne({
+      where: { id: chatRoomId },
+      relations: ['users']
+    });
+
+    if (!chatRoom) {
+      throw new NotFoundException(`UserChatRoom with ID ${chatRoomId} not found`);
+    }
+
+    // 사용자가 채팅방에 속해 있는지 확인
+    // if (!chatRoom.users.some(chatUser => chatUser.id === user.id)) {
+    //   throw new UnauthorizedException('You are not a member of this chat room');
+    // }
+
+    const newMessage = this.userChatMessageRepo.create({
+      ...createMessageDto,
+      writer: user,
+      userChatRoom: chatRoom
+    });
+
+    return await this.userChatMessageRepo.save(newMessage);
+  }
+
+  async createGlobalChatRoom(title: string, ownerId: number): Promise<GlobalChatRoom> {
+    const owner = await this.usersRepo.findOne({ where: { id: ownerId } });
+    if (!owner) {
+      throw new NotFoundException(`User with ID ${ownerId} not found`);
+    }
+
+    const globalChatRoom = this.globalChatRoomRepo.create({ title, owner });
+    globalChatRoom.users = [owner]; // 현재 로그인한 사용자 추가
+
+    return await this.globalChatRoomRepo.save(globalChatRoom);
+  }
+
+  async getUserChatRoomInfo(userId: number): Promise<UserChatRoom | null> {
     const user = await this.usersRepo.findOne({ where: { id: userId } });
     if (!user) {
       throw new NotFoundException(`User with ID "${userId}" not found`);
     }
 
-    const userChatRooms = await this.userChatRoomRepo.find({
+    const userChatRoom = await this.userChatRoomRepo.findOne({
       where: { owner: { id: userId } },
-      relations: ['owner', 'users', 'messages'],
+      relations: ['owner', 'users', 'messages', 'messages.writer'],
     });
 
-    return userChatRooms;
+    return userChatRoom;
   }
-
   async getGlobalChatRoomById(id: string, currentUser: any) {
     // 채팅방 정보 가져오기 (사용자 정보 포함)
     const chatRoom = await this.globalChatRoomRepo.findOne({
@@ -109,17 +145,6 @@ export class ChattingService {
     return { deletedCount: chatRooms.length };
   }
 
-  async createGlobalChatRoom(title: string, ownerId: number): Promise<GlobalChatRoom> {
-    const owner = await this.usersRepo.findOne({ where: { id: ownerId } });
-    if (!owner) {
-      throw new NotFoundException(`User with ID ${ownerId} not found`);
-    }
-
-    const globalChatRoom = this.globalChatRoomRepo.create({ title, owner });
-    globalChatRoom.users = [owner]; // 현재 로그인한 사용자 추가
-
-    return await this.globalChatRoomRepo.save(globalChatRoom);
-  }
 
   async addMessageToGlobalChatRoom(chatRoomId: string, createMessageDto: CreateMessageDto, loginUser: UsersModel) {
     const globalChatRoom = await this.globalChatRoomRepo.findOne({

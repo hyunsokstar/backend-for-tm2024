@@ -8,19 +8,32 @@ import { CreateMessageDto } from './dto/create-message.dto';
 export class ChattingController {
   constructor(private readonly chattingService: ChattingService) { }
 
-  @Get('user/:userId/user-chat-room')
-  async getUserChatRoomInfo(@Param('userId', ParseIntPipe) userId: number) {
-    return this.chattingService.getUserChatRoomInfo(userId);
+  @Post('user-chat-room/:chatRoomId/messages')
+  async addMessageToUserChatRoom(
+    @Param('chatRoomId', ParseUUIDPipe) chatRoomId: string,
+    @Body() createMessageDto: CreateMessageDto,
+    @Req() req
+  ) {
+    if (!req.user) {
+      throw new UnauthorizedException('로그인 해주세요');
+    }
+    const loginUser = req.user;
+    return await this.chattingService.addMessageToUserChatRoom(chatRoomId, createMessageDto, loginUser);
   }
 
-  @Post('global-chat-room/:userId/messages')
-  async addMessageToGlobalChatRoom(@Param('userId') id: string, @Body() createMessageDto: CreateMessageDto, @Req() req) {
+  @Post('global-chat-room/:chatRoomId/messages')
+  async addMessageToGlobalChatRoom(@Param('chatRoomId') chatRoomId: string, @Body() createMessageDto: CreateMessageDto, @Req() req) {
     if (!req.user) {
       throw new UnauthorizedException('로그인 해주세요');
     }
 
     const loginUser = req.user;
-    return await this.chattingService.addMessageToGlobalChatRoom(id, createMessageDto, loginUser);
+    return await this.chattingService.addMessageToGlobalChatRoom(chatRoomId, createMessageDto, loginUser);
+  }
+
+  @Get('user/:userId/user-chat-room')
+  async getUserChatRoomInfo(@Param('userId', ParseIntPipe) userId: number) {
+    return this.chattingService.getUserChatRoomInfo(userId);
   }
 
   @Get('global-chat-rooms/:id')
