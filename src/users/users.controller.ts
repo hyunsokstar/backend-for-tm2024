@@ -1,16 +1,26 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, NotFoundException, Post, Put, Query, Req, Res, UnauthorizedException } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, NotFoundException, Param, Post, Put, Query, Req, Res, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dtos/createUser.dto';
 import { DtoForUserList } from './dtos/dtoForUserList.dto';
 import * as bcrypt from 'bcrypt';
 import { UpdateUserDTO } from './dtos/UpdateUserDTO';
 import { UpdateUserImageDto } from './dtos/UpdateUserImageDto';
-import { FollowUserDto } from './dtos/FollowUser.dto';
+import { UpdatePerformanceLevelDto } from './dtos/dtoForUpdatePerformanceLevel';
 
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) { }
+
+  // put , /:userId/performanceLevel
+  @Put('/:userId/performanceLevel')
+  async updatePerformanceLevel(
+    @Param('userId') userId: number,
+    @Body() updatePerformanceLevelDto: UpdatePerformanceLevelDto
+  ) {
+    return this.usersService.updatePerformanceLevel(userId, updatePerformanceLevelDto.performanceLevel);
+  }
+
 
   @Post()
   async SignUp(@Body() user: CreateUserDto) {

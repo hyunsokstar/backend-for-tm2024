@@ -63,6 +63,24 @@ export class UsersModel {
     @Column({ nullable: true })
     profileImage: string; // 이미지 경로를 저장할 칼럼
 
+    // user current task 관련 필드
+
+    @Column({ type: "boolean", default: false })
+    isOnline: boolean;
+
+    @Column({ nullable: true })
+    currentTask: string | null;
+
+    @Column({ type: 'int', default: 0 })
+    currentTaskProgressPercent: number;
+
+    @Column({
+        type: "enum",
+        enum: ["struggling", "offroad", "ninja", "cheetah", "rocket"],
+        default: "ninja"
+    })
+    performanceLevel: string;
+
     @ManyToMany(() => UsersModel, user => user.followers)
     @JoinTable({
         name: 'followers_following', // 중간 테이블의 이름 설정 (원하는 이름으로 변경 가능)

@@ -25,6 +25,54 @@ export class UsersService {
 
     ) { }
 
+    async getAllUsers(pageNum: number, perPage: number = 5): Promise<{ users: DtoForUserList[], totalCount: number, perPage: number }> {
+        const skip = (pageNum - 1) * perPage;
+
+        const [users, totalCount] = await this.usersRepository.findAndCount({
+            skip,
+            take: perPage,
+            order: {
+                id: 'DESC', // id를 기준으로 내림차순 정렬
+            },
+        });
+
+        if (!users || !users.length) {
+            throw new NotFoundException('No users found');
+        }
+
+        const dtoUsers = users.map(user => {
+            const dtoUser: DtoForUserList = {
+                id: user.id,
+                email: user.email,
+                nickname: user.nickname,
+                role: user.role,
+                gender: user.gender,
+                phoneNumber: user.phoneNumber,
+                backEndLevel: user.backEndLevel,
+                frontEndLevel: user.frontEndLevel,
+                profileImage: user.profileImage,
+                isOnline: user.isOnline,
+                currentTask: user.currentTask,
+                currentTaskProgressPercent: user.currentTaskProgressPercent,
+                performanceLevel: user.performanceLevel,
+            };
+            return dtoUser;
+        });
+
+        return { users: dtoUsers, totalCount, perPage };
+    }
+
+
+    async updatePerformanceLevel(userId: number, performanceLevel: string): Promise<UsersModel> {
+        const user = await this.usersRepository.findOne({ where: { id: userId } });
+        if (!user) {
+            throw new NotFoundException(`User with ID ${userId} not found`);
+        }
+
+        user.performanceLevel = performanceLevel;
+        return this.usersRepository.save(user);
+    }
+
     async CreateUser(user: Partial<UsersModel>): Promise<UsersModel> {
         const hashedPassword = await this.hashPassword(user.password); // 비밀번호를 해시화
         const userToCreate = {
@@ -209,41 +257,6 @@ export class UsersService {
             // .select(['user.id', 'user.email', 'user.nickname', 'user.cashPoints', 'followers', 'following', 'myBookMarksForSkilNoteContents'])
             .getOne();
     }
-
-    async getAllUsers(pageNum, perPage: number = 5): Promise<{ users: DtoForUserList[], totalCount: number, perPage: number }> {
-        const skip = (pageNum - 1) * perPage;
-
-        const [users, totalCount] = await this.usersRepository.findAndCount({
-            skip,
-            take: perPage,
-            order: {
-                id: 'DESC', // id를 기준으로 내림차순 정렬
-            },
-        });
-
-        if (!users || !users.length) {
-            throw new NotFoundException('No users found');
-        }
-
-        const dtoUsers = users.map(user => {
-            const dtoUser: DtoForUserList = {
-                id: user.id,
-                email: user.email,
-                nickname: user.nickname,
-                role: user.role,
-                gender: user.gender,
-                phoneNumber: user.phoneNumber,
-                backEndLevel: user.backEndLevel,
-                frontEndLevel: user.frontEndLevel,
-                profileImage: user.profileImage
-            };
-            return dtoUser;
-        });
-
-        return { users: dtoUsers, totalCount, perPage };
-    }
-
-
 
     async deleteUsersForCheckedIds(checkedIds: number[]): Promise<number> {
         try {

@@ -1,5 +1,4 @@
-// createUser.dto.ts
-import { IsEmail, IsEnum, IsNumber, IsPhoneNumber, IsString, Matches, isNumber, isString } from 'class-validator';
+import { IsBoolean, IsEmail, IsEnum, IsNumber, IsOptional, IsPhoneNumber, IsString, Matches, isNumber, isString } from 'class-validator';
 import { GendersEnum, RolesEnum } from "../enums/roles.enum";
 
 export class DtoForUserList {
@@ -30,4 +29,16 @@ export class DtoForUserList {
     @IsString()
     profileImage: string;
 
+    @IsBoolean()
+    isOnline: boolean;
+
+    @IsOptional()
+    @IsString()
+    currentTask: string | null;
+
+    @IsNumber()
+    currentTaskProgressPercent: number;
+
+    @IsEnum(['struggling', 'offroad', 'ninja', 'cheetah', 'rocket'])
+    performanceLevel: string;
 }
