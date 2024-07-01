@@ -5,20 +5,19 @@ import { DtoForUserList } from './dtos/dtoForUserList.dto';
 import * as bcrypt from 'bcrypt';
 import { UpdateUserDTO } from './dtos/UpdateUserDTO';
 import { UpdateUserImageDto } from './dtos/UpdateUserImageDto';
-import { UpdatePerformanceLevelDto } from './dtos/dtoForUpdatePerformanceLevel';
+import { UpdateUserInfoAboutCurrentStatusDto } from './dtos/dtoForUpdatePerformanceLevel';
 
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
-  // put , /:userId/performanceLevel
-  @Put('/:userId/performanceLevel')
-  async updatePerformanceLevel(
+  @Put('/:userId/currentStatus')
+  async updateUserInfoAboutCurrentStatus(
     @Param('userId') userId: number,
-    @Body() updatePerformanceLevelDto: UpdatePerformanceLevelDto
+    @Body() updateDto: UpdateUserInfoAboutCurrentStatusDto
   ) {
-    return this.usersService.updatePerformanceLevel(userId, updatePerformanceLevelDto.performanceLevel);
+    return this.usersService.updateUserInfoAboutCurrentStatus(userId, updateDto);
   }
 
 

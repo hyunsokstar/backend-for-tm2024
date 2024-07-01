@@ -10,10 +10,10 @@ import { UpdateUserDTO } from './dtos/UpdateUserDTO';
 import { FollowUserDto } from './dtos/FollowUser.dto';
 import { PaymentsModelForCashPoints } from './entities/payment.entity';
 import { UserChatRoom } from 'src/chatting/entities/user-chat-room.entity';
+import { UpdateUserInfoAboutCurrentStatusDto } from './dtos/dtoForUpdatePerformanceLevel';
 
 @Injectable()
 export class UsersService {
-
     constructor(
         @InjectRepository(UsersModel)
         private readonly usersRepository: Repository<UsersModel>,
@@ -22,8 +22,34 @@ export class UsersService {
         private readonly paymentsForCashPointsRepo: Repository<PaymentsModelForCashPoints>,
         @InjectRepository(UserChatRoom)
         private readonly userChatRoomRepo: Repository<UserChatRoom>,
-
     ) { }
+
+    async updateUserInfoAboutCurrentStatus(userId: number, updateDto: UpdateUserInfoAboutCurrentStatusDto): Promise<UsersModel> {
+        const user = await this.usersRepository.findOne({ where: { id: userId } });
+        if (!user) {
+            throw new NotFoundException(`User with ID ${userId} not found`);
+        }
+
+        switch (updateDto.targetField) {
+            case 'profileImage':
+                user.profileImage = updateDto.profileImage;
+                break;
+            case 'isOnline':
+                user.isOnline = updateDto.isOnline;
+                break;
+            case 'currentTask':
+                user.currentTask = updateDto.currentTask;
+                break;
+            case 'currentTaskProgressPercent':
+                user.currentTaskProgressPercent = updateDto.currentTaskProgressPercent;
+                break;
+            case 'performanceLevel':
+                user.performanceLevel = updateDto.performanceLevel;
+                break;
+        }
+
+        return this.usersRepository.save(user);
+    }
 
     async getAllUsers(pageNum: number, perPage: number = 5): Promise<{ users: DtoForUserList[], totalCount: number, perPage: number }> {
         const skip = (pageNum - 1) * perPage;
@@ -62,16 +88,6 @@ export class UsersService {
         return { users: dtoUsers, totalCount, perPage };
     }
 
-
-    async updatePerformanceLevel(userId: number, performanceLevel: string): Promise<UsersModel> {
-        const user = await this.usersRepository.findOne({ where: { id: userId } });
-        if (!user) {
-            throw new NotFoundException(`User with ID ${userId} not found`);
-        }
-
-        user.performanceLevel = performanceLevel;
-        return this.usersRepository.save(user);
-    }
 
     async CreateUser(user: Partial<UsersModel>): Promise<UsersModel> {
         const hashedPassword = await this.hashPassword(user.password); // 비밀번호를 해시화

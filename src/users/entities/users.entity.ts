@@ -63,8 +63,6 @@ export class UsersModel {
     @Column({ nullable: true })
     profileImage: string; // 이미지 경로를 저장할 칼럼
 
-    // user current task 관련 필드
-
     @Column({ type: "boolean", default: false })
     isOnline: boolean;
 
