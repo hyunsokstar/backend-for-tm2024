@@ -65,4 +65,7 @@ export class TodosModel {
 
     @OneToMany(() => SupplementaryTodosModel, supplementaryTodo => supplementaryTodo.todo)
     supplementaryTodos: any;
+
+    @Column({ default: 1 })
+    order: number;
 }
